@@ -43,7 +43,7 @@
             {% endif %}
         {% else %}
             {% if user.trusted and revision.disapproved and revision.approved_by_id == user.id %}
-                <button type="button" class="button" hx-post="{% url 'vehicle_revision_action' revision.id 'apply' %}" hx-prompt="Reason for approving">?? Apply changes</button>
+                <button type="button" class="button" hx-post="{% url 'vehicle_revision_action' revision.id 'apply' %}" hx-prompt="Reason for approving">👍 Apply changes</button>
             {% endif %}
         {% endif %}
     </p>
