@@ -46,7 +46,13 @@
 <header class="site-header">
     <div>
         <a href="/" class="site-name">
-            <img src="https://assets.timesbus.org/logo.svg" height="28px" />
+            {% if '/operators/nasa' in request.path %}
+                <img src="https://assets.timesbus.org/timesspace.svg?v" height="28px" alt="NASA Operator Logo" />
+            {% elif current_month_str == "06" %}
+                <img src="https://assets.timesbus.org/gaytimes.svg" height="28px" />
+            {% else %}
+                <img src="https://assets.timesbus.org/logo.svg" height="28px" />
+            {% endif %}
         </a>
 
         <ul>
