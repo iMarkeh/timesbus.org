@@ -60,7 +60,13 @@
 {% endif %}
 
 {% if tracking %}
-    <p><a href="{{ tracking }}" class="button">Track this bus</a></p>
+    <p>
+        {% if 'vehicles/nasa-iss' in tracking %}
+            Track the Space Station
+        {% else %}
+            Track this bus
+        {% endif %}
+    </p>
 {% endif %}
 
 {% load static %}
