@@ -1,0 +1,150 @@
+<!doctype html>
+<html lang="en-GB">
+<head>
+<meta charset="utf-8">
+<title>{% block title %}{% if object %}{% firstof object.get_long_name object.get_qualified_name object %} – {% endif %}timesbus.org{% endblock %}</title>
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="theme-color" content="#afdee9" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#164450" media="(prefers-color-scheme: dark)">
+<meta name="color-scheme" content="dark light">
+<meta name="format-detection" content="telephone=no">
+{% block canonical %}
+    {% if object.get_absolute_url %}
+        <link rel="canonical" href="https://timesbus.org{{ object.get_absolute_url }}">
+    {% endif %}
+{% endblock canonical %}
+<script type="application/ld+json">{"@context":"http://schema.org","@type":"WebSite","url":"https://timesbus.org","name":"timesbus.org","potentialAction":{"@type":"SearchAction","target":"https://timebus.org/search?q={q}","query-input":"required name=q"}}</script>
+{% load static %}
+<!-- <link rel="icon" sizes="48x48" type="image/png" href="/favicon.ico"> -->
+<link rel="icon" sizes="any" type="image/svg+xml" href="https://cdn.discordapp.com/icons/1337054349267959898/2cc91eb4f9442270ff6a36234e44b9d2.webp?size=1024">
+<link rel="manifest" href="/static/manifest.webmanifest">
+<link rel="stylesheet" href="/static/dist/css/style.css">
+
+<meta name="twitter:card" content="summary">
+<meta name="twitter:site" content="@timesbus_org">
+{% block head %}{% endblock %}
+</head>
+<body class="{% block bodyclass %}wide{% endblock %}{% if ad is False %} no-ads{% endif %}">
+<script>
+(function () {
+  var storedMapStyle = null;
+  try {
+    storedMapStyle = localStorage && localStorage["map-style"];
+  } catch (e) {
+    console.warn("localStorage access error:", e);
+  }
+
+  var systemPrefersDark =
+    window.matchMedia &&
+    window.matchMedia("(prefers-color-scheme: dark)").matches;
+
+  var applyDarkMode = false;
+
+  if (storedMapStyle) {
+    // A style is stored in localStorage
+    if (
+      storedMapStyle === "timesbus_dark_matter" ||
+      storedMapStyle === "thunderforest_transport_dark" // Added Thunderforest dark
+    ) {
+      applyDarkMode = true;
+    } else if (
+      storedMapStyle === "maptiler_satellite" &&
+      systemPrefersDark
+    ) {
+      applyDarkMode = true;
+    }
+  } else {
+    // No style stored in localStorage, rely on system preference
+    // If system prefers dark, React component will load an appropriate dark style by default
+    if (systemPrefersDark) {
+      applyDarkMode = true;
+    }
+  }
+
+  if (applyDarkMode) {
+    document.body.classList.add("dark-mode");
+  }
+})();
+</script>
+
+<a href="#content" class="skip">Skip to main content</a>
+{% block header %}
+<header class="site-header">
+    <div>
+        <a href="/" class="site-name">
+    {% comment %}
+        We can get the current month using the 'now' template tag and then
+        applying the 'date' filter with the format code for month.
+    {% endcomment %}
+    {% now "m" as current_month_str %}
+    
+    {% comment %}
+        The 'now "m"' tag returns the month as a string (e.g., "01" for Jan, "06" for Jun).
+        We need to compare it to "06" for June.
+    {% endcomment %}
+    {% if '/operators/nasa' in request.path %}
+        <img src="https://assets.timesbus.org/timesspace.svg?v" height="28px" alt="NASA Operator Logo" />
+    {% elif current_month_str == "06" %}
+        <img src="https://assets.timesbus.org/gaytimes.svg" height="28px" />
+    {% else %}
+        <img src="https://assets.timesbus.org/logo.svg" height="28px" />
+    {% endif %}
+        </a>
+        <ul>
+            <li><a style="color: #ffffff;" href="/map{% if object.latlong %}#16/{{ object.latlong.y|floatformat:4 }}/{{ object.latlong.x|floatformat:4 }}{% endif %}">Map</a></li>
+        </ul>
+        <form method="GET" action="/search" class="search">
+            <label>
+                Search
+                <input style="color: #ffffff;" name="q" placeholder="Search" type="search" value="{{ query }}" required>
+            </label>
+            <input type="submit" style="color: #ffffff;" value="Search">
+        </form>
+    </div>
+</header>
+{% endblock header %}
+<main>
+    {% block breadcrumb %}{% include 'breadcrumb.html' %}{% endblock %}
+    <div id="content">
+        {% block content %}{% endblock %}
+    </div>
+</main>
+
+{% block footer %}
+<footer>
+    {% if user.is_authenticated %}
+        <form action="{% url 'logout' %}" method="POST">
+            <ul class="user">
+                <li><a href="/accounts/users/{{ user.id }}">User: {{ user.id }} | {{ user.username|default:'' }}</a></li>
+        {% if user.trusted %}
+                <li><a href="/vehicles/edits?operator=&vehicle=&user=&status=pending" title="Requires Trusted status to view">Pending Edits</a></li>
+        {% else %}
+                <li><a href="/vehicles/edits?operator=&vehicle=&user={{ user.id }}&status=approved" title="Approved Edits">Your Edits</a></li>
+        {% endif %}
+                <li>
+                    {% csrf_token %}
+                    <button type="submit" class="button" style="color: white;">Log out</button>
+                </li>
+            </ul>
+        </form>
+    {% endif %}
+    <ul>
+	<li><a href="/rules">Rules & FAQ</a></li>
+        <li><a href="https://timesbus.org/discord">Discord</a></li>
+        <li><a href="/contact">Contact</a></li>
+        <!--<li><a href="/data">Data sources</a></li>
+	<li><a href="/privacy">Privacy policy</a></li>-->
+    </ul>
+    <div class="motd" style="margin-bottom: 20px; border-radius: 10px; border: 1px solid #afdee9; padding: 20px; box-sizing: border-box;">
+    	{% include "motd_partial.html" %}
+    </div>
+<script type='text/javascript' src='https://storage.ko-fi.com/cdn/widget/Widget_2.js'></script>
+<script type='text/javascript'>kofiwidget2.init('Support us on Ko-fi', '#164450', 'W7W21AYHUU');kofiwidget2.draw();</script>
+</footer>
+{% endblock footer %}
+
+
+{% block foot %}{% endblock %}
+
+</body>
+</html>
