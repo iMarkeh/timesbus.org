@@ -27,8 +27,9 @@ import type {
   MapStyleImageMissingEvent,
 } from "maplibre-gl";
 
-const THUNDERFOREST_API_KEY = "b39c71a7e47441c8819703265852cca5"; // Replace!
+const THUNDERFOREST_API_KEY = "b39c71a7e47441c8819703265852cca5";
 const MAPTILER_API_KEY = "55Ux4HYOATM9YGB8TSb9";
+
 const imagesByName: { [imageName: string]: string } = {
   "stop-marker": stopMarker,
   "stop-marker-circle": stopMarkerCircle,
@@ -222,47 +223,11 @@ export default function BusTimesMap(
   } else if (mapStyle === "timesbus_dark_matter") {
     mapStyleURL = "https://tiles.timesbus.org/styles/dark-matter/style.json";
   } else if (mapStyle === "maptiler_satellite") {
-    currentStyleRequiresApiKey = true;
-    if (
-      !MAPTILER_API_KEY ||
-      MAPTILER_API_KEY === "YOUR_MAPTILER_API_KEY_HERE"
-    ) {
-      apiKeyMissing = true;
-      console.error(
-        "MapTiler API Key is not configured. Satellite map will not load correctly.",
-      );
-      mapStyleURL = "https://tiles.timesbus.org/styles/positron/style.json"; // Fallback
-    } else {
-      mapStyleURL = `https://api.maptiler.com/maps/satellite/style.json?key=${MAPTILER_API_KEY}`;
-    }
+      mapStyleURL = "https://api.maptiler.com/maps/satellite/style.json?key=${MAPTILER_API_KEY}"; // Fallback 
   } else if (mapStyle === "thunderforest_transport") {
-    currentStyleRequiresApiKey = true;
-    if (
-      !THUNDERFOREST_API_KEY ||
-      THUNDERFOREST_API_KEY === "YOUR_THUNDERFOREST_API_KEY_HERE"
-    ) {
-      apiKeyMissing = true;
-      console.error(
-        "Thunderforest API Key is not configured. Transport map will not load correctly.",
-      );
-      mapStyleURL = "https://tiles.timesbus.org/styles/positron/style.json"; // Fallback
-    } else {
       mapStyleURL = `https://api.thunderforest.com/styles/transport.json?apikey=${THUNDERFOREST_API_KEY}`;
-    }
   } else if (mapStyle === "thunderforest_transport_dark") {
-    currentStyleRequiresApiKey = true;
-    if (
-      !THUNDERFOREST_API_KEY ||
-      THUNDERFOREST_API_KEY === "YOUR_THUNDERFOREST_API_KEY_HERE"
-    ) {
-      apiKeyMissing = true;
-      console.error(
-        "Thunderforest API Key is not configured. Transport Dark map will not load correctly.",
-      );
-      mapStyleURL = "https://tiles.timesbus.org/styles/dark-matter/style.json"; // Fallback to a dark style
-    } else {
       mapStyleURL = `https://api.thunderforest.com/styles/transport-dark.json?apikey=${THUNDERFOREST_API_KEY}`;
-    }
   } else {
     console.warn(
       `Unknown map style: ${mapStyle}. Falling back to timesbus_positron.`,
