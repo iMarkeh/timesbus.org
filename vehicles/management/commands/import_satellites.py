@@ -7,10 +7,9 @@ from ...models import VehicleLocation, VehicleJourney, Vehicle
 from busstops.models import Operator
 from ..import_live_vehicles import ImportLiveVehiclesCommand
 
-# Corrected SGP4 imports
-from sgp4.api import WGS72 # This seems to remain consistent
+# Final attempt at SGP4 imports that should work with most recent versions
+from sgp4.api import WGS72, jday # Re-including jday, as it's the more stable function for time conversion
 from sgp4.model import Satellite # Import the Satellite class directly
-from sgp4.functions import jday_datetime # This is the key function for converting datetime to Julian date
 
 import math # Make sure this is also imported if not already, for latitude/longitude conversion
 
@@ -91,7 +90,15 @@ class Command(ImportLiveVehiclesCommand):
                     continue
 
         current_time_utc = datetime.datetime.now(datetime.timezone.utc)
-        jd, fr = jday_datetime(current_time_utc) # Julian Date and fraction for SGP4
+        # Use jday directly, passing year, month, day, hour, minute, second
+        jd, fr = jday(
+            current_time_utc.year,
+            current_time_utc.month,
+            current_time_utc.day,
+            current_time_utc.hour,
+            current_time_utc.minute,
+            current_time_utc.second + current_time_utc.microsecond / 1_000_000
+        )
 
         located_items = []
         for record in tle_records:
