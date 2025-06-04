@@ -9,7 +9,7 @@ from ..import_live_vehicles import ImportLiveVehiclesCommand
 
 # Definitive SGP4 imports for sgp4 version 2.24
 from sgp4.api import WGS72, jday # jday and WGS72 are stable here
-from sgp4.conveniences import twoline2rv # THIS IS THE NEW ATTEMPT for twoline2rv
+import sgp4 # Import the entire sgp4 package
 
 import math # Make sure this is also imported if not already, for latitude/longitude conversion
 
@@ -79,7 +79,7 @@ class Command(ImportLiveVehiclesCommand):
 
                 try:
                     # Create a Satellite object from the TLE lines
-                    satellite = twoline2rv(line1, line2)
+                    satellite = sgp4.twoline2rv(line1, line2)
                     tle_records.append({
                         "name": name,
                         "norad_id": satellite.satnum, # NORAD ID is part of the satrec object
