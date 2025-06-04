@@ -70,7 +70,7 @@ class Command(ImportLiveVehiclesCommand):
         Fetches TLE data from Celestrak, parses it using Skyfield,
         and calculates the current position for each satellite.
         """
-        if Command.ts is None: # Use `is None` for clarity
+        if Command.ts is None:
             self.stderr.write("Skyfield timescale not loaded. Aborting get_items.")
             return []
 
@@ -83,16 +83,21 @@ class Command(ImportLiveVehiclesCommand):
             return []
 
         lines = tle_data.strip().split('\n')
-        # Filter out empty lines if any
         clean_lines = [line for line in lines if line.strip()]
 
         try:
-            # --- FIX HERE: Use load.restore() for TLE strings ---
-            # load.restore() can take a list of TLE lines
-            # It expects the TLE lines in groups of 3 (name, line1, line2).
-            # The Celestrak output is already in this format.
-            satellites = load.restore(clean_lines)
-            # ----------------------------------------------------
+            # --- FIX HERE: Use EarthSatellite.from_input_lines() ---
+            # This method takes a list of TLE lines (including names) and returns
+            # a list of EarthSatellite objects.
+            # We'll then convert this list into a dictionary by NORAD ID for easier lookup
+            # consistent with the previous structure.
+            earth_satellites_list = EarthSatellite.from_input_lines(clean_lines, Command.ts)
+            
+            satellites = {
+                satellite.model.satnum: satellite
+                for satellite in earth_satellites_list
+            }
+            # --------------------------------------------------------
         except Exception as e:
             self.stderr.write(f"Error parsing TLE data with Skyfield: {e}")
             self.stderr.write("Raw TLE data (first 6 lines):")
