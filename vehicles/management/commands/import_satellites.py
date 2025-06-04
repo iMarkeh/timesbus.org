@@ -5,9 +5,12 @@ from ...models import VehicleLocation, VehicleJourney, Vehicle
 from busstops.models import Operator
 from ..import_live_vehicles import ImportLiveVehiclesCommand
 
-# Import necessary SGP4 components
-from sgp4.api import WGS72, jday, satrec
-from sgp4.functions import days2mdhms, invjday, jday_datetime
+# Corrected SGP4 imports
+from sgp4.api import WGS72 # WGS72 remains in sgp4.api
+from sgp4.functions import jday, days2mdhms, invjday, jday_datetime # jday, days2mdhms, invjday, jday_datetime are in sgp4.functions
+from sgp4.model import Satellite as satrec # satrec is now in sgp4.model, and it's recommended to import Satellite and alias it
+
+import math # Make sure this is also imported if not already, for latitude/longitude conversion
 
 class Command(ImportLiveVehiclesCommand):
     source_name = "Celestrak" # More accurate name now
