@@ -40,7 +40,7 @@ class Command(ImportLiveVehiclesCommand):
 
     def get_items(self):
         try:
-            response = requests.get("http://api.open-notify.org/iss-now.json")
+            response = requests.get("https://iss.apilogic.uk/tracking/position.asmx")
             response.raise_for_status()
             data = response.json()
         except requests.exceptions.RequestException as e:
@@ -50,10 +50,10 @@ class Command(ImportLiveVehiclesCommand):
         iss_item = {
             "fn": "ISS",
             "timestamp": data["timestamp"],
-            "lat": data["iss_position"]["latitude"],
-            "lon": data["iss_position"]["longitude"],
-            "line": "ISS Orbital Path",
-            "direction": "ORBITAL",
+            "lat": data["latitude"],
+            "lon": data["longitude"],
+            "line": "Orbital Path",
+            "direction": "Planetary",
             "bearing": 0,
         }
         return [iss_item]
