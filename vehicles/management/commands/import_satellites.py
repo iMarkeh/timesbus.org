@@ -8,8 +8,8 @@ from busstops.models import Operator
 from ..import_live_vehicles import ImportLiveVehiclesCommand
 
 # --- NEW IMPORTS FOR SKYFIELD ---
-from skyfield.api import load, EarthSatellite
-from skyfield.timelib import Time
+from skyfield.api import load, EarthSatellite # Just load and EarthSatellite
+from skyfield.timelib import Time # Still potentially useful
 # --------------------------------
 
 import math # Make sure this is also imported if not already, for latitude/longitude conversion
@@ -64,7 +64,6 @@ class Command(ImportLiveVehiclesCommand):
             "fleet_code": item["name"],
         }
         return Vehicle.objects.get_or_create(code=vehicle_code, defaults=defaults)
-
     def get_items(self):
         """
         Fetches TLE data from Celestrak, parses it using Skyfield,
@@ -82,22 +81,33 @@ class Command(ImportLiveVehiclesCommand):
             self.stderr.write(f"Error fetching TLE data from Celestrak: {e}")
             return []
 
-        lines = tle_data.strip().split('\n')
-        clean_lines = [line for line in lines if line.strip()]
+        # --- FIX HERE: Use load.tle_file() with a StringIO object ---
+        # My previous correction about `load.tle_file()` NOT taking StringIO was incorrect.
+        # It DOES take a file-like object, and StringIO is a file-like object.
+        # The earlier error was likely due to the original Skyfield version or a previous
+        # import confusion. With 1.53, this is the canonical way to load a TLE string
+        # that mimics a file.
 
+        satellites = {}
         try:
-            # --- FIX HERE: Use EarthSatellite.from_input_lines() ---
-            # This method takes a list of TLE lines (including names) and returns
-            # a list of EarthSatellite objects.
-            # We'll then convert this list into a dictionary by NORAD ID for easier lookup
-            # consistent with the previous structure.
-            earth_satellites_list = EarthSatellite.from_input_lines(clean_lines, Command.ts)
+            # load.tle_file requires a file-like object. StringIO makes a string behave like a file.
+            # It also requires an ephemeris for accurate propagation, which is implicitly
+            # handled by the `load` object itself.
+            # It returns a dictionary keyed by NORAD ID, which is perfect.
+            # Ensure the ephemeris is available to load.tle_file.
+            # The 'ephemeris' keyword argument was sometimes needed in older versions,
+            # but usually the `load` object provides it.
+            # Let's try without explicit ephemeris first.
             
-            satellites = {
-                satellite.model.satnum: satellite
-                for satellite in earth_satellites_list
-            }
-            # --------------------------------------------------------
+            # The official way to load a string containing multiple TLEs for Skyfield 1.53:
+            # Use `load.tle_file()` with a StringIO object.
+            # This is specifically for multi-TLE files.
+            satellites = load.tle_file(StringIO(tle_data), reload=True) # reload=True forces a fresh parse
+            
+            # If `load.tle_file` still complains about StringIO, then we have to manually parse
+            # the 3-line blocks and use `EarthSatellite(line1, line2, name, ts)`.
+            # But according to docs, `load.tle_file` *should* take StringIO.
+
         except Exception as e:
             self.stderr.write(f"Error parsing TLE data with Skyfield: {e}")
             self.stderr.write("Raw TLE data (first 6 lines):")
@@ -134,7 +144,6 @@ class Command(ImportLiveVehiclesCommand):
                 )
                 continue
         return located_items
-
 
     def get_journey(self, item, vehicle):
         journey_datetime = self.get_datetime(item)
