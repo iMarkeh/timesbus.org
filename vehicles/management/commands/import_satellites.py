@@ -1,6 +1,8 @@
 import datetime
 import requests
 import math
+from io import StringIO # <-- ADD THIS IMPORT
+
 
 from django.contrib.gis.geos import Point
 from ...models import VehicleLocation, VehicleJourney, Vehicle
