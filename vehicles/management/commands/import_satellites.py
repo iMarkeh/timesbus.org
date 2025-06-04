@@ -7,9 +7,9 @@ from ...models import VehicleLocation, VehicleJourney, Vehicle
 from busstops.models import Operator
 from ..import_live_vehicles import ImportLiveVehiclesCommand
 
-# Attempt 1: Revert jday and twoline2rv to sgp4.functions
-from sgp4.api import WGS72 # WGS72 is often stable in sgp4.api
-from sgp4.functions import jday, twoline2rv # Try importing these from sgp4.functions
+# Definitive SGP4 imports for sgp4 version 2.24
+from sgp4.api import WGS72, jday # jday and WGS72 are stable here
+from sgp4 import exporter # This is the key change for twoline2rv
 
 import math # Make sure this is also imported if not already, for latitude/longitude conversion
 
@@ -79,7 +79,7 @@ class Command(ImportLiveVehiclesCommand):
 
                 try:
                     # Create a Satellite object from the TLE lines
-                    satellite = twoline2rv(line1, line2)
+                    satellite = exporter.twoline2rv(line1, line2)
                     tle_records.append({
                         "name": name,
                         "norad_id": satellite.satnum, # NORAD ID is part of the satrec object
