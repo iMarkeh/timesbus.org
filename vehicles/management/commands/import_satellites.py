@@ -8,8 +8,7 @@ from busstops.models import Operator
 from ..import_live_vehicles import ImportLiveVehiclesCommand
 
 # Final attempt at SGP4 imports that should work with most recent versions
-from sgp4.api import WGS72, jday # Re-including jday, as it's the more stable function for time conversion
-from sgp4.model import Satellite # Import the Satellite class directly
+from sgp4.api import WGS72, jday, twoline2rv # Import twoline2rv directly from sgp4.api
 
 import math # Make sure this is also imported if not already, for latitude/longitude conversion
 
@@ -79,7 +78,7 @@ class Command(ImportLiveVehiclesCommand):
 
                 try:
                     # Create a Satellite object from the TLE lines
-                    satellite = Satellite.twoline2rv(line1, line2)
+                    satellite = twoline2rv(line1, line2)
                     tle_records.append({
                         "name": name,
                         "norad_id": satellite.satnum, # NORAD ID is part of the satrec object
