@@ -19,6 +19,7 @@ class Command(ImportLiveVehiclesCommand):
     nasa_operator = None
     # Changed the URL for Celestrak TLEs
     TLE_URL = "https://celestrak.org/NORAD/elements/gp.php?GROUP=stations&FORMAT=tle"
+    ts = None # Initialize to None when the class is defined
 
     def do_source(self):
         self.nasa_operator, created = Operator.objects.get_or_create(
@@ -33,18 +34,18 @@ class Command(ImportLiveVehiclesCommand):
         else:
             self.stdout.write("Found Operator: NASA")
 
-        # Initialize Skyfield timescale
-        if not Command.ts: # Check if already loaded
+        # Initialize Skyfield timescale ONLY if it hasn't been loaded yet
+        if Command.ts is None: # Use `is None` for clarity with None checks
             self.stdout.write("Loading Skyfield timescale data...")
             try:
-                # Skyfield needs a timescale object, which loads data files
-                # This can take a moment the first time it runs
                 Command.ts = load.timescale()
                 self.stdout.write("Skyfield timescale loaded.")
             except Exception as e:
                 self.stderr.write(f"Error loading Skyfield timescale: {e}")
-                return [] # Abort if timescale cannot be loaded
-
+                # You might want to raise an exception or handle this more robustly
+                # if timescale is critical, for now, returning empty list in get_items
+                # is the fallback.
+                return super().do_source() # Continue the super() call to allow cleanup/other tasks
         return super().do_source()
 
     @staticmethod
