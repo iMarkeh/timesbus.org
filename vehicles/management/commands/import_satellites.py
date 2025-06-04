@@ -1,14 +1,15 @@
 import datetime
 import requests
-import math # Make sure this is imported if not already, for latitude/longitude conversion
+import math
 
 from django.contrib.gis.geos import Point
 from ...models import VehicleLocation, VehicleJourney, Vehicle
 from busstops.models import Operator
 from ..import_live_vehicles import ImportLiveVehiclesCommand
 
-# Final attempt at SGP4 imports that should work with most recent versions
-from sgp4.api import WGS72, jday, twoline2rv # Import twoline2rv directly from sgp4.api
+# Attempt 1: Revert jday and twoline2rv to sgp4.functions
+from sgp4.api import WGS72 # WGS72 is often stable in sgp4.api
+from sgp4.functions import jday, twoline2rv # Try importing these from sgp4.functions
 
 import math # Make sure this is also imported if not already, for latitude/longitude conversion
 
