@@ -7,9 +7,10 @@ from ...models import VehicleLocation, VehicleJourney, Vehicle
 from busstops.models import Operator
 from ..import_live_vehicles import ImportLiveVehiclesCommand
 
-# Definitive SGP4 imports for sgp4 version 2.24
-from sgp4.api import WGS72, jday # jday and WGS72 are stable here
-import sgp4 # Import the entire sgp4 package
+# --- NEW IMPORTS FOR SKYFIELD ---
+from skyfield.api import load, EarthSatellite
+from skyfield.timelib import Time
+# --------------------------------
 
 import math # Make sure this is also imported if not already, for latitude/longitude conversion
 
@@ -20,7 +21,6 @@ class Command(ImportLiveVehiclesCommand):
     TLE_URL = "https://celestrak.org/NORAD/elements/gp.php?GROUP=stations&FORMAT=tle"
 
     def do_source(self):
-        # Operator handling remains the same
         self.nasa_operator, created = Operator.objects.get_or_create(
             name="NASA",
             defaults={
@@ -33,6 +33,18 @@ class Command(ImportLiveVehiclesCommand):
         else:
             self.stdout.write("Found Operator: NASA")
 
+        # Initialize Skyfield timescale
+        if not Command.ts: # Check if already loaded
+            self.stdout.write("Loading Skyfield timescale data...")
+            try:
+                # Skyfield needs a timescale object, which loads data files
+                # This can take a moment the first time it runs
+                Command.ts = load.timescale()
+                self.stdout.write("Skyfield timescale loaded.")
+            except Exception as e:
+                self.stderr.write(f"Error loading Skyfield timescale: {e}")
+                return [] # Abort if timescale cannot be loaded
+
         return super().do_source()
 
     @staticmethod
@@ -44,20 +56,23 @@ class Command(ImportLiveVehiclesCommand):
 
     def get_vehicle(self, item) -> tuple[Vehicle, bool]:
         # `item` will now contain 'name' and 'norad_id'
-        # Use a unique identifier for the vehicle code, NORAD ID is perfect.
         vehicle_code = item["norad_id"]
         defaults = {
             "operator": self.nasa_operator,
             "source": self.source,
-            "fleet_code": item["name"], # Use satellite name for fleet_code
+            "fleet_code": item["name"],
         }
         return Vehicle.objects.get_or_create(code=vehicle_code, defaults=defaults)
 
     def get_items(self):
         """
-        Fetches TLE data from Celestrak, parses it, and calculates the current
-        position for each satellite.
+        Fetches TLE data from Celestrak, parses it using Skyfield,
+        and calculates the current position for each satellite.
         """
+        if not Command.ts:
+            self.stderr.write("Skyfield timescale not loaded. Aborting get_items.")
+            return []
+
         try:
             response = requests.get(self.TLE_URL)
             response.raise_for_status()
@@ -66,96 +81,58 @@ class Command(ImportLiveVehiclesCommand):
             self.stderr.write(f"Error fetching TLE data from Celestrak: {e}")
             return []
 
-        # Parse the TLE data
         lines = tle_data.strip().split('\n')
-        # TLEs come in blocks of 3 lines: Name, Line1, Line2
-        # So we process them 3 lines at a time
-        tle_records = []
-        for i in range(0, len(lines), 3):
-            if i + 2 < len(lines):
-                name = lines[i].strip()
-                line1 = lines[i+1].strip()
-                line2 = lines[i+2].strip()
+        # Skyfield's load.tle_file takes a file-like object or a string with multiple TLEs
+        # We'll put it into a stringIO object for convenience.
+        from io import StringIO
+        tle_io = StringIO(tle_data)
 
-                try:
-                    # Create a Satellite object from the TLE lines
-                    satellite = sgp4.twoline2rv(line1, line2)
-                    tle_records.append({
-                        "name": name,
-                        "norad_id": satellite.satnum, # NORAD ID is part of the satrec object
-                        "satellite": satellite
-                    })
-                except ValueError as e:
-                    self.stderr.write(f"Error parsing TLE for {name}: {e}")
-                    continue
+        try:
+            # Load all satellites from the TLE data using Skyfield
+            satellites = load.tle_file(tle_io)
+            # satellites will be a dictionary where keys are NORAD IDs
+        except Exception as e:
+            self.stderr.write(f"Error parsing TLE data with Skyfield: {e}")
+            return []
 
-        current_time_utc = datetime.datetime.now(datetime.timezone.utc)
-        # Use jday directly, passing year, month, day, hour, minute, second
-        jd, fr = jday(
-            current_time_utc.year,
-            current_time_utc.month,
-            current_time_utc.day,
-            current_time_utc.hour,
-            current_time_utc.minute,
-            current_time_utc.second + current_time_utc.microsecond / 1_000_000
-        )
+        # Get the current time in Skyfield's timescale
+        t = Command.ts.now()
 
         located_items = []
-        for record in tle_records:
+        for norad_id, satellite in satellites.items():
             try:
-                # Propagate the satellite to the current time
-                e_val, r_val, v_val = record["satellite"].sgp4(jd, fr)
+                # Get the geographic position (lat, lon, elevation)
+                geocentric = satellite.at(t)
+                lat, lon = geocentric.latitude.degrees, geocentric.longitude.degrees
+                alt_km = geocentric.elevation.km
 
-                # r_val contains x, y, z ECI coordinates in kilometers
-                # Convert ECI to ECEF (latitude, longitude, altitude)
-                # The WGS72 model gives geocentric latitude, SGP4 typically works with this.
-                # If you need geodetic latitude, you'd need a more complex conversion.
-                # For basic tracking and plotting, WGS72 lat/lon is often sufficient.
-                lat_rad = WGS72.atime.radians(r_val[0], r_val[1], r_val[2], jd, fr)[0]
-                lon_rad = WGS72.atime.radians(r_val[0], r_val[1], r_val[2], jd, fr)[1]
-                alt_km = WGS72.atime.radians(r_val[0], r_val[1], r_val[2], jd, fr)[2] / 1000 # convert m to km for consistency
-
-                # Convert radians to degrees
-                lat_deg = lat_rad * (180.0 / math.pi)
-                lon_deg = lon_rad * (180.0 / math.pi)
-
-                # SGP4 often returns longitude in the range [-180, 180] or [0, 360].
-                # Ensure it's within standard mapping ranges, though Django's Point handles it.
-
-                # Calculate bearing (optional but good for visuals)
-                # This is a simplification; a true bearing calculation requires
-                # knowing the previous position or using orbital mechanics formulas.
-                # For a rough estimate, you could calculate based on velocity vector or
-                # simply set to 0 if not critical for your use case.
-                # For now, let's keep it simple.
-                bearing = 0 # Placeholder: More complex to calculate with SGP4 directly without a second point.
+                # Skyfield's methods for velocity can be used to calculate bearing.
+                # For simplicity, let's keep bearing 0 for now unless crucial.
+                bearing = 0 # Placeholder: Skyfield can compute this more accurately
 
                 located_items.append({
-                    "name": record["name"],
-                    "norad_id": record["norad_id"],
-                    "timestamp": current_time_utc, # Use the actual time of propagation
-                    "lat": lat_deg,
-                    "lon": lon_deg,
+                    "name": satellite.name.strip(), # Skyfield's satellite object has a name
+                    "norad_id": str(norad_id), # Ensure NORAD ID is a string for your model
+                    "timestamp": datetime.datetime.now(datetime.timezone.utc), # Use actual capture time
+                    "lat": lat,
+                    "lon": lon,
                     "altitude_km": alt_km,
-                    "line": f"{record['name']} Orbital Path", # Dynamic line name
+                    "line": f"{satellite.name.strip()} Orbital Path",
                     "direction": "ORBITAL",
-                    "bearing": bearing, # Can be refined later
+                    "bearing": bearing,
                 })
 
             except Exception as e:
                 self.stderr.write(
-                    f"Error calculating position for {record['name']} (NORAD ID: {record['norad_id']}): {e}"
+                    f"Error calculating position for {satellite.name} (NORAD ID: {norad_id}): {e}"
                 )
                 continue
         return located_items
 
 
     def get_journey(self, item, vehicle):
-        # The journey logic for 6-hour blocks is good.
-        # We need to adapt it to use the satellite's NORAD ID and Name.
-        journey_datetime = self.get_datetime(item) # This will be the current_time_utc from get_items
+        journey_datetime = self.get_datetime(item)
 
-        # Calculate the start of the current 6-hour block
         total_seconds_since_epoch = int(journey_datetime.timestamp())
         interval_seconds = 6 * 3600
         block_start_timestamp = (
@@ -165,7 +142,6 @@ class Command(ImportLiveVehiclesCommand):
             block_start_timestamp, datetime.timezone.utc
         )
 
-        # Use NORAD ID as part of the unique identifier for the journey
         route_name = item.get("line", f"{item['name']} Orbit")
         journey_code_prefix = f"SAT-{item['norad_id']}"
         journey_code = f"{journey_code_prefix}-{block_start_datetime.strftime('%Y%m%d%H%M%S')}"
@@ -173,9 +149,9 @@ class Command(ImportLiveVehiclesCommand):
         try:
             journey = VehicleJourney.objects.get(
                 vehicle=vehicle,
-                datetime=block_start_datetime, # Block start time
+                datetime=block_start_datetime,
                 route_name=route_name,
-                code=journey_code # Use the unique code for lookup
+                code=journey_code
             )
             self.stdout.write(
                 f"Reusing existing journey for {item['name']} (NORAD ID: {item['norad_id']}) "
@@ -187,8 +163,8 @@ class Command(ImportLiveVehiclesCommand):
                 vehicle=vehicle,
                 route_name=route_name,
                 direction=item.get("direction", "Planetary"),
-                datetime=block_start_datetime, # Use the block start time
-                code=journey_code, # Set the unique code
+                datetime=block_start_datetime,
+                code=journey_code,
             )
             self.stdout.write(
                 f"Creating new journey for {item['name']} (NORAD ID: {item['norad_id']}) "
@@ -197,10 +173,8 @@ class Command(ImportLiveVehiclesCommand):
             return journey
 
     def create_vehicle_location(self, item):
-        # Create VehicleLocation using lat/lon from the item
         return VehicleLocation(
             latlong=Point(float(item["lon"]), float(item["lat"])),
-            heading=item["bearing"], # This will be 0 for now, but can be improved
-            # You might want to store altitude if your model supports it
-            # altitude=item.get("altitude_km"),
+            heading=item["bearing"],
+            # altitude=item.get("altitude_km"), # Uncomment if your model has altitude field
         )
