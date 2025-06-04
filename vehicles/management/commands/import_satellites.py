@@ -159,7 +159,7 @@ class Command(ImportLiveVehiclesCommand):
                 located_items.append({
                     "name": satellite.name.strip(), # Get satellite name and clean whitespace
                     "norad_id": str(norad_id),     # Convert NORAD ID to string
-                    "timestamp": datetime.datetime.now(datetime.timezone.utc), # Use actual capture time UTC
+                    "timestamp": current_datetime_utc.isoformat(), # Use actual capture time UTC
                     "lat": lat,
                     "lon": lon,
                     "altitude_km": alt_km,         # Include altitude if your VehicleLocation model supports it
