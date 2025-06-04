@@ -1,8 +1,7 @@
 import datetime
 import requests
 import math
-from io import StringIO # This import is still here, but not directly used for TLE loading now.
-                        # It's good practice to keep if you might interact with string as file in other ways.
+from io import StringIO
 
 from django.contrib.gis.geos import Point
 from ...models import VehicleLocation, VehicleJourney, Vehicle
@@ -10,8 +9,8 @@ from busstops.models import Operator
 from ..import_live_vehicles import ImportLiveVehiclesCommand
 
 # --- NEW IMPORTS FOR SKYFIELD ---
-from skyfield.api import load, EarthSatellite # Just load and EarthSatellite
-from skyfield.timelib import Time # Still potentially useful if you need explicit time objects
+from skyfield.api import load, EarthSatellite
+from skyfield.timelib import Time
 # --------------------------------
 
 class Command(ImportLiveVehiclesCommand):
@@ -142,10 +141,15 @@ class Command(ImportLiveVehiclesCommand):
             try:
                 # Propagate the satellite to the current time 't'
                 geocentric = satellite.at(t)
-                # Extract latitude and longitude in degrees
-                lat, lon = geocentric.latitude.degrees, geocentric.longitude.degrees
-                # Extract altitude in kilometers
-                alt_km = geocentric.elevation.km
+                
+                # Convert the Geocentric (Earth-centered Cartesian) coordinates
+                # to Geographic (latitude, longitude, elevation) coordinates.
+                geographic = geocentric.subpoint()
+
+                # Extract latitude and longitude in degrees from the geographic object
+                lat, lon = geographic.latitude.degrees, geographic.longitude.degrees
+                # Extract altitude in kilometers from the geographic object
+                alt_km = geographic.elevation.km
 
                 # Bearing calculation is complex with just position, typically requires
                 # velocity vector or a second point. Setting to 0 for simplicity.
@@ -229,7 +233,7 @@ class Command(ImportLiveVehiclesCommand):
         Creates a VehicleLocation object from the item data.
         """
         # Create a Django Point object from longitude and latitude
-        latlong_point = Point(float(item["lon"]), float(item["lat"]))
+        latlong_point = Point(float(item["lon"]), float(item["lat"])),
         
         vehicle_location = VehicleLocation(
             latlong=latlong_point,
