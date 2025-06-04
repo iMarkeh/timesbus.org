@@ -79,7 +79,7 @@ class Command(ImportLiveVehiclesCommand):
 
                 try:
                     # Create a Satellite object from the TLE lines
-                    satellite = satrec.twoline2rv(line1, line2)
+                    satellite = Satellite.twoline2rv(line1, line2)
                     tle_records.append({
                         "name": name,
                         "norad_id": satellite.satnum, # NORAD ID is part of the satrec object
