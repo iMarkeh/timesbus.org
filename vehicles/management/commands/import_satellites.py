@@ -1,14 +1,16 @@
 import datetime
 import requests
+import math # Make sure this is imported if not already, for latitude/longitude conversion
+
 from django.contrib.gis.geos import Point
 from ...models import VehicleLocation, VehicleJourney, Vehicle
 from busstops.models import Operator
 from ..import_live_vehicles import ImportLiveVehiclesCommand
 
 # Corrected SGP4 imports
-from sgp4.api import WGS72 # WGS72 remains in sgp4.api
-from sgp4.functions import jday, days2mdhms, invjday, jday_datetime # jday, days2mdhms, invjday, jday_datetime are in sgp4.functions
-from sgp4.model import Satellite as satrec # satrec is now in sgp4.model, and it's recommended to import Satellite and alias it
+from sgp4.api import WGS72 # This seems to remain consistent
+from sgp4.model import Satellite # Import the Satellite class directly
+from sgp4.functions import jday_datetime # This is the key function for converting datetime to Julian date
 
 import math # Make sure this is also imported if not already, for latitude/longitude conversion
 
