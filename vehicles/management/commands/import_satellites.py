@@ -134,6 +134,7 @@ class Command(ImportLiveVehiclesCommand):
 
         # Get the current time in Skyfield's internal timescale for propagation
         t = Command.ts.now()
+        # please?
         current_datetime_utc = datetime.datetime.now(datetime.timezone.utc)
         located_items = []
         # Iterate through the parsed satellite objects to get their current positions
