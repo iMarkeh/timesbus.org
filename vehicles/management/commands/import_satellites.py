@@ -70,7 +70,7 @@ class Command(ImportLiveVehiclesCommand):
         Fetches TLE data from Celestrak, parses it using Skyfield,
         and calculates the current position for each satellite.
         """
-        if not Command.ts:
+        if Command.ts is None: # Use `is None` for clarity
             self.stderr.write("Skyfield timescale not loaded. Aborting get_items.")
             return []
 
@@ -83,38 +83,38 @@ class Command(ImportLiveVehiclesCommand):
             return []
 
         lines = tle_data.strip().split('\n')
-        # Skyfield's load.tle_file takes a file-like object or a string with multiple TLEs
-        # We'll put it into a stringIO object for convenience.
-        from io import StringIO
-        tle_io = StringIO(tle_data)
+        # Filter out empty lines if any
+        clean_lines = [line for line in lines if line.strip()]
 
         try:
-            # Load all satellites from the TLE data using Skyfield
-            satellites = load.tle_file(tle_io)
-            # satellites will be a dictionary where keys are NORAD IDs
+            # --- FIX HERE: Use load.restore() for TLE strings ---
+            # load.restore() can take a list of TLE lines
+            # It expects the TLE lines in groups of 3 (name, line1, line2).
+            # The Celestrak output is already in this format.
+            satellites = load.restore(clean_lines)
+            # ----------------------------------------------------
         except Exception as e:
             self.stderr.write(f"Error parsing TLE data with Skyfield: {e}")
+            self.stderr.write("Raw TLE data (first 6 lines):")
+            for i, line in enumerate(clean_lines[:6]):
+                self.stderr.write(f"  {line}")
             return []
 
-        # Get the current time in Skyfield's timescale
         t = Command.ts.now()
 
         located_items = []
         for norad_id, satellite in satellites.items():
             try:
-                # Get the geographic position (lat, lon, elevation)
                 geocentric = satellite.at(t)
                 lat, lon = geocentric.latitude.degrees, geocentric.longitude.degrees
                 alt_km = geocentric.elevation.km
 
-                # Skyfield's methods for velocity can be used to calculate bearing.
-                # For simplicity, let's keep bearing 0 for now unless crucial.
-                bearing = 0 # Placeholder: Skyfield can compute this more accurately
+                bearing = 0
 
                 located_items.append({
-                    "name": satellite.name.strip(), # Skyfield's satellite object has a name
-                    "norad_id": str(norad_id), # Ensure NORAD ID is a string for your model
-                    "timestamp": datetime.datetime.now(datetime.timezone.utc), # Use actual capture time
+                    "name": satellite.name.strip(),
+                    "norad_id": str(norad_id),
+                    "timestamp": datetime.datetime.now(datetime.timezone.utc),
                     "lat": lat,
                     "lon": lon,
                     "altitude_km": alt_km,
