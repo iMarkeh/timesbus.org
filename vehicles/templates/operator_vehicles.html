@@ -57,7 +57,7 @@ ticket machines, a byproduct of the live bus tracking and some entries requested
     {% endif %}
         {% if request.user.is_superuser %}
             <li><a href="/vehicles/edits?operator={{ object.noc }}&status=pending">Pending vehicle edits</a></li>
-            <li><a href="{% url 'admin:vehicles_vehicle_changelist' %}?operator={{ object.noc }}">?</a></li>
+            <li><a href="{% url 'admin:vehicles_vehicle_changelist' %}?operator={{ object.noc }}">✏️</a></li>
         {% endif %}
     </ul>
 {% endif %}
