@@ -233,7 +233,9 @@ class Command(ImportLiveVehiclesCommand):
         Creates a VehicleLocation object from the item data.
         """
         # Create a Django Point object from longitude and latitude
-        latlong_point = Point(float(item["lon"]), float(item["lat"])),
+        # --- FIX HERE: REMOVE THE TRAILING COMMA ---
+        latlong_point = Point(float(item["lon"]), float(item["lat"]))
+        # -------------------------------------------
         
         vehicle_location = VehicleLocation(
             latlong=latlong_point,
