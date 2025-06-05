@@ -41,7 +41,7 @@ class Command(ImportLiveVehiclesCommand):
 
     def get_items(self):
         try:
-            response = requests.get("https://tb.apilogic.uk/tracking/iss/position.asmx")
+            response = requests.get("https://tb.apilogic.uk/tracking/iss/position.asmx?api_key=timesbus-vm")
             response.raise_for_status()
             data = response.json()
         except requests.exceptions.RequestException as e:
