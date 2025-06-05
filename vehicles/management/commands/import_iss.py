@@ -2,17 +2,18 @@ import datetime
 import requests
 from django.contrib.gis.geos import Point
 from ...models import VehicleLocation, VehicleJourney, Vehicle
-from busstops.models import Operator
+from busstops.models import Operator, DataSource
 from ..import_live_vehicles import ImportLiveVehiclesCommand
 
 
 class Command(ImportLiveVehiclesCommand):
-    source_name = "Space Station"
+    self.source = DataSource.objects.get(name="APILogic - ISS")
     nasa_operator = None
 
     def do_source(self):
         self.nasa_operator, created = Operator.objects.get_or_create(
             name="NASA",
+            source=self.source,
             defaults={
                 "code": "NASA",
                 "noc": "NASA",
@@ -41,7 +42,7 @@ class Command(ImportLiveVehiclesCommand):
 
     def get_items(self):
         try:
-            response = requests.get("https://tb.apilogic.uk/tracking/iss/position.asmx")
+            response = requests.get("https://tb.apilogic.uk/tracking/iss/position.asmx" headers=)
             response.raise_for_status()
             data = response.json()
         except requests.exceptions.RequestException as e:
