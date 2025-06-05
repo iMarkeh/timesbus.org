@@ -37,10 +37,11 @@ class Command(ImportLiveVehiclesCommand):
             "fleet_code": vehicle_code,
         }
         return Vehicle.objects.get_or_create(code=vehicle_code, defaults=defaults)
+        self.stdout.write("Vehicle Fetched")
 
     def get_items(self):
         try:
-            response = requests.get("https://iss.apilogic.uk/tracking/position.asmx")
+            response = requests.get("https://tb.apilogic.uk/tracking/position.asmx")
             response.raise_for_status()
             data = response.json()
         except requests.exceptions.RequestException as e:
