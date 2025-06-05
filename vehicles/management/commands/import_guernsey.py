@@ -10,7 +10,7 @@ logger = logging.getLogger(__name__)
 class Command(ImportLiveVehiclesCommand):
     source_name = "Guernsey"  # Updated source name
     operator = "SGUE"  # Updated operator
-    url = "https://api.timesbus.org/tracking/guernsey?api_key=timesbus-vm"  # Updated API URL
+    url = "https://tb.apilogic.uk/tracking/guernsey?api_key=timesbus-vm"  # Updated API URL
 
     @staticmethod
     def get_datetime(item):
