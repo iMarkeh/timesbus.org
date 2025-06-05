@@ -42,7 +42,7 @@ class Command(ImportLiveVehiclesCommand):
 
     def get_items(self):
         try:
-            response = requests.get("https://tb.apilogic.uk/tracking/iss/position.asmx" headers=)
+            response = requests.get(self.source.url, headers=self.source.settings)
             response.raise_for_status()
             data = response.json()
         except requests.exceptions.RequestException as e:
