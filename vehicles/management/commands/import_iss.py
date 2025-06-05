@@ -54,7 +54,7 @@ class Command(ImportLiveVehiclesCommand):
             "lat": data["latitude"],
             "lon": data["longitude"],
             "line": "Orbital Path",
-            "direction": "Planetary",
+            "direction": "Earth",
             "bearing": 0,
         }
         return [iss_item]
