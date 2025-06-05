@@ -94,7 +94,7 @@ class Command(ImportLiveVehiclesCommand):
             journey = VehicleJourney(
                 vehicle=vehicle,
                 route_name=item.get("line", "Orbit"),
-                direction=item.get("direction", "Planetary"),
+                direction=item.get("direction", "Earth"),
                 datetime=block_start_datetime,  # Use the block start time
             )
             # You might also want to set a unique code for the journey based on the block start
