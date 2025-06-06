@@ -62,14 +62,13 @@ class Command(ImportLiveVehiclesCommand):
     def get_journey(self, item, vehicle):
         journey_datetime = self.get_datetime(item)
 
-        # --- MODIFICATION START ---
         # Calculate the start of the current 6-hour block
         # Normalize the datetime to the nearest 6-hour interval
         # (e.g., 00:00, 06:00, 12:00, 18:00 UTC)
         total_seconds_since_epoch = int(journey_datetime.timestamp())
         # Seconds in 6 hours
-        interval_seconds = 6 * 3600
-        # Floor to the nearest 6-hour interval
+        interval_seconds = 24 * 3600
+        # Floor to the nearest 24-hour interval
         block_start_timestamp = (
             total_seconds_since_epoch // interval_seconds
         ) * interval_seconds
@@ -98,12 +97,11 @@ class Command(ImportLiveVehiclesCommand):
                 datetime=block_start_datetime,  # Use the block start time
             )
             # You might also want to set a unique code for the journey based on the block start
-            journey.code = f"ISS-{block_start_datetime.strftime('%Y%m%d%H%M%S')}"
+            journey.code = f"ISS-{block_start_datetime.strftime('%Y%m%d')}"
             self.stdout.write(
                 f"Creating new journey for block: {block_start_datetime}"
             )
             return journey
-        # --- MODIFICATION END ---
 
     def create_vehicle_location(self, item):
         return VehicleLocation(
