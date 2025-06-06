@@ -1,9 +1,12 @@
-[![Test](https://github.com/jclgoodwin/bustimes.org/actions/workflows/test.yml/badge.svg)](https://github.com/jclgoodwin/bustimes.org/actions/workflows/test.yml)
-[![Coverage badge](https://raw.githubusercontent.com/jclgoodwin/bustimes.org/python-coverage-comment-action-data/badge.svg)](https://htmlpreview.github.io/?https://github.com/jclgoodwin/bustimes.org/blob/python-coverage-comment-action-data/htmlcov/index.html)
+[![Test](https://github.com/TimesBus/dev.timesbus.org/actions/workflows/test.yml/badge.svg)](https://github.com/TimesBus/dev.timesbus.org/actions/workflows/test.yml/badge.svg)
+[![Coverage badge](https://raw.githubusercontent.com/TimesBus/dev.timesbus.org/python-coverage-comment-action-data/badge.svg)](https://htmlpreview.github.io/?https://github.com/TimesBus/dev.timesbus.org/blob/python-coverage-comment-action-data/htmlcov/index.html)
 
 ## What's this?
 
-Source code for [the website bustimes.org](https://bustimes.org/).
+Source code for [the website timesbus.org](https://timesbus.org/).
+
+The base of which was forked from [jclgoodwin/bustimes.org](https://github.com/jclgoodwin/bustimes.org).
+
 
 It's a magnificent monolithic Django app that's evolved over time (since 2015). The structure doesn't make complete sense:
 
