@@ -17,11 +17,11 @@ stdOut = sys.stdout
 
 parsed = json.loads(stdIn.read())
 con = pg8000.connect(
-    host = "51.210.255.250",
-    database = "tb-data",
-    user = "timesbus",
-    password = "a62ea9c995d021b713a870a31e3111eb",
-    port = 5432
+    host = PG_HOST,
+    database = PG_DB,
+    user = PG_USER,
+    password = PG_PW,
+    port = PG_PORT
 )
 
 def parseVehicleTypes():
