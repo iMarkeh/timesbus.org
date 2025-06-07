@@ -10,7 +10,7 @@
 /slim-bustimes.sql
 /.idea
 /busstops/static/dist/
-
+bustimes_api_importer.py
 /manage.sh
 /credentials.sh
 
