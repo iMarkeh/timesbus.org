@@ -10,9 +10,9 @@ class Command(BaseCommand):
     help = "Creates a fixed range of test vehicles directly in the 'vehicles_vehicle' table, providing defaults for non-nullable columns."
 
     # --- Configuration for this specific script ---
-    OPERATOR_PREFIX = "TRAM"
-    START_CODE = 2530
-    END_CODE = 2565 # Inclusive
+    OPERATOR_PREFIX = "STWS"
+    START_CODE = 36727
+    END_CODE = 36738 # Inclusive
     VEHICLE_TABLE_NAME = "vehicles_vehicle" # Confirmed table name
     # ---------------------------------------------
 
