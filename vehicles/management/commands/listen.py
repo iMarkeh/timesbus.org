@@ -100,8 +100,7 @@ class Command(BaseCommand):
                     }
                 }
 
-                response = session.post(
-                    "https://discord.com/api/webhooks/1337069419058171995/A044rf3-lHCSxOjdbtZVUShfQ9d1QyuUfB7r978ezcDaat3tIB5b8H2NQdGRVxwyIm5l",
+                response = session.post(settings.NEW_VEHICLE_WEBHOOK_URL,
                     json={
                         "username": "Velio",
                         "content": content,
