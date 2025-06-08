@@ -44,10 +44,11 @@ const imagesByName: { [imageName: string]: string } = {
 const mapStyles: { [key: string]: string } = {
   timesbus_positron: "Light",
   timesbus_dark_matter: "Dark",
-  maptiler_satellite: "Satellite", // New option
+  timesbus_bright: "Bright",
+  maptiler_satellite: "Satellite",
   timesbus_atlas: "Atlas",
-  thunderforest_transport: "Transport", // New
-  thunderforest_transport_dark: "Transport Dark", // New
+  thunderforest_transport: "Transport",
+  thunderforest_transport_dark: "Transport Dark",
 };
 
 type StyleSwitcherProps = {
@@ -215,8 +216,6 @@ export default function BusTimesMap(
   }, [mapStyle, darkModeQuery.matches]);
   // Updated mapStyleURL logic
   let mapStyleURL: string;
-  let currentStyleRequiresApiKey = false;
-  let apiKeyMissing = false;
 
   if (mapStyle === "timesbus_positron") {
     mapStyleURL = "https://tiles.timesbus.org/styles/positron/style.json";
@@ -224,6 +223,8 @@ export default function BusTimesMap(
     mapStyleURL = "https://tiles.timesbus.org/styles/dark-matter/style.json";
   } else if (mapStyle === "timesbus_atlas") {
     mapStyleURL = "https://tiles.timesbus.org/styles/atlas/style.json";
+  } else if (mapStyle === "timesbus_bright") {
+    mapStyleURL = "https://tiles.timesbus.org/styles/bright/style.json";
   } else if (mapStyle === "maptiler_satellite") {
       mapStyleURL = "https://api.maptiler.com/maps/satellite/style.json?key=${MAPTILER_API_KEY}"; // Fallback 
   } else if (mapStyle === "thunderforest_transport") {
