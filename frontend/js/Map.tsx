@@ -222,6 +222,8 @@ export default function BusTimesMap(
     mapStyleURL = "https://tiles.timesbus.org/styles/positron/style.json";
   } else if (mapStyle === "timesbus_dark_matter") {
     mapStyleURL = "https://tiles.timesbus.org/styles/dark-matter/style.json";
+  } else if (mapStyle === "timesbus_atlas") {
+    mapStyleURL = "https://tiles.timesbus.org/styles/atlas/style.json";
   } else if (mapStyle === "maptiler_satellite") {
       mapStyleURL = "https://api.maptiler.com/maps/satellite/style.json?key=${MAPTILER_API_KEY}"; // Fallback 
   } else if (mapStyle === "thunderforest_transport") {
