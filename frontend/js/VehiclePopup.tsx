@@ -152,7 +152,7 @@ export default function VehiclePopup({
       )}
       <Delay item={item} />
       <div>
-        <TimeAgo date={item.datetime} key={item.datetime} />
+       Updated: <TimeAgo date={item.datetime} key={item.datetime} />
       </div>
     </Popup>
   );

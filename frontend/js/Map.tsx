@@ -236,9 +236,9 @@ export default function BusTimesMap(
   // } 
   else {
     console.warn(
-      `Unknown map style: ${mapStyle}. Falling back to timesbus_positron.`,
+      `Unknown map style: ${mapStyle}. Falling back to timesbus_bright.`,
     );
-    mapStyleURL = "https://tiles.timesbus.org/styles/positron/style.json";
+    mapStyleURL = "https://tiles.timesbus.org/styles/bright/style.json";
   }
 
   return (
