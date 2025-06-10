@@ -169,7 +169,7 @@ def error(request):
 def robots_txt(request):
     "robots.txt"
 
-    if request.get_host() == "timesbus.org":  # live site
+    if request.get_host() in ("timesbus.org", "transportthing.uk"):  # live site
         content = """User-agent: *
 Disallow: /trips/
 Disallow: /api/
