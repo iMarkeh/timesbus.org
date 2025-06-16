@@ -278,16 +278,7 @@ class Vehicle(models.Model):
         return self.notes == "Spare ticket machine"
 
     def is_editable(self) -> bool:
-        if self.locked:
-            return False
-        # withrawn and hasn't tracked recently - "let sleeping dogs lie"
-        if self.withdrawn and (
-            not self.latest_journey
-            or timezone.now() - self.latest_journey.datetime
-            > datetime.timedelta(days=30)
-        ):
-            return False
-        return True
+        return not self.locked
 
     def save(self, *args, update_fields=None, **kwargs):
         if (
