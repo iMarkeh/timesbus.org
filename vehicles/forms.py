@@ -208,7 +208,7 @@ link to a picture to prove it. Be polite.""",
                 del self.fields["features"]
 
         if vehicle.withdrawn:
-            del self.fields["spare_ticket_machine"]
+            # del self.fields["spare_ticket_machine"]
             del self.fields["notes"]
             del self.fields["operator"]
             del self.fields["fleet_number"]
