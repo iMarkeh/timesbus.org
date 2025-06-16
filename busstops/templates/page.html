@@ -104,6 +104,8 @@
 </header>
 {% endblock header %}
 <main>
+{% load maintenance_tags %}
+{% show_maintenance_alert %}
     {% block breadcrumb %}{% include 'breadcrumb.html' %}{% endblock %}
     <div id="content">
         {% block content %}{% endblock %}

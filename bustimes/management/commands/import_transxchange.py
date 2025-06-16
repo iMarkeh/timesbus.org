@@ -699,10 +699,10 @@ class Command(BaseCommand):
                 trip.destination = stop_time.stop
 
         return stop_time
-
     @cache
     def get_note(self, note_code, note_text):
-        return Note.objects.get_or_create(code=note_code or "", text=note_text[:255])[0]
+        processed_note_text = (note_text or "")[:255]
+        return Note.objects.get_or_create(code=note_code or "", text=processed_note_text)[0]
 
     def handle_journeys(
         self,

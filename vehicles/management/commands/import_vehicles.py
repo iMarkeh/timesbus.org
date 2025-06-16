@@ -10,9 +10,9 @@ class Command(BaseCommand):
     help = "Creates a fixed range of test vehicles directly in the 'vehicles_vehicle' table, providing defaults for non-nullable columns."
 
     # --- Configuration for this specific script ---
-    OPERATOR_PREFIX = "STWS"
-    START_CODE = 36727
-    END_CODE = 36738 # Inclusive
+    OPERATOR_PREFIX = "TBTEST"
+    START_CODE = 23
+    END_CODE = 30 # Inclusive
     VEHICLE_TABLE_NAME = "vehicles_vehicle" # Confirmed table name
     # ---------------------------------------------
 
@@ -78,7 +78,7 @@ class Command(BaseCommand):
                     branding = ""
                     
                     # notes: non-nullable (varchar(255))
-                    notes = f"" # <--- NOW FIXED
+                    notes = f"Livery Team Testing Vehicle" # <--- NOW FIXED
                     
                     # latest_journey_data: nullable (jsonb)
                     latest_journey_data = 'NULL' # As it's nullable
@@ -93,7 +93,7 @@ class Command(BaseCommand):
                     locked = "FALSE" # Default to not locked
                     
                     # garage_id: nullable (int4)
-                    garage_id = 'NULL' 
+                    garage_id = 'NULL'
                     
                     # latest_journey_id: nullable (int4)
                     latest_journey_id = 'NULL'

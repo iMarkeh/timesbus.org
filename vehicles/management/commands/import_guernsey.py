@@ -8,16 +8,12 @@ logger = logging.getLogger(__name__)
 
 
 class Command(ImportLiveVehiclesCommand):
-    source_name = "Guernsey"  # Updated source name
-    operator = "SGUE"  # Updated operator
-    url = "https://tb.apilogic.uk/tracking/guernsey?api_key=timesbus-vm"  # Updated API URL
-
+    source_name = "guernsey"
+    operator = "SGUE"
     @staticmethod
     def get_datetime(item):
-        # Use the 'reported' field for the vehicle location time
         reported_time_str = item.get("reported")
         if reported_time_str:
-            # datetime.fromisoformat can handle this
             return datetime.datetime.fromisoformat(
                 reported_time_str.replace("Z", "+00:00")
             )
@@ -29,11 +25,8 @@ class Command(ImportLiveVehiclesCommand):
         )  # Fallback to now if reported is not available
 
     def get_vehicle(self, item):
-        # The new API has both "vehicleId" (a UUID) and "vehicleRef" (the number)
-        # Let's use "vehicleRef" as the code, similar to the original script's logic
         vehicle_code = item.get("vehicleRef")
         if not vehicle_code:
-            # Fallback to vehicleId if vehicleRef is missing, though vehicleRef seems more suitable
             logger.warning(
                 f"Missing 'vehicleRef', falling back to 'vehicleId' for item: {item}"
             )
@@ -42,7 +35,6 @@ class Command(ImportLiveVehiclesCommand):
         defaults = {
             "operator_id": self.operator,
         }
-        # We can use vehicleRef as the vehicleRef if it's present and suitable
         if item.get("vehicleRef"):
             defaults["fleet_number"] = item["vehicleRef"]
         vehicle, created = self.vehicles.get_or_create(
@@ -50,12 +42,11 @@ class Command(ImportLiveVehiclesCommand):
         )
         if created:
             logger.info(f"Created new vehicle: {vehicle_code}")
-        return vehicle, created  # returning 2 variables
+        return vehicle, created
 
     def get_items(self):
-        # Modified to handle the new API's dictionary response structure
         data = super().get_items()
-        items = data.get("items", [])  # Extracts list of vehicle items
+        items = data.get("items", [])
         logger.info(f"Fetched {len(items)} items from API")
         return items
 
@@ -65,7 +56,7 @@ class Command(ImportLiveVehiclesCommand):
         journey.direction = item["direction"][:8]
         journey.destination = item.get(
             "destination", ""
-        )  # Use .get() with a default
+        )
         journey.block = item.get("vehicleDutyId", "")
         logger.debug(
             f"Created journey for vehicle {vehicle.code}: route={journey.route_name}, destination={journey.destination}"
@@ -76,7 +67,7 @@ class Command(ImportLiveVehiclesCommand):
         position_data = item.get("position")
         if not position_data:
             logger.warning(f"Missing 'position' data for item: {item}")
-            return None  # No position data available
+            return None
 
         latitude = position_data.get("latitude")
         longitude = position_data.get("longitude")
@@ -84,11 +75,11 @@ class Command(ImportLiveVehiclesCommand):
 
         if latitude is None or longitude is None:
             logger.warning(f"Missing coordinates for item: {item}")
-            return None  # Need valid coordinates
+            return None
 
         location = VehicleLocation(
-            latlong=Point(longitude, latitude),  # Corrected order for Point
-            heading=bearing,  # Use .get() as bearing might be optional
+            latlong=Point(longitude, latitude),
+            heading=bearing,
         )
         logger.debug(
             f"Created location: lat={latitude}, lon={longitude}, bearing={bearing}"

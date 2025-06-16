@@ -38,8 +38,8 @@ class Command(ImportLiveVehiclesCommand):
             "YCD": "YCST",
             "ROS": "ROST",
             "LUI": "LNUD",
-            "KDT": "KDTR"
-            # Add more mappings here if needed
+            "KDT": "KDTR",
+            "NADT": "NADT"
         }
         code = item["VehicleRef"]
         if code.isdigit():

@@ -26,7 +26,7 @@ CSRF_TRUSTED_ORIGINS = os.environ.get(
 TEST = "test" in sys.argv or "pytest" in sys.argv[0]
 DEBUG = False
 
-DEFAULT_FROM_EMAIL = '"timesbus.org" <timesbus.org@timesbus.org>'
+DEFAULT_FROM_EMAIL = '"timesbus.org" <noreply@timesbus.org>'
 
 EMAIL_HOST = os.environ.get("EMAIL_HOST", "")
 EMAIL_HOST_USER = os.environ.get("EMAIL_HOST_USER", "")
