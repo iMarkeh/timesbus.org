@@ -208,18 +208,10 @@ link to a picture to prove it. Be polite.""",
                 del self.fields["features"]
 
         if vehicle.withdrawn:
-            # del self.fields["spare_ticket_machine"]
-            del self.fields["notes"]
-            del self.fields["operator"]
-            del self.fields["fleet_number"]
-            del self.fields["reg"]
-            del self.fields["vehicle_type"]
-            del self.fields["name"]
-            del self.fields["previous_reg"]
-            del self.fields["colours"]
-            del self.fields["other_colour"]
-            del self.fields["branding"]
-            del self.fields["features"]
+            fields = ["spare_ticket_machine", "notes", "operator", "fleet_number", "reg", "vehicle_type", "name", "previous_reg", "colours", "other_colour", "branding", "features"]
+            for field in fields:
+                if field in self.fields:
+                    del self.fields[field]
 
 
 class DebuggerForm(forms.Form):
