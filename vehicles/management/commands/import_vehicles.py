@@ -30,11 +30,11 @@ class Command(BaseCommand):
 
 
                 vehicle_data_values = []
-                for current_numeric_code in range(0, len(self.WANTED_CODES) + 1):
-                    current_code_str = str(WANTED_CODES[current_numeric_code])
+                for current_numeric_code in range(0, len(self.WANTED_CODES)):
+                    current_code_str = str(self.WANTED_CODES[current_numeric_code])
                     slug = f"{self.OPERATOR_PREFIX}-{current_code_str}"
                     code = current_code_str
-                    if self.WANTED_CODES[current_numeric_code].isstring():
+                    if type(self.WANTED_CODES[current_numeric_code]) == int:
                         fleet_number = self.WANTED_CODES[current_numeric_code]
                     fleet_code = current_code_str
                     reg = f""

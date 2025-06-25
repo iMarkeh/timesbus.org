@@ -12,7 +12,7 @@
         })
     }
     function fetchAprilQuote() {
-        $.getJSON("https://api.snubs.dev/quotes/random?tags=tb-april&published=true", function (quotes) {
+        $.getJSON("https://snubs.apilogic.uk/quotes/random?tags=tb-april&published=true", function (quotes) {
             if (quotes.length === 0) {
                 $("#motd-text").text(" ")
                 return;
