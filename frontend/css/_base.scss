@@ -213,20 +213,17 @@ body {
 
     .site-name {
         font-size: 24px;
+         margin-top: 15px;
+	 height: 28px;
+	 width: 150px;
+	 background-image: var(--logo-url);
+	 background-repeat: no-repeat;
+	 background-size: contain;
+         position: absolute;
     }
 
     div {
         margin: 0 auto;
-
-        .site-name {
-	    margin-top: 15px;
-	    height: 28px;
-	    width: 150px;
-	    background-image: var(--logo-url);
-	    background-repeat: no-repeat;
-	    background-size: contain;
-            position: absolute;
-        }
     }
 
     ul {
