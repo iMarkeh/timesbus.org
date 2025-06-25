@@ -10,12 +10,13 @@
 <meta name="format-detection" content="telephone=no">
 {% block canonical %}
     {% if object.get_absolute_url %}
-        <link rel="canonical" href="https://timesbus.org{{ object.get_absolute_url() }}">
+        <link rel="canonical" href="https://transportthing.uk{{ object.get_absolute_url }}">
     {% endif %}
 {% endblock canonical %}
-<script type="application/ld+json">{"@context":"http://schema.org","@type":"WebSite","url":"https://timesbus.org","name":"timesbus.org","potentialAction":{"@type":"SearchAction","target":"https://timesbus.org/search?q={q}","query-input":"required name=q"}}</script>
+<script type="application/ld+json">{"@context":"http://schema.org","@type":"WebSite","url":"https://transportthing.uk","name":"TransportThing","potentialAction":{"@type":"SearchAction","target":"https://transportthing.uk/search?q={q}","query-input":"required name=q"}}</script>
+
 <!-- <link rel="icon" sizes="48x48" type="image/png" href="/favicon.ico"> -->
-<link rel="icon" sizes="any" type="image/svg+xml" href="https://assets.timesbus.org/favicon.svg">
+<link rel="icon" sizes="any" type="image/svg+xml" href="https://cdn.discordapp.com/icons/1337054349267959898/bcb0fa2c5561cb082d1e8fb83f4e6566.webp?size=1024">
 <link rel="manifest" href="{{ static('manifest.webmanifest') }}">
 <link rel="stylesheet" href="/static/dist/css/style.css">
 
@@ -45,16 +46,7 @@
 {% block header %}
 <header class="site-header">
     <div>
-        <a href="/" class="site-name">
-            {% if '/operators/nasa' in request.path %}
-                <img src="https://assets.timesbus.org/timesspace.svg?v" height="28px" alt="NASA Operator Logo" />
-            {% elif current_month_str == "06" %}
-                <img src="https://assets.timesbus.org/gaytimes.svg" height="28px" />
-            {% else %}
-                <img src="https://assets.timesbus.org/logo.svg" height="28px" />
-            {% endif %}
-        </a>
-
+        <a href="/" class="site-name"></a>
         <ul>
             <li><a href="/map{% if object.latlong %}#16/{{ object.latlong.y }}/{{ object.latlong.x }}{% endif %}">Map</a></li>
         </ul>

@@ -2,18 +2,18 @@
 
     @font-face {
         font-family: 'Mark Pro';
-        src: url('https://assets.timesbus.org/206a789ea97608a82865a64235cf62f0.woff2') format('woff2');
+        src: url('https://cdn.transportthing.uk/206a789ea97608a82865a64235cf62f0.woff2') format('woff2');
     }
 
 :root{
-    --brand-color:#164450;
+    --brand-color: #2E8A9E;
+    --brand-color-darker: #339FBB;
+    --brand-color-darker-darker: #339FBB;
     --ppborder: #164450;
-    --brand-color-darker:#133c46;
     --viewed-color: #8cd6ea;
-    --brand-color-darker-darker:#0d2930;
     --border-color:var(--brand-color-darker);
     --border-color-darker:var(--brand-color-darker-darker);
-    --brand-banner: url("//assets.timesbus.org/tb_banner_bg.svg");
+    --brand-banner: url("//cdn.transportthing.uk/tb_banner_bg.svg");
     --black:#000;
     --white:#fff;
     --red:red;
@@ -27,6 +27,7 @@
     --lightningcss-dark: ;
     --lightningcss-light:initial;
     --lightningcss-dark: ;
+    --logo-url: url('//cdn.transportthing.uk/light_logo.svg');
     color-scheme:light;
 }
 
@@ -34,12 +35,13 @@
 // - ash
 
 .dark-mode{
-    --brand-color:#164450;
-    --brand-color-darker:#133c46;
-    --brand-color-darker-darker:#0d2930;
+    --brand-color: #006C7F;
+    --brand-color-darker: #1D5560;
+    --brand-color-darker-darker: #1D5560;
     --border-color:var(--brand-color-darker);
     --border-color-darker:var(--brand-color-darker-darker);
-    --brand-banner: url("//assets.timesbus.org/dark_banner.svg");
+    --brand-banner: url("//cdn.transportthing.uk/dark_banner.svg");
+    --logo-url: url('//cdn.transportthing.uk/dark_logo.svg');
     --background-color:#111;
     --text-color:#fff;
     --link-color:#afdde9;
@@ -217,6 +219,12 @@ body {
         margin: 0 auto;
 
         .site-name {
+	    margin-top: 15px;
+	    height: 28px;
+	    width: 150px;
+	    background-image: var(--logo-url);
+	    background-repeat: no-repeat;
+	    background-size: contain;
             position: absolute;
         }
     }
@@ -270,6 +278,15 @@ body {
             padding-right: 8px;
         }
     }
+}
+
+.site-logo {
+    background-image: var(--logo-url);
+    background-repeat: no-repeat;
+    background-size: contain; /* Or 'cover' depending on your needs */
+    width: 150px; /* Adjust as needed */
+    height: 50px; /* Adjust as needed */
+    /* Add any other styling for your logo container */
 }
 
 .search {

@@ -1,7 +1,7 @@
 import L from "leaflet";
 
 var tiles =
-  "https://tiles.timesbus.org/data/osm-planet/{z}/{x}/{y}.pbf";
+  "https://tiles.transportthing.uk/data/osm-planet/{z}/{x}/{y}.pbf";
 var attribution =
   '<a href="https://openmaptiles.org/">&copy; OpenMapTiles</a> <a href="https://www.openstreetmap.org/about/">&copy; OpenStreetMap contributors</a>';
 

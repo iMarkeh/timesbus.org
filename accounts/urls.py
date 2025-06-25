@@ -31,7 +31,7 @@ urlpatterns = [
         auth_views.PasswordResetCompleteView.as_view(),
         name="password_reset_complete",
     ),
-    path("register/", views.register, name="register"),
+    path("signup/", views.register, name="register"),
     path(
         "register/confirm/<uidb64>/<token>/",
         views.RegisterConfirmView.as_view(),

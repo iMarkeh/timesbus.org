@@ -1,14 +1,14 @@
 {
     "icons": [
         {
-            "src": "https://assets.timesbus.org/favicon.svg",
+            "src": "https://cdn.transportthing.uk/favicon.svg",
             "type": "image/svg+xml"
         },
         {
-            "src": "https://assets.timesbus.org/favicon.svg",
+            "src": "https://cdn.transportthing.uk/favicon.svg",
             "type": "image/svg+xml"
         }
     ],
-    "background_color": "#164450",
-    "theme_color": "#164450"
+    "background_color": "#006C7F",
+    "theme_color": "#006C7F"
 }
