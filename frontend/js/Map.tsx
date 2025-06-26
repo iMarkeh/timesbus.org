@@ -46,9 +46,9 @@ const mapStyles: { [key: string]: string } = {
   timesbus_dark_matter: "Dark",
   timesbus_bright: "Bright",
   maptiler_satellite: "Satellite",
-  timesbus_atlas: "Atlas",
-  thunderforest_transport: "Transport",
-  thunderforest_transport_dark: "Transport Dark",
+//  timesbus_atlas: "Atlas",
+//  thunderforest_transport: "Transport",
+//  thunderforest_transport_dark: "Transport Dark",
 };
 
 type StyleSwitcherProps = {
@@ -218,13 +218,13 @@ export default function BusTimesMap(
   let mapStyleURL: string;
 
   if (mapStyle === "timesbus_positron") {
-    mapStyleURL = "https://tiles.timesbus.org/styles/positron/style.json";
+    mapStyleURL = "https://tiles.transportthing.uk/styles/positron/style.json";
   } else if (mapStyle === "timesbus_dark_matter") {
-    mapStyleURL = "https://tiles.timesbus.org/styles/dark-matter/style.json";
+    mapStyleURL = "https://tiles.transportthing.uk/styles/dark-matter/style.json";
   } else if (mapStyle === "timesbus_atlas") {
-    mapStyleURL = "https://tiles.timesbus.org/styles/atlas/style.json";
+    mapStyleURL = "https://tiles.transportthing.uk/styles/atlas/style.json";
   } else if (mapStyle === "timesbus_bright") {
-    mapStyleURL = "https://tiles.timesbus.org/styles/bright/style.json";
+    mapStyleURL = "https://tiles.transportthing.uk/styles/bright/style.json";
   } else if (mapStyle === "maptiler_satellite") {
       mapStyleURL = `https://api.maptiler.com/maps/satellite/style.json?key=${MAPTILER_API_KEY}`; // Fallback 
   }
