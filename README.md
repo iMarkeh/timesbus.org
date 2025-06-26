@@ -3,7 +3,7 @@
 
 ## What's this?
 
-Source code for [the website transporttthing.uk](https://transportthing.uk/).
+Source code for [the website transportthing.uk](https://transportthing.uk/).
 
 The base of which was forked from [jclgoodwin/bustimes.org](https://github.com/jclgoodwin/bustimes.org).
 
