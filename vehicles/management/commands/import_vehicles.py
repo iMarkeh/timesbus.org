@@ -9,8 +9,8 @@ class Command(BaseCommand):
     help = "Creates a fixed range of test vehicles directly in the 'vehicles_vehicle' table, providing defaults for non-nullable columns."
 
     # --- Configuration for this specific script ---
-    WANTED_CODES = [66780, 60820, 8, 44, 77, 177, 116, 84, 15, 28, 436, 526, 2150, 3166, 3245, 25,3460, 3496, 3520, 3629, 55, 4632, "RM1414", 74, 1001, 246, 368, 394, 163, 17,11, 235, 280, 235, 112, 214, 254, 70, 185, 308, 321, 91, 97, 57, "8860 VR", 27,97, 432, 270, 224, 174, "C295", 1205, 7001, "EX30", 5781, 1722, 5083, 3065,5208, 1676, 63, 4706, 612, "LMA 284", "SDK 442", "HTF 586", "YDK 590","HVU 244N", "PA 164", 80, 1250, "EX62", 2, "LSU 282", "A118", 106, 256,"BRJ 333", "W4", 6]
-    OPERATOR_PREFIX = "MOTGM"
+    WANTED_CODES = [22193, 22195, 22196, 22197, 22198, 22199, 22201, 22202, 22214, 22451, 22452, 22453, 22454, 22455, 22456, 22462, 22463, 22464, 22465, 22466, 22467, 22468, 22469, 22470, 22471, 22472, 22473, 22474, 22475, 22476, 22477, 22478, 22479, 22480, 22481, 22482, 22483, 22484, 22485, 22486, 22487, 22488, 22489, 22490, 22491, 22492, 22493, 22494, 22495, 22011, 22012, 22013, 22014, 22015, 22016, 22017, 22018, 22019, 22020, 22021, 22022, 22023, 22024, 22025, 22026, 22027, 22028, 22029, 22030, 22031, 22032, 22033, 22034, 22035, 22036, 22037, 22038, 22039, 22040, 22041, 22042, 22043, 22044, 22045, 22046, 22047, 22048, 22049, 22050, 22051, 22062, 22063, 22064, 22065, 22066, 22067, 22068, 22069, 22070, 22072, 22074, 22077, 22078, 22079, 22080, 22081, 22082, 22342, 22343, 22344, 22345, 22346, 22347, 22348, 22408, 22409, 22410, 22411, 22412, 22428, 22443, 22444]
+    OPERATOR_PREFIX = "SCNE"
     VEHICLE_TABLE_NAME = "vehicles_vehicle"
     # ---------------------------------------------
 
@@ -31,7 +31,7 @@ class Command(BaseCommand):
 
                 vehicle_data_values = []
                 for current_numeric_code in range(0, len(self.WANTED_CODES)):
-                    current_code_str = str(self.WANTED_CODES[current_numeric_code])
+                    current_code_str = str(f"{self.WANTED_CODES[current_numeric_code]}")
                     slug = f"{self.OPERATOR_PREFIX}-{current_code_str}"
                     code = current_code_str
                     if type(self.WANTED_CODES[current_numeric_code]) == int:
@@ -41,7 +41,7 @@ class Command(BaseCommand):
                     colours = ""
                     name = f""
                     branding = ""
-                    notes = f""                    
+                    notes = f""
                     latest_journey_data = 'NULL'
                     withdrawn = "FALSE"
                     data = 'NULL'

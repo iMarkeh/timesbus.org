@@ -1,7 +1,7 @@
 {% extends "admin/base_site.html" %}
 
 {% block branding %}
-<h1 id="site-name"><a id="alogo" href="{% url 'admin:index' %}"><span aria-label="TransportThing Admin"></span></a></h1>
+<h1 id="site-name"><a id="alogo" href="{% url 'admin:index' %}"></a></h1>
 {% endblock %}
 
 {% block extrahead %}
@@ -11,16 +11,20 @@
             top: 0;
         }
     </style>
+
     <style>
-   #alogo {
-    background-image: url(//cdn.transportthing.uk/admin_logo.svg?v24);
-    background-size: contain;
-    background-repeat: no-repeat;
-    width: 200px;
-    height: 19px;
-    position: absolute;
-    top: 1rem;
-   }
+        #site-name, #alogo {
+            width: 142px;
+            height: 19px;
+        }
+
+        #alogo {
+            background-image: url(//cdn.transportthing.uk/admin_logo.svg?v24);
+            background-size: contain;
+            background-repeat: no-repeat;
+            position: absolute;
+            top: 1rem;
+        }
         /* Your custom CSS for the header */
         #header {
             background: #222222;

@@ -4,7 +4,10 @@
         font-family: 'Mark Pro';
         src: url('https://cdn.transportthing.uk/206a789ea97608a82865a64235cf62f0.woff2') format('woff2');
     }
-
+    @font-face {
+         font-family: 'Museo Sans';
+         src: url('https://cdn.transportthing.uk/MuseoSans.woff2') format('woff2');
+    }
 :root{
     --brand-color: #2E8A9E;
     --brand-color-darker: #339FBB;
@@ -42,7 +45,7 @@
     --border-color-darker:var(--brand-color-darker-darker);
     --brand-banner: url("//cdn.transportthing.uk/dark_banner.svg");
     --logo-url: url('//cdn.transportthing.uk/dark_logo.svg');
-    --background-color:#111;
+    --background-color:#000;
     --text-color:#fff;
     --link-color:#afdde9;
     --viewed-color: #454545;
@@ -55,11 +58,13 @@
     --ppborder: #afdee9;
     color-scheme:dark;
 }
-
+.maplibregl-popup-content {
+    font: 12px/20px 'Museo Sans';
+}
 body {
     background: var(--background-color);
     color: var(--text-color);
-    font-family: 'Mark Pro',-apple-system,BlinkMacSystemFont,Aptos,"Segoe UI Variable","Segoe UI",Roboto,"Helvetica Neue",Helvetica,Arial,sans-serif;
+    font-family: 'Museo Sans',-apple-system,BlinkMacSystemFont,Aptos,"Segoe UI Variable","Segoe UI",Roboto,"Helvetica Neue",Helvetica,Arial,sans-serif;
     font-size: 16px;
     line-height: 1.5;
     margin: 0;

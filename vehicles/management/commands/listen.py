@@ -88,7 +88,7 @@ class Command(BaseCommand):
                     group = "tfi"
                     role_id = "1367127895696216104"
 
-                vehicle_url = f"https://timesbus.org/vehicles/{slug}"
+                vehicle_url = f"https://transportthing.uk/vehicles/{slug}"
                 content = f"<@&{role_id}>" if role_id else " "
                 allowed_mentions = (
                     {"roles": [role_id]} if role_id else {"parse": []}
@@ -111,10 +111,10 @@ class Command(BaseCommand):
                         }
                     ],
                     "thumbnail": {
-                        "url": "https://assets.timesbus.org/favicon.svg"
+                        "url": "https://assets.transportthing.uk/favicon.svg"
                     },
                     "footer": {
-                        "text": "Timesbus Fleet Tracker"
+                        "text": "TT Fleet Tracker"
                     }
                 }
 
