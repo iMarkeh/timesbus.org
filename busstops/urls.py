@@ -30,7 +30,7 @@ urlpatterns = [
         "ads.txt",
         cache_control(max_age=1800)(
             RedirectView.as_view(
-                url="https://assets.timesbus.org/ads.txt"
+                url="https://cdn.transportthing.uk/ads.txt"
             )
         ),
     ),
@@ -50,23 +50,15 @@ urlpatterns = [
     path("status", views.status),
     path("timetable-source-stats.json", views.timetable_source_stats),
     path("stats.json", views.stats),
-    path(
-        "ads.txt",
-        cache_control(max_age=1800)(
-            RedirectView.as_view(
-                url="https://cdn.adfirst.media/adstxt/bustimes-ads.txt"
-            )
-        ),
-    ),
     path("robots.txt", views.robots_txt),
     path("stops.json", views.stops_json),
     path(
-        "regions/<pk>",
+        "region/<pk>",
         cdn_cache_control(1800)(views.RegionDetailView.as_view()),
         name="region_detail",
     ),
     re_path(
-        r"^(admin-)?areas/(?P<pk>\d+)",
+        r"^(admin-)?area/(?P<pk>\d+)",
         cdn_cache_control(1800)(views.AdminAreaDetailView.as_view()),
         name="adminarea_detail",
     ),
@@ -129,7 +121,7 @@ urlpatterns = [
         {"sitemaps": sitemaps},
         name="django.contrib.sitemaps.views.sitemap",
     ),
-    path("search", views.search, name="search"),
+    path("search-query", views.search, name="search"),
     path("journey", views.journey),
     path(
         ".well-known/change-password",

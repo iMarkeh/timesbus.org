@@ -13,7 +13,7 @@
         <link rel="canonical" href="https://transportthing.uk{{ object.get_absolute_url }}">
     {% endif %}
 {% endblock canonical %}
-<script type="application/ld+json">{"@context":"http://schema.org","@type":"WebSite","url":"https://transportthing.uk","name":"TransportThing","potentialAction":{"@type":"SearchAction","target":"https://transportthing.uk/search?q={q}","query-input":"required name=q"}}</script>
+<script type="application/ld+json">{"@context":"http://schema.org","@type":"WebSite","url":"https://transportthing.uk","name":"TransportThing","potentialAction":{"@type":"SearchAction","target":"https://transportthing.uk/search-query?q={q}","query-input":"required name=q"}}</script>
 
 <!-- <link rel="icon" sizes="48x48" type="image/png" href="/favicon.ico"> -->
 <link rel="icon" sizes="any" type="image/svg+xml" href="https://cdn.discordapp.com/icons/1337054349267959898/bcb0fa2c5561cb082d1e8fb83f4e6566.webp?size=1024">
@@ -50,7 +50,7 @@
         <ul>
             <li><a href="/map{% if object.latlong %}#16/{{ object.latlong.y }}/{{ object.latlong.x }}{% endif %}">Map</a></li>
         </ul>
-        <form method="GET" action="/search" class="search">
+        <form method="GET" action="/search-query" class="search">
             <label>
                 Search
                 <input name="q" placeholder="Search" type="search" value="" required>
