@@ -45,7 +45,7 @@
     --border-color-darker:var(--brand-color-darker-darker);
     --brand-banner: url("//cdn.transportthing.uk/dark_banner.svg");
     --logo-url: url('//cdn.transportthing.uk/dark_logo.svg');
-    --background-color:#000;
+    --background-color:#0f0f0f;
     --text-color:#fff;
     --link-color:#afdde9;
     --viewed-color: #454545;
@@ -57,9 +57,6 @@
     --lightningcss-dark:initial;
     --ppborder: #afdee9;
     color-scheme:dark;
-}
-.maplibregl-popup-content {
-    font: 12px/20px 'Museo Sans';
 }
 body {
     background: var(--background-color);

@@ -14,7 +14,7 @@
         <ul>
             <li><a href="/map{% if object.latlong %}#16/{{ object.latlong.y|floatformat:4 }}/{{ object.latlong.x|floatformat:4 }}{% endif %}" style="color: #ffffff">Map</a></li>
         </ul>
-        <form method="GET" action="/search" class="search">
+        <form method="GET" action="/search-query" class="search">
             <label>
                 Search
                 <input name="q" placeholder="Search" type="search" value="{{ query }}" required>

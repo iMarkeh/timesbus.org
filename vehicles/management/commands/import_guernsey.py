@@ -53,7 +53,7 @@ class Command(ImportLiveVehiclesCommand):
     def get_journey(self, item, vehicle):
         journey = VehicleJourney()
         journey.route_name = item["routeName"]
-        journey.direction = item["direction"][:8]
+#        journey.direction = item["direction"][:8]
         journey.destination = item.get(
             "destination", ""
         )
