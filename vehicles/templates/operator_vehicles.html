@@ -88,7 +88,6 @@ ticket machines, a byproduct of the live bus tracking and some entries requested
                 }
             </style>
             <tr id="{{ vehicle.slug }}" {% if vehicle.withdrawn %}class="withdrawn"{% endif %}>
-                {% if vehicle.withdrawn == True %}<del>{% endif %}
                 <td class="tabular"{% if not vehicle.reg %} colspan="2"{% endif %}>
                     <a href="{{ vehicle.get_absolute_url }}">
                         {% if vehicle.fleet_code or vehicle.fleet_number %}
@@ -132,7 +131,6 @@ ticket machines, a byproduct of the live bus tracking and some entries requested
                 {% if vehicle.is_editable %}
                     <td><a href="{{ vehicle.get_edit_url }}">Edit{% if vehicle.pending_edits %}<abbr title="pending edits">*</abbr>{% endif %}</a></td>
                 {% endif %}
-                {% if vehicle.withdrawn == True %}</del>{% endif %}
             </tr>
         {% endfor %}
     </tbody>
