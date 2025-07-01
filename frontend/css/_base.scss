@@ -1,4 +1,11 @@
 @charset "UTF-8";
+    @font-face{
+        font-family:"DVLA-VRM-Regular";
+        font-weight:normal;
+        font-style:normal;
+        src: url(https://cdn.transportthing.uk/DVLA-VRM-ea424d81e1dc91a8d11e.woff) format("woff"),
+        url(https://cdn.transportthing.uk/DVLA-VRM-c09fdcf7fa6f0f3a0124.woff2) format("woff2"),
+    }
 
     @font-face {
         font-family: 'Mark Pro';
@@ -316,7 +323,7 @@ h1 {
 }
 
 .reg {
-    font-family: "Charles Wright";
+    font-family: "DVLA-VRM-Regular";
     text-align: center;
     color: var(--text-color);
     font-weight: normal;
@@ -324,9 +331,11 @@ h1 {
 
 h1 .reg {
     border: 1px solid var(--border-color);
-    padding: 8px 6px 2px;
-    border-radius: 2px;
-    font-size: 24px;
+    background-color: #ffd307;
+    border-radius: 7px;
+    padding: 8px 6px 8px;
+    font-size: 30px;
+    color: black;
 }
 
 h2 {
