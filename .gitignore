@@ -13,7 +13,7 @@
 bustimes_api_importer.py
 /manage.sh
 /credentials.sh
-
+.gitconfig
 # Sentry Auth Token
 .env.sentry-build-plugin
 
