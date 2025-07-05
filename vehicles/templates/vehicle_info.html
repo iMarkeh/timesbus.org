@@ -4,13 +4,18 @@
 
 <dl class="contact-details">
     {% if vehicle.colours or vehicle.livery %}
+        {% if vehicle.livery and perms.vehicles.change_livery %}
+            <a href="{% url 'admin:vehicles_livery_change' object.livery_id %}">
+        {% endif %}
         <div class="livery" style="background:{{ vehicle.get_livery }}"{% if vehicle.livery.name %} title="{{ vehicle.livery.name }}"{% endif %}></div>
+        {% if vehicle.livery and perms.vehicles.change_livery %}
+            </a>
+        {% endif %}
          <div> 
            <dt>Livery Name{% if vehicle.branding %} - Branding{% endif %}</dt>
            <dd>{{ vehicle.livery.name|default:"Hex Code" }}{% if vehicle.branding %} - {{ vehicle.branding }}{% endif %}</dd>
          </div>
     {% endif %}
-
     {% if vehicle.vehicle_type %}
         <div>
             <dt>Type</dt>

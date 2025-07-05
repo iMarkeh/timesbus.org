@@ -226,8 +226,8 @@ def contact(request):
             message = EmailMessage(
                 subject,
                 body,
-                '"{}" <noreply@timesbus.org>'.format(form.cleaned_data["name"]),
-                ["noreply@timesbus.org"],
+                '"{}" <noreply@transportthing.uk>'.format(form.cleaned_data["name"]),
+                ["noreply@transportthing.uk"],
                 reply_to=[form.cleaned_data["email"]],
             )
             message.send()

@@ -23,12 +23,17 @@
             <strong>
                 {% if revision.disapproved %}Disa{% else %}A{% endif %}pproved
             </strong>
-            {% if revision.approved_by_id and user.trusted %}
-                by <a href="{% url 'user_detail' revision.approved_by_id %}">user {{ revision.approved_by_id }}</a>
-            {% endif %}
-            {% if revision.disapproved_reason %}
-                &centerdot; <i>{{ revision.disapproved_reason }}</i>
-            {% endif %}
+            {% if revision.approved_by_id %}
+                by
+                {% if user.trusted and 'hideid' not in request.GET %}
+                    <a href="{% url 'user_detail' revision.approved_by_id %}">user {{ revision.approved_by_id }}</a>
+                {% else %}
+                     Secret User
+                {% endif %}
+             {% endif %}
+{% if revision.disapproved_reason %}
+    &centerdot; <i>{{ revision.disapproved_reason }}</i>
+{% endif %}
     {% endif %}
 
     <p class="actions" hx-target="#revision-{{ revision.id }}">
