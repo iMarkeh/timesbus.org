@@ -1,19 +1,17 @@
-{% comment %}
-    This partial template is rendered by the 'show_maintenance_alert'
-    inclusion tag. The 'show_alert' variable controls its visibility.
-{% endcomment %}
-
-{% if show_alert %}
+{% if not show_alert %}
 <div class="maintenance-alert" style="
-    background-color: #ffc107;
-    color: #343a40;
-    padding: 10px 15px;
+    color: #ffffff;
+    padding: 28px 28px;
     text-align: center;
+    line-height: .8rem;
     font-weight: bold;
-    border-bottom: 1px solid #e0a800;
     margin-bottom: 15px;
+    background-image: url('//cdn.transportthing.uk/maintenance.svg?s');
+    background-position: center;
+    background-repeat: no-repeat;
+    background-size: contain;
 ">
-    <p>&#9888; <strong>Heads Up!</strong> Ticketer maintenance is underway.</p>
-    <p>Expect brief tracking interruptions between 9:30 PM and 10:30 PM.<br>We apologize for any inconvenience!</p>
+    <p>&#9888; <strong>Heads Up!</strong> We're making a few changes to the site</p>
+    <p>Expect brief interruptions for the next hour or so.<br>We apologize for any inconvenience!</p>
 </div>
 {% endif %}
