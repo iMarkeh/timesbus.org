@@ -10,6 +10,7 @@ dependencies = [
     "ciso8601>=2.2.0,<3",
     "dj-database-url>=2.0.0,<3",
     "Django<5.3,>=5.2",
+    "skyfield>=1.53",
     "django-autoslug>=1.9.8,<2",
     "django-email-obfuscator>=0.1.5,<0.2",
     "django-filter~=25.1",

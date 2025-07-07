@@ -17,7 +17,7 @@ def show_maintenance_alert(context):
     is_sunday = now.weekday() == 6
     print(f"Is Sunday? {is_sunday}")
 
-    start_time = time(21, 30) # 9:30 PM
+    start_time = time(20, 30) # 9:30 PM
     end_time = time(22, 20)   # 11:00 PM
     print(f"Maintenance Window: {start_time} to {end_time}")
 
