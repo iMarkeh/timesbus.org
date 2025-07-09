@@ -1,4 +1,10 @@
 @charset "UTF-8";
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
     @font-face{
         font-family:"DVLA-VRM-Regular";
         font-weight:normal;

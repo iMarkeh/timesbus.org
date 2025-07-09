@@ -9,8 +9,8 @@ class Command(BaseCommand):
     help = "Creates a fixed range of test vehicles directly in the 'vehicles_vehicle' table, providing defaults for non-nullable columns."
 
     # --- Configuration for this specific script ---
-    WANTED_CODES = [24001, 24002, 24003, 39657, 39658, 39659, 39660, 39661, 39662, 39663, 39664, 39665, 39666, 39667, 39668, 39669, 39670, 39671, 39672, 39673, 39674, 39675, 39701, 39702, 39703, 39704, 39705, 39706, 39707, 39708, 39709, 39710, 39711, 39712, 39714, 39715, 39716, 39717, 39718, 39719, 39720, 39721, 39722, 39723, 39724, 39725, 39726, 39727, 39728, 39729, 39730, 39731, 39732,27508]
-    OPERATOR_PREFIX = "SCNE"
+    WANTED_CODES = [1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32,33,34,35,36,37,38,39,40,41,42,43,44,45,46,47,48,49,50]
+    OPERATOR_PREFIX = "YTJT"
     VEHICLE_TABLE_NAME = "vehicles_vehicle"
     # ---------------------------------------------
 

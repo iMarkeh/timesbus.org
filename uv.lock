@@ -112,6 +112,7 @@ dependencies = [
     { name = "requests" },
     { name = "sentry-sdk", extra = ["django"] },
     { name = "shapely" },
+    { name = "skyfield" },
     { name = "tenacity" },
     { name = "titlecase" },
     { name = "uk-postcode-utils" },
@@ -174,6 +175,7 @@ requires-dist = [
     { name = "requests", specifier = ">=2.32.3,<3" },
     { name = "sentry-sdk", extras = ["django"], specifier = ">=2.4.0,<3" },
     { name = "shapely", specifier = ">=2.0.1,<3" },
+    { name = "skyfield", specifier = ">=1.53" },
     { name = "tenacity", specifier = ">=9.0.0,<10" },
     { name = "titlecase", specifier = "~=2.3" },
     { name = "uk-postcode-utils", specifier = "~=1.1" },
@@ -681,6 +683,18 @@ wheels = [
 ]
 
 [[package]]
+name = "jplephem"
+version = "2.23"
+source = { registry = "https://pypi.org/simple" }
+dependencies = [
+    { name = "numpy" },
+]
+sdist = { url = "https://files.pythonhosted.org/packages/3c/42/0545c37e070e5f940eb52987fb25a351ab3c9327b40bab6ad3dd6125b2e1/jplephem-2.23.tar.gz", hash = "sha256:d3fb9477e4bf4c39d10497d4ff15e5271b7ac03fa101e1821aac527d646eccf9", size = 44989, upload-time = "2025-06-22T18:42:28.813Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/da/e0/b215df7cae3be61a0a293346723f5b068e359a3430dcadb32ef90ae3398c/jplephem-2.23-py3-none-any.whl", hash = "sha256:66110814810b0b30213bdd058a85a41bedbc030bb8a365c85088674fe02546cf", size = 49368, upload-time = "2025-06-22T18:42:27.642Z" },
+]
+
+[[package]]
 name = "json2html"
 version = "1.3.0"
 source = { registry = "https://pypi.org/simple" }
@@ -1155,6 +1169,22 @@ wheels = [
 ]
 
 [[package]]
+name = "sgp4"
+version = "2.24"
+source = { registry = "https://pypi.org/simple" }
+sdist = { url = "https://files.pythonhosted.org/packages/10/fa/4251a1cac8a23ccc552ed367ae7fa7439f631022b7db5472ce99f43b49b3/sgp4-2.24.tar.gz", hash = "sha256:5655249f276ea23fbdae9e881ab01d82420285b45dc76d0da4f424e3647f8352", size = 180085, upload-time = "2025-02-15T16:07:54.33Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/e6/b7/d8ca6e6c9c0164de22872c2b82d5adb71d0a03d597beb7f8b18ea3481139/sgp4-2.24-cp313-cp313-macosx_10_13_universal2.whl", hash = "sha256:e5676d4093441240534b5ca4342b2c33ff2a34f476e427e51b2f0baf0a6a7cfb", size = 186679, upload-time = "2025-04-16T01:51:36.125Z" },
+    { url = "https://files.pythonhosted.org/packages/67/2f/4709227049cd0f2cce53cd50098758b751444d732875ec365feea53fdead/sgp4-2.24-cp313-cp313-macosx_10_13_x86_64.whl", hash = "sha256:988070a3a2d45ea7bdf3f162cdb2bef2698faa8985f4534804a502a53163bd2d", size = 162335, upload-time = "2025-04-16T01:51:38.014Z" },
+    { url = "https://files.pythonhosted.org/packages/2f/db/ade41803faf9d5070fa76c4c698c913568aa781b02582a59516eaf978a6c/sgp4-2.24-cp313-cp313-macosx_11_0_arm64.whl", hash = "sha256:afe447906e605029eb0e86857263d8fba1bf54e3efa8a776c051f4c37dd3fa2b", size = 161504, upload-time = "2025-04-16T01:51:39.633Z" },
+    { url = "https://files.pythonhosted.org/packages/31/18/10744a54653a4038990dbbc5f8edb999e7521858ecb06005a32bee0139fb/sgp4-2.24-cp313-cp313-manylinux_2_17_aarch64.manylinux2014_aarch64.whl", hash = "sha256:f71418f3bb1339feee5cf812d69b212fa539d5191f65127955ca6db9135a8997", size = 235746, upload-time = "2025-05-04T13:36:58.231Z" },
+    { url = "https://files.pythonhosted.org/packages/0d/2c/f103896a3b526a78bfea3db87576a9f33ecb9199aedff1448fbc77a1354e/sgp4-2.24-cp313-cp313-manylinux_2_5_i686.manylinux1_i686.manylinux_2_17_i686.manylinux2014_i686.whl", hash = "sha256:1af8176b34778d538e5e3a45ef8d108128eb9beae227ca6bf470c03553d6f7d7", size = 232542, upload-time = "2025-05-04T13:36:59.72Z" },
+    { url = "https://files.pythonhosted.org/packages/7e/95/159a9d8e3e42de813b2eac2d22bdfa58e1fe37f2ad117b1738ea61e55d8f/sgp4-2.24-cp313-cp313-manylinux_2_5_x86_64.manylinux1_x86_64.manylinux_2_17_x86_64.manylinux2014_x86_64.whl", hash = "sha256:6cbd3fd3fe4d9bde476058e51b129ddbdb01254a3f3aaf9545ef6baff0a144fe", size = 235131, upload-time = "2025-04-16T01:51:41.203Z" },
+    { url = "https://files.pythonhosted.org/packages/01/e0/7d5a7674bb1a4881c46990340ae07884c7279c4f9ca21f66fac197392007/sgp4-2.24-cp313-cp313-win32.whl", hash = "sha256:9d98551dd94dc9a21e58694886ca0dcbcaff728e732ffe225eca733d8bda6d95", size = 161431, upload-time = "2025-04-16T01:51:42.618Z" },
+    { url = "https://files.pythonhosted.org/packages/7d/38/55c85bf39edeab006ad85227083c6561ec11affa7b0c447b99400d99d2fd/sgp4-2.24-cp313-cp313-win_amd64.whl", hash = "sha256:f8bc77551a438cc6b08e56e7bb373b7ca334581c9d948cd5435096c34810f526", size = 163583, upload-time = "2025-04-16T01:51:44.161Z" },
+]
+
+[[package]]
 name = "shapely"
 version = "2.1.1"
 source = { registry = "https://pypi.org/simple" }
@@ -1188,6 +1218,21 @@ source = { registry = "https://pypi.org/simple" }
 sdist = { url = "https://files.pythonhosted.org/packages/94/e7/b2c673351809dca68a0e064b6af791aa332cf192da575fd474ed7d6f16a2/six-1.17.0.tar.gz", hash = "sha256:ff70335d468e7eb6ec65b95b99d3a2836546063f63acc5171de367e834932a81", size = 34031, upload-time = "2024-12-04T17:35:28.174Z" }
 wheels = [
     { url = "https://files.pythonhosted.org/packages/b7/ce/149a00dd41f10bc29e5921b496af8b574d8413afcd5e30dfa0ed46c2cc5e/six-1.17.0-py2.py3-none-any.whl", hash = "sha256:4721f391ed90541fddacab5acf947aa0d3dc7d27b2e1e8eda2be8970586c3274", size = 11050, upload-time = "2024-12-04T17:35:26.475Z" },
+]
+
+[[package]]
+name = "skyfield"
+version = "1.53"
+source = { registry = "https://pypi.org/simple" }
+dependencies = [
+    { name = "certifi" },
+    { name = "jplephem" },
+    { name = "numpy" },
+    { name = "sgp4" },
+]
+sdist = { url = "https://files.pythonhosted.org/packages/2d/cb/0c9f9685f6ff3b9c268b1d995c584f0d09de160f46fbd6c1df0631565bfd/skyfield-1.53.tar.gz", hash = "sha256:24099855f3ba3906663ac1c10e650041e747680b986e807400eddedc0be4a8b4", size = 343126, upload-time = "2025-04-07T23:32:11.614Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/17/f0/c031c7a0e14b75e68c69d90ae8966d6d2383f6e33379914eea0f41bf9518/skyfield-1.53-py3-none-any.whl", hash = "sha256:f2028bba5f3617ef34afab1cabac251601f72a8cd70298ca5def72c4beadce00", size = 366966, upload-time = "2025-04-07T23:32:09.76Z" },
 ]
 
 [[package]]
