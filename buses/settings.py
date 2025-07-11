@@ -312,7 +312,8 @@ ALLOW_VEHICLE_NOTES_OPERATORS = (
     "ie-1178",  # Dublin Express
     "ie-7778000", # Citylink... 
     "PRES", # Preservation
-    "MOTGTM" # MoTGM
+    "MOTGTM", # MoTGM
+    "REPOWER"
 )
 
 NEW_VEHICLE_WEBHOOK_URL = os.environ.get("NEW_VEHICLE_WEBHOOK_URL")

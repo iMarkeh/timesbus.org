@@ -1,4 +1,3 @@
-import datetime
 from django.core.management.base import BaseCommand, CommandError
 from django.db import connection, transaction
 import logging
@@ -6,11 +5,15 @@ import logging
 logger = logging.getLogger(__name__)
 
 class Command(BaseCommand):
-    help = "Creates a fixed range of test vehicles directly in the 'vehicles_vehicle' table, providing defaults for non-nullable columns."
+    help = (
+        "Creates a fixed range of test vehicles directly in the 'vehicles_vehicle' "
+        "table, providing defaults for non-nullable columns."
+    )
 
     # --- Configuration for this specific script ---
-    WANTED_CODES = [1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32,33,34,35,36,37,38,39,40,41,42,43,44,45,46,47,48,49,50]
-    OPERATOR_PREFIX = "YTJT"
+    # Example: If you want vehicles SE-101, SE-102, SE-ABC, SE-XYZ
+    WANTED_CODES = [450001, 450002, 450003, 450004, 450005, 450006, 450007, 450008, 450009, 450010, 450011, 450012, 450013, 450014, 450015, 450016, 450017, 450018, 450019, 450020, 450021, 450022, 450023, 450024, 450025, 450026, 450027, 450028, 450029, 450030, 450031, 450032, 450033, 450034, 450035, 450036, 450037, 450038, 450039, 450040, 450041, 450042, 450043, 450044, 450045, 450046, 450047, 450048, 450049, 450050, 450051, 450052, 450053, 450054, 450055, 450056, 450057, 450058, 450059, 450060, 450061, 450062, 450063, 450064, 450065, 450066, 450067, 450068, 450069, 450070, 450071, 450072, 450073, 450074, 450075, 450076, 450077, 450078, 450079, 450080, 450081, 450082, 450083, 450084, 450085, 450086, 450087, 450088, 450089, 450090, 450091, 450092, 450093, 450094, 450095, 450096, 450097, 450098, 450099, 450100, 450101, 450102, 450103, 450104, 450105, 450106, 450107, 450108, 450109, 450110, 450111, 450112, 450113, 450114, 450115, 450116, 450117, 450118, 450119, 450120, 450121, 450122, 450123, 450124, 450125, 450126, 450127]
+    OPERATOR_PREFIX = "SW"
     VEHICLE_TABLE_NAME = "vehicles_vehicle"
     # ---------------------------------------------
 
@@ -18,91 +21,114 @@ class Command(BaseCommand):
         self.stdout.write(
             self.style.NOTICE(
                 f"Attempting to create test vehicles with '{self.OPERATOR_PREFIX}-' "
-                f"slugs from code kieron welsh is a nonce"
-                f"(inclusive) in table..."
+                f"slugs from the WANTED_CODES list in table '{self.VEHICLE_TABLE_NAME}'..."
             )
         )
 
         try:
-            with transaction.atomic(), connection.cursor() as cursor:
-                default_source_id = 'NULL' # If 'source_id' is nullable in DB
-                default_operator_id = self.OPERATOR_PREFIX.upper()
+            with transaction.atomic():
+                with connection.cursor() as cursor:
+                    # Collect data for insertion, using None for SQL NULL
+                    # and Python booleans for SQL booleans.
+                    vehicle_insert_data = []
 
+                    for current_code_raw in self.WANTED_CODES:
+                        # Ensure all codes are treated as strings for consistency
+                        current_code_str = str(current_code_raw)
+                        slug = f"{self.OPERATOR_PREFIX}-{current_code_str}"
+                        code = current_code_str
 
-                vehicle_data_values = []
-                for current_numeric_code in range(0, len(self.WANTED_CODES)):
-                    current_code_str = str(f"{self.WANTED_CODES[current_numeric_code]}")
-                    slug = f"{self.OPERATOR_PREFIX}-{current_code_str}"
-                    code = current_code_str
-                    if type(self.WANTED_CODES[current_numeric_code]) == int:
-                        fleet_number = self.WANTED_CODES[current_numeric_code]
-                    fleet_code = current_code_str
-                    reg = f""
-                    colours = ""
-                    name = f""
-                    branding = ""
-                    notes = f""
-                    latest_journey_data = 'NULL'
-                    withdrawn = "FALSE"
-                    data = 'NULL'
-                    locked = "FALSE"
-                    garage_id = 'NULL'
-                    latest_journey_id = 'NULL'
-                    livery_id = 'NULL'
-                    operator_id = f"'{default_operator_id}'"
-                    source_id = default_source_id
-                    vehicle_type_id = 'NULL'
-                    vehicle_data_values.append(
-                        f"""
-                        (
-                            '{slug}',
-                            '{code}',
-                            {fleet_number},
-                            '{fleet_code}',
-                            '{reg}',
-                            '{colours}',
-                            '{name}',
-                            '{branding}',
-                            '{notes}',
-                            {latest_journey_data},
-                            {withdrawn},
-                            {data},
-                            {locked},
-                            {garage_id},
-                            {latest_journey_id},
-                            {livery_id},
-                            {operator_id},
-                            {source_id},
-                            {vehicle_type_id}
+                        # Example logic for fleet_number and fleet_code
+                        # Adjust this based on your actual data requirements and schema types
+                        fleet_number = None # Or an integer if applicable, e.g., int(current_code_str) if it's always numeric
+                        fleet_code = "" # Often a string identifier
+
+                        reg = current_code_str # Assuming reg is a string/varchar
+                        colours = ""
+                        name = ""
+                        branding = ""
+                        notes = ""
+                        latest_journey_data = None
+                        withdrawn = False
+                        data = None # For JSONB/JSONField, pass Python dict if needed, else None
+                        locked = False
+                        garage_id = None
+                        latest_journey_id = None
+                        livery_id = None
+                        operator_id = self.OPERATOR_PREFIX.upper()
+                        source_id = None
+                        vehicle_type_id = None
+
+                        vehicle_insert_data.append(
+                            (
+                                slug,
+                                code,
+                                fleet_number,
+                                fleet_code,
+                                reg,
+                                colours,
+                                name,
+                                branding,
+                                notes,
+                                latest_journey_data,
+                                withdrawn,
+                                data,
+                                locked,
+                                garage_id,
+                                latest_journey_id,
+                                livery_id,
+                                operator_id,
+                                source_id,
+                                vehicle_type_id,
+                            )
                         )
-                        """
-                    )
 
-                if not vehicle_data_values:
-                    self.stdout.write(self.style.WARNING("No vehicles to insert within the specified range."))
-                    return
-                insert_sql = f"""
-                INSERT INTO {self.VEHICLE_TABLE_NAME} (
-                    slug, code, fleet_number, fleet_code, reg, colours, name,
-                    branding, notes, latest_journey_data, withdrawn, data,
-                    locked, garage_id, latest_journey_id, livery_id,
-                    operator_id, source_id, vehicle_type_id
-                )
-                VALUES {','.join(vehicle_data_values)}
-                ON CONFLICT (slug) DO NOTHING;
-                """
-                
-                # Execute the bulk insert
-                cursor.execute(insert_sql)
-                rows_processed = cursor.rowcount 
-                
-                self.stdout.write(
-                    self.style.SUCCESS(
-                        f"Successfully processed. "
-                        f"Attempted to create {len(vehicle_data_values)} vehicles. "
-                        f"Inserted/Skipped {rows_processed} rows."
+                    if not vehicle_insert_data:
+                        self.stdout.write(
+                            self.style.WARNING("No vehicles to insert within the specified list.")
+                        )
+                        return
+
+                    # Construct the VALUES part for bulk insertion using placeholders
+                    # For (val1, val2, ...), you'll have (%s, %s, ...)
+                    placeholders = ", ".join(["%s"] * len(vehicle_insert_data[0]))
+                    values_list_placeholders = [
+                        f"({placeholders})" for _ in vehicle_insert_data
+                    ]
+
+                    # Flatten the list of tuples into a single tuple for execute_many
+                    flat_values = [item for sublist in vehicle_insert_data for item in sublist]
+
+                    # Note: execute_many is generally preferred for performance
+                    # but it expects a list of tuples, one tuple per row.
+                    # Your current approach flattens, so a single execute call with
+                    # VALUES (%s, %s, ...), (%s, %s, ...) is also valid.
+                    # Let's stick with the single INSERT...VALUES statement for clarity
+                    # given the `ON CONFLICT` clause.
+
+                    insert_sql = f"""
+                    INSERT INTO {self.VEHICLE_TABLE_NAME} (
+                        slug, code, fleet_number, fleet_code, reg, colours, name,
+                        branding, notes, latest_journey_data, withdrawn, data,
+                        locked, garage_id, latest_journey_id, livery_id,
+                        operator_id, source_id, vehicle_type_id
                     )
-                )
+                    VALUES {','.join(values_list_placeholders)}
+                    ON CONFLICT (slug) DO NOTHING;
+                    """
+
+                    # Execute the bulk insert with parameters
+                    cursor.execute(insert_sql, flat_values)
+                    rows_processed = cursor.rowcount
+
+                    self.stdout.write(
+                        self.style.SUCCESS(
+                            f"Successfully processed. "
+                            f"Attempted to create {len(vehicle_insert_data)} vehicles. "
+                            f"Inserted/Skipped {rows_processed} rows."
+                        )
+                    )
 
         except Exception as e:
-            raise CommandError(f"Error creating test vehicles: {e}")
+            logger.exception("Error creating vehicles:") # Log full traceback
+            raise CommandError(f"Error creating vehicles: {e}")

@@ -1,23 +1,88 @@
-{% extends 'map.html' %}
+{% extends 'page.html' %}
 
-{% load static %}
+{% block canonical %}
+    <link rel="canonical" href="https://transportthing.uk">
+{% endblock canonical %}
 
-{% block footer %}
-    <script>
-        INITIAL_VIEW_STATE = {
-        {% if request.headers.cf_ipcountry == "IE" %}
-            latitude: 53.45,
-            longitude: -7.5,
-        {% else %}
-            latitude: 54,
-            longitude: -2.9,
-        {% endif %}
-            zoom: 5,
-        };
-    </script>
-    <link rel="stylesheet" href="{% static 'dist/js/bigmap-classic.css' %}">
-    <script src="{% static 'js/reqwest.min.js' %}"></script>
-    <script src="{% static 'dist/js/bigmap-classic.js' %}"></script>
+{% block bodyclass %}narrow{% endblock %}
 
-    <link rel="stylesheet" media="print" href="/liveries.{{ liveries_css_version }}.css" onload="this.onload=null;this.removeAttribute('media')">
-{% endblock footer %}
+{% block breadcrumb %}{% endblock %}
+
+{% block content %}
+
+<p>
+    turning operators open data into <a href="/map">real-time maps</a>, timetables and more</p>
+</p>
+
+<div class="panes">
+    <div class="pane">
+        <form method="get" action="/search-query" class="search">
+            <h2><label for="q">Search</label></h2>
+
+            <p><label for="q">Search for places, operators or routes</label></p>
+            <p>
+                <input id="q" name="q" type="search" required>
+                <input type="submit" value="Search" style="color: white">
+            </p>
+        </form>
+    </div>
+    <div class="pane">
+        <h2>Quick Links</h2>
+        <p><a href="/map" class="button" style="color: white">Track buses and find bus stops!</a></p>
+        <p><a href="/vehicles/nasa-iss" class="button" style="color: white">Track the ISS while it orbits earth</a></p>
+    </div>
+</div>
+<h2>Regions</h2>
+
+<ul class="regions">
+    {% if request.headers.cf_ipcountry == "IE" %}
+    <li>Ireland
+        <ul class="long">
+            <li><a href="/region/CO">Connacht</a></li>
+            <li><a href="/region/LE">Leinster</a></li>
+            <li><a href="/region/MU">Munster</a></li>
+            <li><a href="/region/UL">Ulster</a></li>
+        </ul>
+    </li>
+    <li><a href="/regions/NI">Northern Ireland</a></li>
+    {% endif %}
+    <li>England
+        <ul class="long">
+            <li><a href="/region/EA">East Anglia</a></li>
+            <li><a href="/region/EM">East Midlands</a></li>
+            <li><a href="/region/L">London</a></li>
+            <li><a href="/region/NE">North East</a></li>
+            <li><a href="/region/NW">North West</a></li>
+            <li><a href="/region/SE">South East</a></li>
+            <li><a href="/region/SW">South West</a></li>
+            <li><a href="/region/WM">West Midlands</a></li>
+            <li><a href="/region/Y">Yorkshire</a></li>
+        </ul>
+    </li>
+    <li>Other regions in the UK
+    <ul class="long">
+        <li><a href="/region/W">Wales</a></li>
+        <li><a href="/region/S">Scotland</a></li>
+        <li><a href="/region/GB">Great Britain</a></li>
+    </ul>
+    {% if request.headers.cf_ipcountry != "IE" %}
+    <li><a href="/region/NI">Northern Ireland</a></li>
+    <li>Ireland
+        <ul class="long">
+            <li><a href="/region/CO">Connacht</a></li>
+            <li><a href="/region/LE">Leinster</a></li>
+            <li><a href="/region/MU">Munster</a></li>
+            <li><a href="/region/UL">Ulster</a></li>
+        </ul>
+    </li>
+    {% endif %}
+    </li>
+    <li>Outer Islands
+        <ul class="long">
+            <li><a href="/region/IM">Isle of Man</a></li>
+            <li><a href="/region/GG">Guernsey</a></li>
+            <li><a href="/region/JE">Jersey</a></li>
+        </ul>
+    </li>
+</ul>
+{% endblock content %}
