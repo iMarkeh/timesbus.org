@@ -45,12 +45,14 @@ class Command(BaseCommand):
             NCTR_NOCs = ["NCTR", "TBTN"]
             tfl_nocs = ["TFLO", "LGEN", "FLON"]
             tfi_nocs = ["ULB", "FY-", "GLE", "MET", "ACAH", "IE-", "I-"]
+            midlands = ["ADER", "AMID", "AMMO", "TBTN", "KBUS", "TMTL", "NDTR", "MDCL", "BULI", "HIPK", "NOCT", "LTLS"]
 
             COLORS = {
                 "bee": 0xFFD700,    # Gold
                 "nctr": 0x1E90FF,   # Dodger Blue
                 "tfl": 0xA020F0,    # Purple
                 "tfi": 0x228B22,    # Forest Green
+                "midland": 0xBB0000, # Red
                 "default": 0xCCCCCC # Grey
             }
 
@@ -84,6 +86,9 @@ class Command(BaseCommand):
                 elif noc_code in tfl_nocs:
                     group = "tfl"
                     role_id = "1365031195737329674"
+                elif noc_code in midlands:
+                     group = "midland"
+                     role_id = "1393283118596886548"
                 elif noc_code in tfi_nocs:
                     group = "tfi"
                     role_id = "1367127895696216104"

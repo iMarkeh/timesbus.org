@@ -42,9 +42,9 @@ const imagesByName: { [imageName: string]: string } = {
 
 // Updated mapStyles to only use timesbus.org styles
 const mapStyles: { [key: string]: string } = {
-  timesbus_positron: "Light",
+  //timesbus_positron: "Light",
   timesbus_dark_matter: "Dark",
-  timesbus_bright: "Bright",
+  timesbus_bright: "Light",
   maptiler_satellite: "Satellite",
 //  timesbus_atlas: "Atlas",
 //  thunderforest_transport: "Transport",

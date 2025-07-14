@@ -46,6 +46,7 @@ urlpatterns = [
         cdn_cache_control(1800)(TemplateView.as_view(template_name="cookies.html")),
     ),
     path("503", TemplateView.as_view(template_name="503.html")),
+    path("trains", TemplateView.as_view(template_name="trains.html")),
     path("maintenance", TemplateView.as_view(template_name="maintenance.html")),
     path("data", TemplateView.as_view(template_name="data.html")),
     path("status", views.status),

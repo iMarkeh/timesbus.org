@@ -3,7 +3,7 @@ from django.db.models import Q
 from django.forms.widgets import TextInput, NumberInput
 from vehicles.models import Vehicle, Operator
 from accounts.models import User
-
+import requests
 
 class VehicleRevisionFilter(FilterSet):
     operator = ModelChoiceFilter(
@@ -16,9 +16,9 @@ class VehicleRevisionFilter(FilterSet):
         label="Vehicle ID", queryset=Vehicle.objects, widget=NumberInput
     )
     user = ModelChoiceFilter(label="User ID", queryset=User.objects, widget=NumberInput)
-    # approved_by = ModelChoiceFilter(
-    #     label="(Dis)approver", queryset=User.objects, widget=NumberInput
-    # )
+    approved_by = ModelChoiceFilter(
+        label="(Dis)approver", queryset=User.objects, widget=NumberInput
+    )
     status = ChoiceFilter(
         label="Status",
         choices=[

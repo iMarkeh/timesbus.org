@@ -1,0 +1,416 @@
+{% block canonical %}
+    <link rel="canonical" href="https://transportthing.uk/trains">
+{% endblock canonical %}
+
+{% block content %}
+ <!-- Include MapLibre GL JS CSS -->
+    <link href="https://unpkg.com/maplibre-gl@3.x/dist/maplibre-gl.css" rel="stylesheet" />
+    <!-- Include MapLibre GL JS script -->
+    <script src="https://unpkg.com/maplibre-gl@3.x/dist/maplibre-gl.js"></script>
+    <style>
+        body {margin: 0}
+        #map { position: absolute; top: 0; bottom: 0; width: 100vw; }
+        #controls {
+            position: absolute;
+            top: 1.25rem;
+            left: 1.25rem;
+            background: rgba(255, 255, 255, 0.8);
+            padding: 10px;
+            border-radius: 5px;
+            z-index: 1; /* Ensure controls are above the map */
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+        #controls label {
+            margin-right: 10px;
+        }
+
+        #map .mapboxgl-popup-content {
+            background: #333 !important;
+            color: #eee !important;
+            padding: 10px !important;
+            border-radius: 5px !important;
+            box-shadow: 0 1px 5px rgba(0, 0, 0, 0.6) !important;
+        }
+
+        #map .mapboxgl-popup-tip {
+             /* Style the triangle pointer */
+            border-top-color: #333 !important; /* Match top border color to background */
+            border-bottom-color: #333 !important; /* Match bottom border color */
+        }
+
+         #map .mapboxgl-popup-close-button {
+            color: #eee !important; /* Light color for the close button */
+         }
+
+        #map .popup-link {
+            font-weight: bold;
+            color: #00bcd4 !important; /* A lighter color for links that stands out on dark background */
+            text-decoration: underline !important;
+            cursor: pointer !important;
+        }
+
+        /* Optionally style strong tags in popup */
+         #map .mapboxgl-popup-content strong {
+            color: #bbb !important; /* Slightly lighter color for strong text */
+         }
+    </style>
+    <div id="map"></div>
+    <div id="controls">
+        <div>
+            <!-- MODIFIED LABEL -->
+            <label for="toc-select">Select Operator:</label>
+            <select id="toc-select">
+                <option value="">All Trains</option>
+                <!-- Options will be populated by JavaScript -->
+            </select>
+        </div>
+        <div>
+            <label>Realtime Trains Link:</label>
+            <input type="radio" id="link-simple" name="rtt-link-type" value="simple" checked>
+            <label for="link-simple">Simple</label>
+            <input type="radio" id="link-detailed" name="rtt-link-type" value="detailed">
+            <label for="link-detailed">Detailed</label>
+        </div>
+    </div>
+
+    <script>
+        const API_KEY = "ash-dev";
+        var styleUrl = 'https://tiles.snubs.dev/styles/fiord/style.json';
+        const fastapiApiUrl = 'https://tb.apilogic.uk/networkrail/trains.asmx';
+
+        var map = new maplibregl.Map({
+            container: 'map',
+            style: styleUrl,
+            center: [-2.0, 54.0],
+            zoom: 6
+        });
+
+        let openTrainPopup = null;
+        let openTrainRid = null;
+
+        const tocSelect = document.getElementById('toc-select');
+        const linkSimpleRadio = document.getElementById('link-simple');
+        const linkDetailedRadio = document.getElementById('link-detailed');
+
+
+        function formatDateForRealtimeTrains() {
+            const now = new Date();
+            const year = now.getFullYear();
+            const month = ('0' + (now.getMonth() + 1)).slice(-2); // Months are 0-indexed
+            const day = ('0' + now.getDate()).slice(-2);
+            // Corrected format to YYYY-MM-DD
+            return `${year}-${month}-${day}`;
+        }
+
+        // Function to fetch and plot train data from endpoint
+        function fetchAndPlotTrains(toc) {
+            const apiUrl = toc ? `${fastapiApiUrl}?toc=${toc}` : fastapiApiUrl;
+
+            const requestHeaders = new Headers();
+            requestHeaders.append("X-API-Key", API_KEY);
+
+            fetch(apiUrl, {
+                headers: requestHeaders
+            })
+            .then(response => {
+                if (!response.ok) {
+                    if (response.status === 401) {
+                        console.error("Unauthorized access to API. Check your API Key.");
+                        alert("Unauthorized access to train data. Please check your API Key.");
+                    }
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                return response.json();
+            })
+            .then(geojsonData => {
+                if (map.getSource('trains')) {
+                    map.getSource('trains').setData(geojsonData);
+                    console.log(`Plotted ${geojsonData.features.length} trains.`);
+
+                    if (tocSelect.options.length <= 1) { // Only populate once
+                        const operatorData = [];
+                        const seenTocs = new Set(); // To ensure each TOC (and its operator) is added only once
+
+                        geojsonData.features.forEach(f => {
+                            if (f.properties && f.properties.toc && f.properties.train_operator && !seenTocs.has(f.properties.toc)) {
+                                operatorData.push({
+                                    toc: f.properties.toc,
+                                    operatorName: f.properties.train_operator
+                                });
+                                seenTocs.add(f.properties.toc);
+                            }
+                        });
+
+                        // Sort by operator name, then by TOC as a secondary sort (for consistency)
+                        operatorData.sort((a, b) => {
+                            const nameCompare = a.operatorName.localeCompare(b.operatorName);
+                            if (nameCompare !== 0) {
+                                return nameCompare;
+                            }
+                            return a.toc.localeCompare(b.toc);
+                        });
+
+                        operatorData.forEach(item => {
+                            const option = document.createElement('option');
+                            option.value = item.toc; // Value is the TOC code for filtering
+                            option.textContent = item.operatorName; // Display is the Train Operator name
+                            tocSelect.appendChild(option);
+                        });
+
+                        // URL param logic for 'toc' (still uses TOC code)
+                        const urlParams = new URLSearchParams(window.location.search);
+                        const tocFromUrl = urlParams.get('toc'); // This is a TOC code
+                        if (tocFromUrl) {
+                            // Check if this tocFromUrl exists as a value in the newly populated options
+                            const matchingOption = Array.from(tocSelect.options).find(opt => opt.value === tocFromUrl);
+                            if (matchingOption) {
+                                tocSelect.value = tocFromUrl; // Set selected value based on TOC code
+                            }
+                        }
+                    }
+                    // --- End Populate Operator Dropdown ---
+
+
+                    // --- Popup Following Logic (MODIFIED) ---
+                    if (openTrainPopup && openTrainRid) {
+                        const updatedTrain = geojsonData.features.find(
+                            feature => feature.properties && feature.properties.rid === openTrainRid
+                        );
+
+                        if (updatedTrain && updatedTrain.geometry && updatedTrain.geometry.coordinates) {
+                            // 1. Update position
+                            openTrainPopup.setLngLat(updatedTrain.geometry.coordinates);
+
+                            // 2. Update content (re-create the HTML based on updated properties)
+                            const properties = updatedTrain.properties; // Use the updated properties
+
+                            const selectedLinkType = document.querySelector('input[name="rtt-link-type"]:checked').value;
+
+                            let realtimeTrainsUrl = '';
+                            let linkText = 'N/A';
+
+                            if (properties.uid) {
+                                const todayDate = formatDateForRealtimeTrains();
+                                realtimeTrainsUrl = `https://www.realtimetrains.co.uk/service/gb-nr:${properties.uid}/${todayDate}`;
+                                linkText = "View on RTT";
+                                if (selectedLinkType === 'detailed') {
+                                    realtimeTrainsUrl += '/detailed';
+                                }
+                            } else if (properties.headcode) {
+                                const todayDate = formatDateForRealtimeTrains();
+                                realtimeTrainsUrl = `https://www.realtimetrains.co.uk/service/${properties.headcode}/${todayDate}`;
+                                linkText = "View on RTT";
+                                if (selectedLinkType === 'detailed') {
+                                    realtimeTrainsUrl += '/detailed';
+                                }
+                            }
+
+                            let linkHtml = `<strong>RTT Link:</strong> ${linkText}`;
+                            if (realtimeTrainsUrl && linkText !== 'N/A') {
+                                linkHtml = `<strong>RTT Link:</strong> <a href="${realtimeTrainsUrl}" target="_blank" class="popup-link">${linkText}</a>`;
+                            }
+                            linkHtml += '<br>';
+
+                            const popupContent = `
+                                ${linkHtml}
+                                <strong>Operator:</strong> ${properties.train_operator || 'N/A'}<br>
+                                <strong>Headcode:</strong> ${properties.headcode || 'N/A'}<br>
+                                <strong>Delay:</strong> ${properties.delay !== null ? properties.delay + ' mins' : 'N/A'}<br>
+                                <strong>Origin:</strong> ${properties.origin_name || 'N/A'}<br>
+                                <strong>Destination:</strong> ${properties.destination_name || 'N/A'}
+                                ${properties.ts ? '<br><strong>Last Updated:</strong> ' + new Date(properties.ts).toLocaleTimeString() : ''}
+                            `;
+
+                            openTrainPopup.setHTML(popupContent); // Set the updated HTML content
+
+                        } else {
+                            console.log(`Train with RID ${openTrainRid} not found in updated data. Closing popup.`);
+                            openTrainPopup.remove();
+                            openTrainPopup = null;
+                            openTrainRid = null;
+                        }
+                    }
+                    // --- End Popup Following Logic ---
+
+                } else {
+                    console.error("Train data source 'trains' not found after map load.");
+                }
+            })
+            .catch(error => {
+                console.error('Error fetching train data from FastAPI:', error);
+                if (map.getSource('trains')) {
+                    map.getSource('trains').setData({ type: 'FeatureCollection', features: [] });
+                }
+                if (openTrainPopup) {
+                    openTrainPopup.remove();
+                    openTrainPopup = null;
+                    openTrainRid = null;
+                }
+            });
+        }
+
+        function updateMapFromControls() {
+             const selectedToc = tocSelect.value; // This correctly gets the TOC code from option's value
+             fetchAndPlotTrains(selectedToc);
+
+            const urlParams = new URLSearchParams(window.location.search);
+            if (selectedToc) {
+                urlParams.set('toc', selectedToc); // URL parameter is still 'toc'
+            } else {
+                urlParams.delete('toc');
+            }
+            // Using # for client-side state, not query params that reload the page
+            history.replaceState(null, '', `${window.location.pathname}?${urlParams}#`);
+
+        }
+
+
+        map.on('load', function() {
+             map.loadImage(
+                'https://trains.snubs.dev/train.png', // Replace with the URL to your train icon image
+                function (error, image) {
+                    if (error) console.error("Error loading train icon:", error);
+                    if (image && !map.hasImage('train-icon')) {
+                         map.addImage('train-icon', image);
+                         console.log("Train icon loaded.");
+                    } else if (!image) {
+                         console.warn("Train icon image is null or undefined.");
+                    }
+
+                     if (!map.getLayer('train-points')) {
+                         map.addLayer({
+                             id: 'train-points',
+                             type: 'symbol',
+                             source: 'trains',
+                             layout: {
+                                 'icon-image': map.hasImage('train-icon') ? 'train-icon' : '',
+                                 'icon-size': 0.05,
+                                 'icon-allow-overlap': true,
+
+                                 'text-field': ['get', 'headcode'], // Still try to display headcode if available
+                                 'text-font': ['Metropolis Light', 'Noto Sans Regular'],
+                                 'text-size': 10,
+                                 'text-anchor': 'bottom',
+                                 'text-offset': [0, -2],
+                                 'text-allow-overlap': true
+                             },
+                             paint: {
+                                  'icon-color': [
+                                    'match', ['get', 'toc'], 'AW', '#005432', 'CC', '#003399', 'CH', '#673AB7', 'EM', '#FF5722',
+                                     'ES', '#673AB7', 'GN', '#3F51B5', 'GR', '#FF9800', 'GW', '#795548', 'HX', '#FFC107',
+                                     'LE', '#00BCD4', 'LM', '#4CAF50', 'LO', '#FF9800', 'ME', '#9C27B0', 'MV', '#E91E63',
+                                     'NT', '#FF0000', 'SR', '#00796B', 'SW', '#03A9F4', 'TL', '#9E9E9E', 'TP', '#2196F3',
+                                     'TW', '#8BC34A', 'VT', '#FFEB3B', '#FFFFFF'
+                                  ],
+                                 'text-color': [
+                                    'match', ['get', 'toc'], 'AW', '#005432', 'CC', '#003399', 'CH', '#673AB7', 'EM', '#FF5722',
+                                     'ES', '#673AB7', 'GN', '#3F51B5', 'GR', '#FF9800', 'GW', '#795548', 'HX', '#FFC107',
+                                     'LE', '#00BCD4', 'LM', '#4CAF50', 'LO', '#FF9800', 'ME', '#9C27B0', 'MV', '#E91E63',
+                                     'NT', '#FF0000', 'SR', '#00796B', 'SW', '#03A9F4', 'TL', '#9E9E9E', 'TP', '#2196F3',
+                                     'TW', '#8BC34A', 'VT', '#FFEB3B', '#FFFFFF'
+                                 ],
+                                 'text-halo-color': '#000000',
+                                 'text-halo-width': 1
+                             }
+                         });
+                     } else {
+                         console.warn("Train points layer already exists.");
+                     }
+
+                    updateMapFromControls(); // Initial fetch
+
+                    setInterval(() => {
+                         fetchAndPlotTrains(tocSelect.value); // Pass current selection
+                     }, 2000);
+
+
+                }
+            );
+
+            map.addSource('trains', {
+                type: 'geojson',
+                data: {
+                    type: 'FeatureCollection',
+                    features: []
+                }
+            });
+
+             map.on('click', 'train-points', function (e) {
+                var properties = e.features[0].properties;
+                if (properties) {
+                     if (openTrainPopup) {
+                         openTrainPopup.remove();
+                     }
+
+                    const selectedLinkType = document.querySelector('input[name="rtt-link-type"]:checked').value;
+
+                    let realtimeTrainsUrl = '';
+                     let linkText = 'N/A'; // Default link text
+
+                     // Prioritize uid for RTT link
+                    if (properties.uid) {
+                        const todayDate = formatDateForRealtimeTrains();
+                        realtimeTrainsUrl = `https://www.realtimetrains.co.uk/service/gb-nr:${properties.uid}/${todayDate}`;
+                         linkText = "View on RTT"; // Use UID as link text
+                         if (selectedLinkType === 'detailed') {
+                            realtimeTrainsUrl += '/detailed';
+                         }
+                    } else if (properties.headcode) {
+                         // Further fallback to headcode/date link
+                         const todayDate = formatDateForRealtimeTrains();
+                         realtimeTrainsUrl = `https://www.realtimetrains.co.uk/service/${properties.headcode}/${todayDate}`;
+                          linkText = "View on RTT"; // Use Headcode as link text
+                          if (selectedLinkType === 'detailed') {
+                            realtimeTrainsUrl += '/detailed';
+                         }
+                    }
+
+
+                    let linkHtml = `<strong>RTT Link:</strong> ${linkText}`;
+                     if (realtimeTrainsUrl && linkText !== 'N/A') { // Only create link if a URL and valid text exist
+                         linkHtml = `<strong>RTT Link:</strong> <a href="${realtimeTrainsUrl}" target="_blank" class="popup-link">${linkText}</a>`;
+                     }
+                    linkHtml += '<br>'; // Add a line break after the link
+
+                    openTrainPopup = new maplibregl.Popup({
+                        closeButton: true,
+                        closeOnClick: true
+                    })
+                        .setLngLat(e.features[0].geometry.coordinates)
+                        .setHTML(`
+                             ${linkHtml}
+                            <strong>Operator:</strong> ${properties.train_operator || 'N/A'}<br>
+                            <strong>Headcode:</strong> ${properties.headcode || 'N/A'}<br>
+                            <strong>Delay:</strong> ${properties.delay !== null ? properties.delay + ' mins' : 'N/A'}<br>
+                            <strong>Origin:</strong> ${properties.origin_name || 'N/A'}<br>
+                            <strong>Destination:</strong> ${properties.destination_name || 'N/A'}
+                             ${properties.ts ? '<br><strong>Last Updated:</strong> ' + new Date(properties.ts).toLocaleTimeString() : ''}
+                         `)
+                        .addTo(map);
+
+                     openTrainRid = properties.rid;
+
+                     openTrainPopup.on('close', function() {
+                         openTrainPopup = null;
+                         openTrainRid = null;
+                     });
+
+                }
+            });
+
+            map.on('mouseenter', 'train-points', function () {
+                map.getCanvas().style.cursor = 'pointer';
+            });
+
+            map.on('mouseleave', 'train-points', function () {
+                map.getCanvas().style.cursor = '';
+            });
+
+
+        });
+
+        tocSelect.addEventListener('change', updateMapFromControls);
+        // No need for a listener on radio buttons, popup logic reads the selected value when opened
+
+    </script>
+{% endblock content %}

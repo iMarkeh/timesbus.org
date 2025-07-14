@@ -1,88 +1,394 @@
 {% extends 'page.html' %}
 
 {% block canonical %}
-    <link rel="canonical" href="https://transportthing.uk">
+<link rel="canonical" href="https://transportthing.uk">
 {% endblock canonical %}
 
-{% block bodyclass %}narrow{% endblock %}
+{% block bodyclass %}wide{% endblock %}
 
 {% block breadcrumb %}{% endblock %}
 
 {% block content %}
 
-<p>
-    turning operators open data into <a href="/map">real-time maps</a>, timetables and more</p>
-</p>
+<style>
+/*
+ * ROOT VARIABLES: Define your base colors for light mode.
+ * These will be the defaults.
+ */
+:root {
+  --background-color: #f0f4f8; /* Light background for the overall page */
+  --text-color: #333; /* Dark text for light mode */
+  --heading-color: #2c3e50; /* Even darker for headings */
+  --card-background: #fff; /* White background for cards */
+  --card-border: #eee; /* Light border for cards */
+  --link-color: #007bff; /* Standard blue link */
+  --link-hover-color: #0056b3; /* Darker blue on hover */
+  --input-border: #ccc; /* Input border color */
+  --input-placeholder-color: #777; /* Placeholder text color */
+  --hero-background: #e2e8f0; /* Slightly darker hero background for contrast */
 
-<div class="panes">
-    <div class="pane">
-        <form method="get" action="/search-query" class="search">
-            <h2><label for="q">Search</label></h2>
+  /* Button Colors */
+  --primary-button-bg: #28a745;
+  --primary-button-text: white;
+  --primary-button-hover-bg: #218838;
 
-            <p><label for="q">Search for places, operators or routes</label></p>
-            <p>
-                <input id="q" name="q" type="search" required>
-                <input type="submit" value="Search" style="color: white">
-            </p>
-        </form>
-    </div>
-    <div class="pane">
-        <h2>Quick Links</h2>
-        <p><a href="/map" class="button" style="color: white">Track buses and find bus stops!</a></p>
-        <p><a href="/vehicles/nasa-iss" class="button" style="color: white">Track the ISS while it orbits earth</a></p>
-    </div>
+  --secondary-button-bg: #6c757d;
+  --secondary-button-text: white;
+  --secondary-button-hover-bg: #5a6268;
+
+  /* Region Group Specifics */
+  --region-group-bg: #f9f9f9;
+  --region-group-border: #eee;
+}
+
+/*
+ * DARK MODE OVERRIDES: Apply these styles when the user prefers dark mode.
+ * The values of the CSS variables are changed here.
+ */
+@media (prefers-color-scheme: dark) {
+  :root {
+    --background-color: #1a202c; /* Dark background */
+    --text-color: #e2e8f0; /* Light text */
+    --heading-color: #cbd5e0; /* Lighter headings */
+    --card-background: #2d3748; /* Darker background for cards */
+    --card-border: #4a5568; /* Darker border for cards */
+    --link-color: #63b3ed; /* Lighter blue link */
+    --link-hover-color: #3182ce; /* Even lighter on hover */
+    --input-border: #4a5568; /* Darker input border */
+    --input-placeholder-color: #a0aec0; /* Lighter placeholder */
+    --hero-background: #2a3340; /* Darker hero background */
+
+    /* Button Colors (often remain similar, but can be adjusted) */
+    --primary-button-bg: #28a745;
+    --primary-button-text: white;
+    --primary-button-hover-bg: #218838;
+
+    --secondary-button-bg: #6c757d;
+    --secondary-button-text: white;
+    --secondary-button-hover-bg: #5a6268;
+
+    /* Region Group Specifics */
+    --region-group-bg: #3a475a;
+    --region-group-border: #4a5568;
+  }
+}
+
+/* General Layout - using variables */
+.wide {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 20px;
+  background-color: var(--background-color); /* Apply background variable */
+  color: var(--text-color); /* Apply text color variable */
+  transition: background-color 0.3s ease, color 0.3s ease; /* Smooth transition */
+}
+
+/* Card Styling - using variables */
+.card {
+  background-color: var(--card-background); /* Apply card background variable */
+  border-radius: 8px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  padding: 30px;
+  margin-bottom: 30px;
+  border: 1px solid var(--card-border); /* Apply card border variable */
+  transition: background-color 0.3s ease, border-color 0.3s ease; /* Smooth transition */
+}
+
+/* Hero Section - using variables */
+.hero-section {
+  text-align: center;
+  padding: 50px 20px;
+  background-color: var(--hero-background); /* Apply hero background variable */
+  margin-bottom: 30px;
+  border-radius: 8px;
+  transition: background-color 0.3s ease; /* Smooth transition */
+}
+
+.hero-section h1 {
+  font-size: 2.5em;
+  color: var(--heading-color); /* Apply heading color variable */
+  margin-bottom: 15px;
+}
+
+.hero-section .subtitle {
+  font-size: 1.2em;
+  color: var(--text-color); /* Apply text color variable */
+  line-height: 1.5;
+  max-width: 700px;
+  margin: 0 auto;
+}
+
+/* Headings - using variables */
+.search-section h2,
+.features-section h2,
+.regions-section h2,
+.region-group h3 {
+  color: var(--heading-color); /* Apply heading color variable */
+  margin-bottom: 20px;
+  font-size: 1.8em;
+  transition: color 0.3s ease; /* Smooth transition */
+}
+
+.region-group h3 {
+  border-bottom-color: var(--card-border); /* Apply card border for separator */
+}
+
+/* Search Form - using variables */
+.search-form {
+  display: flex;
+  gap: 10px;
+  margin-top: 20px;
+}
+
+.search-form input[type="search"] {
+  flex-grow: 1;
+  padding: 12px 15px;
+  border: 1px solid var(--input-border); /* Apply input border variable */
+  border-radius: 5px;
+  font-size: 1em;
+  box-sizing: border-box;
+  background-color: var(--card-background); /* Use card background for input */
+  color: var(--text-color); /* Use text color for input text */
+  transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease; /* Smooth transition */
+}
+
+.search-form input[type="search"]::placeholder {
+  color: var(--input-placeholder-color); /* Apply placeholder color variable */
+}
+
+.search-form button[type="submit"] {
+  padding: 12px 25px;
+  background-color: var(--link-color); /* Use link color for default button */
+  color: white; /* Button text often remains white */
+  border: none;
+  border-radius: 5px;
+  font-size: 1em;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.search-form button[type="submit"]:hover {
+  background-color: var(--link-hover-color); /* Darker on hover */
+}
+
+/* Feature List buttons - using variables */
+.button {
+  display: block;
+  padding: 15px 20px;
+  text-align: center;
+  text-decoration: none;
+  border-radius: 5px;
+  font-weight: bold;
+  transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+.primary-button {
+  background-color: var(--primary-button-bg);
+  color: var(--primary-button-text);
+}
+
+.primary-button:hover {
+  background-color: var(--primary-button-hover-bg);
+}
+
+.secondary-button {
+  background-color: var(--secondary-button-bg);
+  color: var(--secondary-button-text);
+}
+
+.secondary-button:hover {
+  background-color: var(--secondary-button-hover-bg);
+}
+
+/* Regions Section - using variables */
+.main-content-grid {
+  display: flex;
+  gap: 30px;
+  margin-bottom: 30px;
+}
+
+.search-section,
+.features-section {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+.feature-list {
+  list-style: none;
+  padding: 0;
+  margin: auto 0 0 0;
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+}
+
+.feature-list li {
+  width: 100%;
+}
+
+.region-list-container {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 25px;
+}
+
+.region-group {
+  background-color: var(--region-group-bg); /* Apply region group background variable */
+  padding: 20px;
+  border-radius: 5px;
+  border: 1px solid var(--region-group-border); /* Apply region group border variable */
+  transition: background-color 0.3s ease, border-color 0.3s ease; /* Smooth transition */
+}
+
+.region-group ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.region-group ul li {
+  margin-bottom: 8px;
+}
+
+.region-group ul li a {
+  text-decoration: none;
+  color: var(--link-color); /* Apply link color variable */
+  transition: color 0.2s ease;
+}
+
+.region-group ul li a:hover {
+  color: var(--link-hover-color); /* Apply link hover color variable */
+  text-decoration: underline;
+}
+
+/* Responsive Adjustments */
+@media (max-width: 768px) {
+  .main-content-grid {
+    flex-direction: column;
+  }
+
+  .hero-section h1 {
+    font-size: 1.8em;
+  }
+
+  .hero-section .subtitle {
+    font-size: 1em;
+  }
+
+  .search-form {
+    flex-direction: column;
+  }
+
+  .search-form input[type="search"],
+  .search-form button[type="submit"] {
+    width: 100%;
+  }
+
+  .region-list-container {
+    grid-template-columns: 1fr;
+  }
+}
+</style>
+<div class="hero-section">
+  <h1>Turning operator open data into real-time maps, timetables, and more!</h1>
+  <p class="subtitle">Your ultimate guide to public transport in the UK and Ireland.</p>
 </div>
-<h2>Regions</h2>
 
-<ul class="regions">
+<div class="main-content-grid">
+  <div class="search-section card">
+    <h2><label for="q">Find Your Journey</label></h2>
+    <p>Search for places, operators, or routes across the network.</p>
+    <form method="get" action="/search-query" class="search-form">
+      <input id="q" name="q" type="search" placeholder="e.g., London, Stagecoach, 236" required />
+      <button type="submit">Search</button>
+    </form>
+  </div>
+
+  <div class="features-section card">
+    <h2>Popular Features</h2>
+    <ul class="feature-list">
+      <li>
+        <a href="/map" class="button primary-button">Track buses and find bus stops!</a>
+      </li>
+      <li>
+        <a href="/vehicles/nasa-iss" class="button secondary-button">Track the ISS while it orbits Earth</a>
+      </li>
+    </ul>
+  </div>
+</div>
+
+<div class="regions-section card">
+  <h2>Explore Regions</h2>
+  <div class="region-list-container">
     {% if request.headers.cf_ipcountry == "IE" %}
-    <li>Ireland
-        <ul class="long">
-            <li><a href="/region/CO">Connacht</a></li>
-            <li><a href="/region/LE">Leinster</a></li>
-            <li><a href="/region/MU">Munster</a></li>
-            <li><a href="/region/UL">Ulster</a></li>
-        </ul>
-    </li>
-    <li><a href="/regions/NI">Northern Ireland</a></li>
+    <div class="region-group">
+      <h3>Ireland</h3>
+      <ul>
+        <li><a href="/region/CO">Connacht</a></li>
+        <li><a href="/region/LE">Leinster</a></li>
+        <li><a href="/region/MU">Munster</a></li>
+        <li><a href="/region/UL">Ulster</a></li>
+      </ul>
+    </div>
+    <div class="region-group">
+      <h3>Northern Ireland</h3>
+      <ul>
+        <li><a href="/regions/NI">Northern Ireland</a></li>
+      </ul>
+    </div>
     {% endif %}
-    <li>England
-        <ul class="long">
-            <li><a href="/region/EA">East Anglia</a></li>
-            <li><a href="/region/EM">East Midlands</a></li>
-            <li><a href="/region/L">London</a></li>
-            <li><a href="/region/NE">North East</a></li>
-            <li><a href="/region/NW">North West</a></li>
-            <li><a href="/region/SE">South East</a></li>
-            <li><a href="/region/SW">South West</a></li>
-            <li><a href="/region/WM">West Midlands</a></li>
-            <li><a href="/region/Y">Yorkshire</a></li>
-        </ul>
-    </li>
-    <li>Other regions in the UK
-    <ul class="long">
+
+    <div class="region-group">
+      <h3>England</h3>
+      <ul>
+        <li><a href="/region/EA">East Anglia</a></li>
+        <li><a href="/region/EM">East Midlands</a></li>
+        <li><a href="/region/L">London</a></li>
+        <li><a href="/region/NE">North East</a></li>
+        <li><a href="/region/NW">North West</a></li>
+        <li><a href="/region/SE">South East</a></li>
+        <li><a href="/region/SW">South West</a></li>
+        <li><a href="/region/WM">West Midlands</a></li>
+        <li><a href="/region/Y">Yorkshire</a></li>
+      </ul>
+    </div>
+
+    <div class="region-group">
+      <h3>Other UK Regions</h3>
+      <ul>
         <li><a href="/region/W">Wales</a></li>
         <li><a href="/region/S">Scotland</a></li>
         <li><a href="/region/GB">Great Britain</a></li>
-    </ul>
+      </ul>
+    </div>
+
     {% if request.headers.cf_ipcountry != "IE" %}
-    <li><a href="/region/NI">Northern Ireland</a></li>
-    <li>Ireland
-        <ul class="long">
-            <li><a href="/region/CO">Connacht</a></li>
-            <li><a href="/region/LE">Leinster</a></li>
-            <li><a href="/region/MU">Munster</a></li>
-            <li><a href="/region/UL">Ulster</a></li>
-        </ul>
-    </li>
+    <div class="region-group">
+      <h3>Northern Ireland</h3>
+      <ul>
+        <li><a href="/region/NI">Northern Ireland</a></li>
+      </ul>
+    </div>
+    <div class="region-group">
+      <h3>Ireland</h3>
+      <ul>
+        <li><a href="/region/CO">Connacht</a></li>
+        <li><a href="/region/LE">Leinster</a></li>
+        <li><a href="/region/MU">Munster</a></li>
+        <li><a href="/region/UL">Ulster</a></li>
+      </ul>
+    </div>
     {% endif %}
-    </li>
-    <li>Outer Islands
-        <ul class="long">
-            <li><a href="/region/IM">Isle of Man</a></li>
-            <li><a href="/region/GG">Guernsey</a></li>
-            <li><a href="/region/JE">Jersey</a></li>
-        </ul>
-    </li>
-</ul>
+
+    <div class="region-group">
+      <h3>Outer Islands</h3>
+      <ul>
+        <li><a href="/region/IM">Isle of Man</a></li>
+        <li><a href="/region/GG">Guernsey</a></li>
+        <li><a href="/region/JE">Jersey</a></li>
+      </ul>
+    </div>
+  </div>
+</div>
 {% endblock content %}

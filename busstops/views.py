@@ -220,7 +220,7 @@ def contact(request):
                 request.headers.get("user-agent", ""),
             ]
             if request.user.is_authenticated:
-                body.append(f"https://timesbus.org{request.user.get_absolute_url()}")
+                body.append(f"https://transportthing.uk{request.user.get_absolute_url()}")
             body = "\n\n".join(body)
 
             message = EmailMessage(
