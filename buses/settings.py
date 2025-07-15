@@ -317,7 +317,7 @@ ALLOW_VEHICLE_NOTES_OPERATORS = (
 )
 
 NEW_VEHICLE_WEBHOOK_URL = os.environ.get("NEW_VEHICLE_WEBHOOK_URL")
-
+NEW_TRAIN_WEBHOOK_URL = os.environ.get("NEW_TRAIN_WEBHOOK_URL");
 DATA_DIR = os.environ.get("DATA_DIR")
 if DATA_DIR:
     DATA_DIR = Path(DATA_DIR)
@@ -329,6 +329,6 @@ TNDS_DIR = DATA_DIR / "TNDS"
 TURNSTILE_SITEKEY = os.environ.get("TURNSTILE_SITEKEY", "0x4AAAAAAAFWiyCqdh2c-5sy")
 TURNSTILE_SECRET = os.environ.get("TURNSTILE_SECRET")
 
-ABBREVIATE_HOURLY = True  # we override this in some tests, that's all
+ABBREVIATE_HOURLY = False
 DISABLE_REGISTRATION = os.environ.get("DISABLE_REGISTRATION", False)
 DISABLE_EDITING = os.environ.get("DISABLE_EDITING", False)

@@ -17,6 +17,7 @@ services:
       - TFL_APP_ID
       - TFL_APP_KEY
       - NEW_VEHICLE_WEBHOOK_URL
+      - NEW_TRAIN_WEBHOOK_URL
       - TURNSTILE_SITEKEY
       - TURNSTILE_SECRET
       - DEBUG

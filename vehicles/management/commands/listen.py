@@ -12,7 +12,7 @@ class Command(BaseCommand):
 
     def handle(self, *args, **options):
         assert settings.NEW_VEHICLE_WEBHOOK_URL, "NEW_VEHICLE_WEBHOOK_URL is not set"
-
+        assert settings.NEW_TRAIN_WEBHOOK_URL, "NEW_TRAIN_WEBHOOK_URL is not set"
         session = requests.Session()
 
         with connection.cursor() as cursor:
@@ -46,6 +46,7 @@ class Command(BaseCommand):
             tfl_nocs = ["TFLO", "LGEN", "FLON"]
             tfi_nocs = ["ULB", "FY-", "GLE", "MET", "ACAH", "IE-", "I-"]
             midlands = ["ADER", "AMID", "AMMO", "TBTN", "KBUS", "TMTL", "NDTR", "MDCL", "BULI", "HIPK", "NOCT", "LTLS"]
+            trains = ["VT", "CS", "CH", "XC", "EM", "ES", "GX", "GN", "GW", "LE", "HX", "IL", "GR", "LULD", "LD", "ME", "NT", "SR", "SW", "SE", "SN", "SX", "XR", "TL", "TP", "AW", "WM", "LM", "CC"]
 
             COLORS = {
                 "bee": 0xFFD700,    # Gold
@@ -124,16 +125,28 @@ class Command(BaseCommand):
                 }
 
                 try:
-                    response = session.post(
-                        settings.NEW_VEHICLE_WEBHOOK_URL,
-                        json={
-                            "username": "Vehicle Tracker",
-                            "content": content,
-                            "allowed_mentions": allowed_mentions,
-                            "embeds": [embed],
-                        },
-                        timeout=5,
-                    )
+                    if noc_code in trains: # checks if its a train tracking or not
+                        response = session.post(
+                            settings.NEW_TRAIN_WEBHOOK_URL,
+                            json={
+                                "username": "Train Tracker",
+                                "content": content,
+                                "allowed_mentions": allowed_mentions,
+                                "embeds": [embed],
+                            },
+                            timeout=5,
+                        )
+                    else:
+                        response = session.post(
+                            settings.NEW_VEHICLE_WEBHOOK_URL,
+                            json={
+                                "username": "Vehicle Tracker",
+                                "content": content,
+                                "allowed_mentions": allowed_mentions,
+                                "embeds": [embed],
+                            },
+                            timeout=5,
+                        )
                     response.raise_for_status() # Raise HTTPError for bad responses (4xx or 5xx)
                     logger.info(f"Successfully sent webhook for {slug}. Response: {response.text}")
                 except requests.exceptions.Timeout:
