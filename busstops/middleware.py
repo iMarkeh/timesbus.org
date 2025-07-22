@@ -7,6 +7,12 @@ from django.utils.cache import add_never_cache_headers
 # from multidb.pinning import pin_this_thread, unpin_this_thread
 from whitenoise.middleware import WhiteNoiseMiddleware
 
+from django.contrib.auth import get_user_model
+User = get_user_model()
+
+
+from .models import featureToggle
+from django.shortcuts import render, redirect
 
 class WhiteNoiseWithFallbackMiddleware(WhiteNoiseMiddleware):
     def immutable_file_test(self, path, url):
@@ -48,3 +54,27 @@ class GZipIfNotStreamingMiddleware(GZipMiddleware):
             return response
 
         return super().process_response(request, response)
+
+EXEMPT_PATHS = ['/admin/', '/accounts/login', '/queue/', '/ads.txt', '/robots.txt']
+
+class SiteLockMiddleware:
+    def __init__(self, get_response):
+        self.get_response = get_response
+
+    def __call__(self, request):
+        # Exempt login and admin pages
+        exempt_paths = EXEMPT_PATHS
+        if any(request.path.startswith(path) for path in exempt_paths):
+            return self.get_response(request)
+
+        try:
+            feature = featureToggle.objects.get(name='admin_lockdown')
+            if feature.enabled and not request.user.is_superuser:
+               context = {
+                    'hours': feature.coming_soon_percent,
+               }
+               return render(request, 'site_locked.html', context, status=401)
+        except featureToggle.DoesNotExist:
+            pass
+
+        return self.get_response(request)

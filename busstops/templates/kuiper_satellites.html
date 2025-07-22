@@ -1,0 +1,209 @@
+{% extends 'page.html' %}
+
+{% block title %}Kuiper Satellites - transportthing.uk{% endblock %}
+
+{% block head %}
+    <meta property="og:title" content="Kuiper Satellites - transportthing.uk">
+    <style>
+     main {padding: 0;}
+    </style>
+{% endblock head %}
+
+{% block bodyclass %}no-scroll{% endblock %}
+
+{% block header %}
+   <header class="site-header">
+        <a href="/" class="site-name"></a>
+        <ul>
+            <li><a href="/map{% if object.latlong %}#16/{{ object.latlong.y|floatformat:4 }}/{{ object.latlong.x|floatformat:4 }}{% endif %}" style="color: #ffffff">Map</a></li>
+        </ul>
+        <form method="GET" action="/search-query" class="search">
+            <label>
+                Search
+                <input name="q" placeholder="Search" type="search" value="{{ query }}" required>
+            </label>
+            <input type="submit" value="Search" style="color: #ffffff">
+        </form>
+    </header>
+{% endblock header %}
+
+{% block breadcrumb %}{% endblock %}
+
+{% block content %}
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" crossorigin=""/>
+    <div id="map-container" style="height: 100vh;width: 100vw;">
+        <div id="loading-overlay">
+            <p>Loading map and satellite data...</p>
+            <div id="error-message" style="display: none;"></div>
+        </div>
+        <!-- Leaflet map will be initialized here -->
+    </div>
+
+    <!-- Leaflet JavaScript -->
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" crossorigin=""></script>
+
+    <script>
+        // --- Configuration ---
+        // !!! IMPORTANT: Updated to your new public URL !!!
+        const FASTAPI_BASE_URL = 'https://snubs.apilogic.uk'; 
+        const UPDATE_INTERVAL_MS = 30000; // Updated to 15 seconds to reduce load
+
+        // --- Custom Satellite Icon ---
+        const satelliteIcon = L.icon({
+            iconUrl: 'https://img.transportthing.uk/image/a6a5f566-998b-448e-956c-9488480ee586.png', // <--- IMPORTANT: Path to your satellite icon image
+            iconSize: [32, 32],             // Size of the icon
+            iconAnchor: [16, 16],           // Point of the icon corresponding to marker's location (center-bottom for pins, center for circles)
+            popupAnchor: [0, -16]          // Point from which the popup should open relative to the iconAnchor
+        });
+
+        // --- Map Initialization ---
+        let map = null;
+        const satelliteMarkers = {}; // Object to store Leaflet markers, keyed by NORAD ID
+        const loadingOverlay = document.getElementById('loading-overlay');
+        const errorMessageDiv = document.getElementById('error-message');
+
+        function initMap() {
+            map = L.map('map-container', {
+                worldCopyJump: true // Prevents map from showing multiple copies of the world
+            }).setView([0, 0], 2); // Center map on 0,0 with zoom level 2
+
+            L.tileLayer('https://tiles.snubs.dev/styles/satellite/512/{z}/{x}/{y}.png', {
+                attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
+                maxZoom: 18,
+            }).addTo(map);
+
+            // Hide loading overlay once map is initialized
+            loadingOverlay.style.display = 'none';
+        }
+
+        // --- Fetch and Display Satellite Data ---
+
+        /**
+         * Displays an error message on the loading overlay.
+         * @param {string} message The error message to display.
+         * @param {boolean} showOverlay Whether to show the entire overlay or just the message.
+         */
+        function displayError(message, showOverlay = true) {
+            errorMessageDiv.textContent = `Error: ${message}`;
+            errorMessageDiv.style.display = 'block';
+            if (showOverlay) {
+                loadingOverlay.style.display = 'flex'; // Ensure overlay is visible to show error
+            }
+        }
+
+        /**
+         * Clears any displayed error messages.
+         */
+        function clearError() {
+            errorMessageDiv.textContent = '';
+            errorMessageDiv.style.display = 'none';
+        }
+
+        /**
+         * Fetches position data for a single satellite from your FastAPI backend.
+         * @param {number} noradId The NORAD Catalog Number of the satellite.
+         * @returns {Promise<Object|null>} A promise that resolves with satellite data or null on error.
+         */
+        async function fetchSatellitePosition(noradId) {
+            const url = `${FASTAPI_BASE_URL}/satellite/${noradId}/positions`;
+            try {
+                const response = await fetch(url);
+                if (!response.ok) {
+                    // Try to parse error detail from FastAPI
+                    const errorJson = await response.json().catch(() => ({ detail: "Unknown server error or non-JSON response" }));
+                    throw new Error(`Failed to fetch ${noradId}: ${errorJson.detail || response.statusText}`);
+                }
+                const data = await response.json();
+                return data;
+            } catch (error) {
+                console.error(`Error fetching satellite ${noradId}:`, error);
+                // For individual satellite errors, only update the error message without showing full overlay
+                displayError(`Failed to load data for satellite ${noradId}. ${error.message}`, false);
+                return null;
+            }
+        }
+
+        /**
+         * Updates the position of a satellite marker on the map.
+         * @param {Object} satelliteData The transformed satellite data from your FastAPI.
+         */
+        function updateSatelliteOnMap(fullSatelliteDataItem) {
+            if (!map) {
+                console.warn("Map not initialized yet.");
+                return;
+            }
+
+            // Access data directly from the passed item
+            const satId = fullSatelliteDataItem.info.satelliteId;
+            const satName = fullSatelliteDataItem.info.satelliteName;
+            const position = fullSatelliteDataItem.position; // <--- THIS IS THE FIX! Directly access 'position'
+
+            if (!position) {
+                console.warn(`No position data for ${satName} (${satId}).`);
+                return;
+            }
+
+            const lat = position.latitude;
+            const lon = position.longitude;
+            const alt = position.altitude;
+            const timestamp = new Date(position.timestamp * 1000).toLocaleTimeString();
+
+            const popupContent = `
+                <strong>${satName}</strong><br>
+                NORAD ID: ${satId}<br>
+                Latitude: ${lat.toFixed(2)}°<br>
+                Longitude: ${lon.toFixed(2)}°<br>
+                Altitude: ${alt.toFixed(2)} km<br>
+                Last Updated: ${timestamp}
+            `;
+
+            if (satelliteMarkers[satId]) {
+                satelliteMarkers[satId].setLatLng([lat, lon]);
+                satelliteMarkers[satId].setPopupContent(popupContent);
+            } else {
+                const marker = L.marker([lat, lon], { icon: satelliteIcon }).addTo(map);
+                marker.bindPopup(popupContent);
+                satelliteMarkers[satId] = marker;
+            }
+        }
+        /**
+         * Fetches and updates all tracked satellites.
+         */
+        async function fetchAllSatellites() {
+            clearError();
+            try {
+                const response = await fetch(`${FASTAPI_BASE_URL}/satellites/kuiper`);
+                if (!response.ok) {
+                    const errorData = await response.json().catch(() => ({ detail: "Unknown server error" }));
+                    throw new Error(`Failed to fetch all satellites: ${errorData.detail || response.statusText}`);
+                }
+                const allSatellitesData = await response.json(); // This is the list of FullSatelliteData dicts
+
+                allSatellitesData.forEach(satellite => {
+                    // Each 'satellite' here is an object like { info: {...}, position: {...} }
+                    updateSatelliteOnMap(satellite); // This function expects the combined structure
+                });
+
+                if (map && loadingOverlay.style.display !== 'none' && errorMessageDiv.style.display === 'none') {
+                    loadingOverlay.style.display = 'none';
+                }
+
+            } catch (error) {
+                console.error('Error fetching all satellite data:', error);
+                displayError(`Failed to load all satellite data: ${error.message}`);
+                // If it fails to load ALL, maybe clear existing markers?
+                // For now, they'll just stay at their last known positions.
+            }
+        }
+
+        // --- Main Execution ---
+        document.addEventListener('DOMContentLoaded', () => {
+            initMap();
+            fetchAllSatellites(); // Initial fetch
+
+            // Set up interval to refresh satellite positions
+            setInterval(fetchAllSatellites, UPDATE_INTERVAL_MS);
+        });
+
+    </script>
+{% endblock content %}

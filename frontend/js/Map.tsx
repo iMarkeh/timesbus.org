@@ -226,7 +226,7 @@ export default function BusTimesMap(
   } else if (mapStyle === "timesbus_bright") {
     mapStyleURL = "https://tiles.transportthing.uk/styles/bright/style.json";
   } else if (mapStyle === "maptiler_satellite") {
-      mapStyleURL = `https://api.maptiler.com/maps/satellite/style.json?key=${MAPTILER_API_KEY}`; // Fallback 
+      mapStyleURL = `https://tiles.transportthing.uk/styles/satellite/style.json`; 
   }
   // else if (mapStyle === "thunderforest_transport") {
   //     mapStyleURL = `https://api.thunderforest.com/styles/transport.json?apikey=${THUNDERFOREST_API_KEY}`;

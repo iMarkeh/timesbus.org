@@ -16,6 +16,7 @@ from django.contrib.postgres.search import SearchVector, SearchVectorField
 from django.core.cache import cache
 from django.db.models import Q
 from django.db.models.functions import Coalesce, Now, Upper
+from django.core.validators import MinValueValidator, MaxValueValidator
 from django.urls import reverse
 from django.utils.html import escape, format_html
 from django.utils.safestring import mark_safe
@@ -196,7 +197,6 @@ class StopArea(models.Model):
     def get_absolute_url(self):
         return reverse("stoparea_detail", args=(self.id,))
 
-
 class DataSource(models.Model):
     name = models.CharField(max_length=255, db_index=True)
     description = models.CharField(blank=True)
@@ -237,6 +237,8 @@ class DataSource(models.Model):
             parsed_url.path == "/open-data"
             or parsed_url.hostname == "data.discoverpassenger.com"
         ):
+            return self.url
+        if parsed_url.hostname == "opendata.ticketer.com":
             return self.url
         match parsed_url.hostname:
             case "opendata.stagecoachbus.com":
@@ -287,7 +289,8 @@ class DataSource(models.Model):
             elif hostname == "www.transportforireland.ie":
                 text = "National Transport Authority"
         elif urlparse(self.url).hostname == "opendata.ticketer.com":
-            text = self.url
+            text = self.name
+            url = self.url
         elif self.name == "MET" or self.name == "ULB":
             url = self.url
             text = "Translink open data"
@@ -1145,3 +1148,25 @@ class SIRISource(models.Model):
 
     def is_poorly(self):
         return cache.get(self.get_poorly_key())
+
+class featureToggle(models.Model):
+    name = models.CharField(max_length=255, unique=True)
+    enabled = models.BooleanField(default=True)
+    maintenance = models.BooleanField(default=False)
+    super_user_only = models.BooleanField(default=False, help_text="Only superusers can access this feature")
+    coming_soon = models.BooleanField(default=False)
+    coming_soon_percent = models.IntegerField(default=0, validators=[MinValueValidator(0), MaxValueValidator(100)], blank=True, null=True)
+
+    @property
+    def status_text(self):
+        if self.maintenance:
+            return "Under Maintenance"
+        elif self.coming_soon:
+            return "Coming Soon"
+        elif self.enabled:
+            return "Enabled"
+        else:
+            return "Disabled"
+
+    def __str__(self):
+        return f"{self.name} - {'Enabled' if self.enabled else 'Disabled'}"

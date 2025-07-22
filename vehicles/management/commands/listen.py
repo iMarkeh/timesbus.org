@@ -42,7 +42,7 @@ class Command(BaseCommand):
             Bee_NOCs = [
                 "BNML", "BNSM", "BNDB", "BNGN", "BNVB", "BNFM"
             ]
-            NCTR_NOCs = ["NCTR", "TBTN"]
+            NCTR_NOCs = ["NCTR"]
             tfl_nocs = ["TFLO", "LGEN", "FLON"]
             tfi_nocs = ["ULB", "FY-", "GLE", "MET", "ACAH", "IE-", "I-"]
             midlands = ["ADER", "AMID", "AMMO", "TBTN", "KBUS", "TMTL", "NDTR", "MDCL", "BULI", "HIPK", "NOCT", "LTLS"]

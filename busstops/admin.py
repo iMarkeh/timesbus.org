@@ -12,6 +12,10 @@ from sql_util.utils import SubqueryCount
 
 from bustimes.models import Route, RouteLink
 
+from .models import featureToggle
+
+
+
 from . import models
 
 
@@ -615,6 +619,13 @@ class PaymentMethodAdmin(admin.ModelAdmin):
     def operators(obj):
         return obj.operators
 
+@admin.register(featureToggle)
+class FeatureToggleAdmin(admin.ModelAdmin):
+    list_display = ('name', 'enabled', 'maintenance', 'coming_soon', 'coming_soon_percent')
+    list_editable = ('enabled', 'maintenance', 'coming_soon', 'coming_soon_percent')
+    search_fields = ('name',)
+    list_filter = ('enabled', 'maintenance', 'coming_soon')
+    ordering = ('name',)
 
 admin.site.register(models.Region)
 admin.site.register(models.District)

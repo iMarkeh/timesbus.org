@@ -27,6 +27,61 @@ urlpatterns = [
         name="index",
     ),
     path(
+        "updates",
+        TemplateView.as_view(template_name="changes.html"),
+        name="updates",
+    ),
+    path(
+        "satellites/all",
+        TemplateView.as_view(template_name="satellites_all.html"),
+        name="all_satellites",
+    ),
+    path(
+        "satellites",
+        TemplateView.as_view(template_name="satellites_home.html"),
+        name="satellites",
+    ),
+    path(
+        "satellites/starlink",
+        TemplateView.as_view(template_name="starlink_satellites.html"),
+        name="sl_satellites",
+    ),
+    path(
+        "satellites/oneweb",
+        TemplateView.as_view(template_name="oneweb_satellites.html"),
+        name="ow_satellites",
+    ),
+    path(
+        "satellites/gps",
+        TemplateView.as_view(template_name="gps_satellites.html"),
+        name="gps_satellites",
+    ),
+    path(
+        "satellites/visual",
+        TemplateView.as_view(template_name="visual_satellites.html"),
+        name="visual_satellites",
+    ),
+    path(
+        "satellites/weather",
+        TemplateView.as_view(template_name="weather_satellites.html"),
+        name="weather_satellites",
+    ),
+    path(
+        "satellites/goes",
+        TemplateView.as_view(template_name="goes_satellites.html"),
+        name="goes_satellites",
+    ),
+    path(
+        "satellites/kuiper",
+        TemplateView.as_view(template_name="kuiper_satellites.html"),
+        name="kuiper_satellites",
+    ),
+    path(
+        "satellites/soon",
+        TemplateView.as_view(template_name="satellites_soon.html"),
+        name="coming_soon_sat",
+    ),
+    path(
         "ads.txt",
         cache_control(max_age=1800)(
             RedirectView.as_view(

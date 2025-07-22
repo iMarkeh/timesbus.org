@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Site Locked | TransportThing</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+      /* Custom spinner animation */
+      .spinner {
+        border: 8px solid;
+        border-color: #f3f3f3; /* Light grey */
+        border-top-color: #ef4444; /* Tailwind red-500 */
+        border-radius: 50%;
+        width: 60px;
+        height: 60px;
+        animation: spin 1s linear infinite;
+        margin: 30px auto;
+      }
+      @keyframes spin {
+        0% {
+          transform: rotate(0deg);
+        }
+        100% {
+          transform: rotate(360deg);
+        }
+      }
+
+      /* Dark mode spinner adjustments */
+      html.dark .spinner {
+        border-color: #4a5568; /* Tailwind gray-700 */
+        border-top-color: #f87171; /* Tailwind red-400 */
+      }
+
+      /* Transitions for smooth theme changes */
+      body,
+      .container {
+        transition: background-color 0.3s ease, color 0.3s ease;
+      }
+    </style>
+  </head>
+  <body
+    class="bg-gray-100 text-gray-900 dark:bg-gray-900 dark:text-gray-100 flex justify-center items-center min-h-screen p-4"
+  >
+    <div
+      class="container bg-white dark:bg-gray-800 p-8 md:p-12 rounded-lg shadow-xl max-w-lg w-full text-center relative"
+    >
+      <!-- Dark/Light Mode Toggle -->
+      <button
+        id="theme-toggle"
+        aria-label="Toggle theme"
+        class="absolute top-4 right-4 p-2 rounded-full bg-gray-200 dark:bg-gray-700 hover:bg-gray-300 dark:hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-400 dark:focus:ring-offset-gray-900 dark:focus:ring-gray-500 transition-colors"
+      >
+        <!-- Sun Icon (Light Mode) -->
+        <svg
+          id="sun-icon"
+          class="h-6 w-6 text-yellow-500 hidden dark:block"
+          fill="none"
+          stroke="currentColor"
+          viewBox="0 0 24 24"
+          xmlns="http://www.w3.org/2000/svg"
+        >
+          <path
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            stroke-width="2"
+            d="M12 3v1m0 16v1m9-9h1M3 12h1m15.325-7.757l-.707.707M4.343 19.071l-.707.707M19.071 4.343l.707-.707M4.929 4.929l-.707-.707"
+          ></path>
+        </svg>
+        <!-- Moon Icon (Dark Mode) -->
+        <svg
+          id="moon-icon"
+          class="h-6 w-6 text-gray-700 dark:hidden"
+          fill="none"
+          stroke="currentColor"
+          viewBox="0 0 24 24"
+          xmlns="http://www.w3.org/2000/svg"
+        >
+          <path
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            stroke-width="2"
+            d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"
+          ></path>
+        </svg>
+      </button>
+
+      <h1
+        class="text-4xl md:text-5xl font-extrabold text-red-500 dark:text-red-400 mb-6"
+      >
+        Site Temporarily Closed
+      </h1>
+      <p class="text-lg mb-8 text-gray-700 dark:text-gray-300">
+        We are currently performing essential maintenance and updates to improve
+        your experience. We apologize for any inconvenience this may cause.
+      </p>
+
+      <div id="loading-area" class="flex flex-col items-center">
+        <div class="spinner"></div>
+        <p id="status-message" class="text-lg font-semibold text-gray-600 dark:text-gray-400 mt-4">
+          Checking site status... Please do not refresh this page.
+        </p>
+      </div>
+
+      <button
+        id="carry-on-button"
+        onclick="redirectToHome()"
+        class="hidden mt-8 px-8 py-3 bg-green-600 hover:bg-green-700 text-white font-bold rounded-lg text-xl shadow-md transition-colors duration-300 focus:outline-none focus:ring-4 focus:ring-green-500 focus:ring-opacity-50"
+      >
+        Carry On!
+      </button>
+
+      <p class="text-md mt-10 text-gray-500 dark:text-gray-400">
+        Thank you for your patience!
+      </p>
+    </div>
+
+    <script>
+      const CHECK_INTERVAL_MS = 5000; // Check every 5 seconds
+      const statusMessage = document.getElementById('status-message');
+      const loadingArea = document.getElementById('loading-area');
+      const carryOnButton = document.getElementById('carry-on-button');
+      const themeToggle = document.getElementById('theme-toggle');
+      const htmlElement = document.documentElement;
+      const homeUrl = "{% url 'home' %}"; // Get Django URL for home
+
+      // --- Theme Logic ---
+      function setTheme(theme) {
+        if (theme === 'dark') {
+          htmlElement.classList.add('dark');
+          localStorage.setItem('theme', 'dark');
+        } else {
+          htmlElement.classList.remove('dark');
+          localStorage.setItem('theme', 'light');
+        }
+      }
+
+      function toggleTheme() {
+        if (htmlElement.classList.contains('dark')) {
+          setTheme('light');
+        } else {
+          setTheme('dark');
+        }
+      }
+
+      // Initialize theme based on user preference or system setting
+      function initializeTheme() {
+        const storedTheme = localStorage.getItem('theme');
+        if (storedTheme) {
+          setTheme(storedTheme);
+        } else if (
+          window.matchMedia &&
+          window.matchMedia('(prefers-color-scheme: dark)').matches
+        ) {
+          setTheme('dark');
+        } else {
+          setTheme('light');
+        }
+      }
+
+      // Attach event listener to toggle button
+      themeToggle.addEventListener('click', toggleTheme);
+      // --- End Theme Logic ---
+
+      // --- Site Check Logic ---
+      function checkSiteStatus() {
+        fetch("https://transportthing.uk")
+          .then((response) => {
+            if (!response.ok) {
+              throw new Error(`HTTP error! status: ${response.status}`);
+            }
+            return response.json();
+          })
+          .then((data) => {
+            if (!data.maintenance_mode) {
+              // Site is no longer in maintenance mode
+              statusMessage.textContent = 'Site is now live!';
+              loadingArea.classList.add('hidden'); // Hide spinner and status text
+              carryOnButton.classList.remove('hidden'); // Show the button
+              // Optional: You could automatically redirect here after a small delay
+              // setTimeout(redirectToHome, 2000);
+            } else {
+              // Site is still in maintenance mode
+              statusMessage.textContent =
+                'Still undergoing maintenance... Checking again soon.';
+              // Keep polling
+              setTimeout(checkSiteStatus, CHECK_INTERVAL_MS);
+            }
+          })
+          .catch((error) => {
+            console.error('Error checking site status:', error);
+            statusMessage.textContent =
+              'Could not check site status. Please try again later.';
+            // Still attempt to check again in case it was a temporary network issue
+            setTimeout(checkSiteStatus, CHECK_INTERVAL_MS);
+          });
+      }
+
+      function redirectToHome() {
+        window.location.href = homeUrl;
+      }
+
+      // Initial checks when the page loads
+      document.addEventListener('DOMContentLoaded', () => {
+        initializeTheme(); // Set the initial theme
+        // Only start checking if the site is initially in maintenance mode
+        if ({{ site_maintenance_mode|yesno:"true,false" }}) {
+          checkSiteStatus();
+        } else {
+          // If for some reason the page loaded but site_maintenance_mode is false,
+          // hide spinner and show button immediately, or redirect.
+          statusMessage.textContent = 'Site is live!';
+          loadingArea.classList.add('hidden');
+          carryOnButton.classList.remove('hidden');
+          // You might want to auto-redirect here if this page was accidentally hit
+          // window.location.href = homeUrl;
+        }
+      });
+    </script>
+  </body>
+</html>

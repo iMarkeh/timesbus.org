@@ -75,6 +75,7 @@ MIDDLEWARE = [
     "django.middleware.csrf.CsrfViewMiddleware",
     "django.contrib.auth.middleware.AuthenticationMiddleware",
     "django.contrib.messages.middleware.MessageMiddleware",
+    "busstops.middleware.SiteLockMiddleware",
 ]
 
 # Stadia Maps tiles require we send at least the origin in cross-origin requests.
@@ -102,9 +103,9 @@ if DEBUG and "runserver" in sys.argv:
         "debug_toolbar_force.middleware.ForceDebugToolbarMiddleware",
     ]
     INTERNAL_IPS = ["127.0.0.1"]
-    # DEBUG_TOOLBAR_PANELS = [
-    #     "template_profiler_panel.panels.template.TemplateProfilerPanel",
-    # ]
+    DEBUG_TOOLBAR_PANELS = [
+        "template_profiler_panel.panels.template.TemplateProfilerPanel",
+    ]
 
 ROOT_URLCONF = "buses.urls"
 
@@ -330,5 +331,5 @@ TURNSTILE_SITEKEY = os.environ.get("TURNSTILE_SITEKEY", "0x4AAAAAAAFWiyCqdh2c-5s
 TURNSTILE_SECRET = os.environ.get("TURNSTILE_SECRET")
 
 ABBREVIATE_HOURLY = False
-DISABLE_REGISTRATION = os.environ.get("DISABLE_REGISTRATION", False)
+DISABLE_REGISTRATION = os.environ.get("DISABLE_REGISTRATION", True)
 DISABLE_EDITING = os.environ.get("DISABLE_EDITING", False)

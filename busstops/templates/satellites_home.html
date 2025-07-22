@@ -1,0 +1,125 @@
+{% extends 'page.html' %}
+
+{% block title %}Satellites - transportthing.uk{% endblock %}
+
+{% block head %}
+    <meta property="og:title" content="Satellites &middledash; transportthing.uk">
+{% endblock head %}
+
+{% block bodyclass %}narrow no-ads{% endblock %}
+
+{% block header %}
+   <header class="site-header">
+        <a href="/" class="site-name"></a>
+        <ul>
+            <li><a href="/map{% if object.latlong %}#16/{{ object.latlong.y|floatformat:4 }}/{{ object.latlong.x|floatformat:4 }}{% endif %}" style="color: #ffffff">Map</a></li>
+        </ul>
+        <form method="GET" action="/search-query" class="search">
+            <label>
+                Search
+                <input name="q" placeholder="Search" type="search" value="{{ query }}" required>
+            </label>
+            <input type="submit" value="Search" style="color: #ffffff">
+        </form>
+    </header>
+{% endblock header %}
+
+{% block breadcrumb %}{% endblock %}
+
+{% block content %}
+<style>
+    /* Specific styles for the landing page layout */
+    .satellite-links-container {
+        max-width: 800px;
+        margin: 40px auto;
+        padding: 20px;
+        background-color: var(--background-secondary); /* Use CSS variable for theme awareness */
+        border-radius: 8px;
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+        text-align: center;
+        color: var(--text-color); /* Use CSS variable for theme awareness */
+    }
+    .satellite-links-container h2 {
+        margin-bottom: 25px;
+        font-size: 2em;
+        color: var(--heading-color); /* Use CSS variable for theme awareness */
+    }
+    .satellite-links-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 20px;
+        margin-top: 30px;
+    }
+    .satellite-link-card {
+        background-color: var(--card-background); /* Custom variable or adjust */
+        border: 1px solid var(--border-color); /* Custom variable or adjust */
+        border-radius: 8px;
+        padding: 20px;
+        transition: transform 0.2s ease, box-shadow 0.2s ease;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        text-decoration: none; /* Remove underline from link */
+        color: inherit; /* Inherit text color */
+    }
+    .satellite-link-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3);
+    }
+    .satellite-link-card h3 {
+        margin-top: 0;
+        color: var(--link-color); /* Custom variable or adjust */
+        font-size: 1.3em;
+    }
+    .satellite-link-card p {
+        font-size: 0.9em;
+        line-height: 1.5;
+        opacity: 0.8;
+    }
+</style>
+    <div class="satellite-links-container">
+        <h2>Explore Satellite Constellations</h2>
+        <p>Select a group below to view their real-time positions on a dedicated map.</p>
+
+        <div class="satellite-links-grid">
+            <a href="/satellites/all" class="satellite-link-card">
+                <h3>All Tracked Satellites</h3>
+                <p>A comprehensive view of all active satellites currently tracked by the system.</p>
+            </a>
+            <a href="/satellites/starlink" class="satellite-link-card">
+                <h3>Starlink Constellation</h3>
+                <p>See SpaceX's Starlink satellites. Be aware, this can be many dots!</p>
+            </a>
+            <a href="/satellites/oneweb" class="satellite-link-card">
+                <h3>OneWeb Constellation</h3>
+                <p>View the OneWeb broadband internet satellites.</p>
+            </a>
+            <a href="/satellites/gps" class="satellite-link-card">
+                <h3>GPS Constellation</h3>
+                <p>Track the satellites that power global positioning systems.</p>
+            </a>
+            <a href="/satellites/visual" class="satellite-link-card">
+                <h3>Visually Brightest</h3>
+                <p>See satellites that are often visible to the naked eye.</p>
+            </a>
+            <a href="/satellites/weather" class="satellite-link-card">
+                <h3>Weather Satellites</h3>
+                <p>Monitor meteorological satellites like NOAA and MetOp.</p>
+            </a>
+            <a href="/satellites/goes" class="satellite-link-card">
+                <h3>GOES Satellites</h3>
+                <p>Track Geostationary Operational Environmental Satellites.</p>
+            </a>
+            <a href="/satellites/soon" class="satellite-link-card">
+                <h3>QIANFAN Satellites</h3>
+                <p>Track QIANFAN Satellites.</p>
+            </a>
+            <a href="/satellites/kuiper" class="satellite-link-card">
+                <h3>Kuiper Satellites</h3>
+                <p>Track Amazon Kuiper Satellites.</p>
+            </a>
+
+        </div>
+    </div>
+{% endblock content %}

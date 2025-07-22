@@ -1,0 +1,288 @@
+<!doctype html>
+<html lang="en-GB">
+<head>
+    <meta charset="utf-8">
+    <title>TransportThing - Launching Soon... into Orbit!</title>
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <meta name="theme-color" content="#000000"> <!-- Force black theme -->
+    <meta name="color-scheme" content="dark"> <!-- Force dark mode -->
+    <meta name="format-detection" content="telephone=no">
+    <link rel="canonical" href="https://transportthing.uk">
+    <link rel="icon" sizes="any" type="image/svg+xml" href="https://cdn.discordapp.com/icons/1337054349267959898/bcb0fa2c5561cb082d1e8fb83f4e6566.webp?size=1024">
+    <link rel="manifest" href="https://transportthing.uk/static/manifest.webmanifest">
+
+    <!-- Roboto Condensed Font from Google Fonts (Optional but Recommended) -->
+    <link href="https://fonts.googleapis.com/css2?family=Roboto+Condensed:wght@300;400;700&display=swap" rel="stylesheet">
+
+    <link rel="stylesheet" href="https://cdn.transportthing.uk/app.css"> <!-- Base styles -->
+
+    <!-- Font Awesome for icons (optional - replace with your own) -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" integrity="sha512-DTOQO9RWCH3ppGqcWaEA1BIZOC6xxalwEsw9c2QQeAIftl+Vegovlnee1c9QX4TctnWMn13TZye+giMm8e2LwA==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+
+    <meta name="twitter:card" content="summary">
+    <meta name="twitter:site" content="@transportthing_uk">
+
+    <style>
+        /* General Reset (Override potentially conflicting styles from TransportThing's app.css) */
+        body, html {
+            height: 100%;
+            margin: 0;
+            padding: 0;
+            overflow: hidden; /* Prevent scrollbars on the main page */
+        }
+        /* Override body.dark-mode to ensure SpaceX styles take precedence */
+        body.dark-mode {
+            background-color: #000; /* Force Black background */
+            color: #ddd;             /* Very light gray text */
+            font-family: 'Roboto Condensed', sans-serif; /* Set this for all text, ensure consistent look. */
+            --background-primary: #000;
+            --background-secondary: rgba(30, 30, 30, 0.8); /* Semi-transparent backing */
+            --text-color: #ddd;
+            --heading-color: #fff;
+            --accent-color: #00bfff; /* Cyan-like accent for highlight  */
+            --link-color: #9ee3ff;     /* Light blue for links */
+            --card-background: rgba(50, 50, 50, 0.7);   /* Card BG */
+            --border-color: rgba(70, 70, 70, 0.5);  /* Semi-transparent border */
+            --shadow-color: rgba(0, 0, 0, 0.5);    /* Shadow */
+        }
+
+        /* == Space Background Animation == */
+        #space-background {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1; /* Send it behind the rest of the content */
+            background: #000; /* Deep black space */
+            overflow: hidden;
+        }
+
+        .star {
+            position: absolute;
+            background: #fff;
+            border-radius: 50%;
+            opacity: 0.5 + Math.random() * 0.5; /* Random brightness */
+            animation: twinkle 5s linear infinite;
+        }
+
+        @keyframes twinkle {
+            0% { opacity: 0.5 + Math.random() * 0.5; }
+            50% { opacity: 0.1; }
+            100% { opacity: 0.5 + Math.random() * 0.5; }
+        }
+
+        /* == Parallax and General Content Styling == */
+        main {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;  /* Important to fill the screen */
+            padding: 40px 20px;
+            color: var(--text-color);
+            position: relative; /* Enable stacking context */
+        }
+
+        #content {
+            max-width: 900px;
+            width: 100%;
+            text-align: center;
+            box-shadow: 0 8px 40px var(--shadow-color); /* Noticeable, deep shadow */
+            border-radius: 16px;
+            overflow: hidden; /* Ensures shadow and overflow interact correctly */
+            position: relative; /* For relative positioning */
+            background: var(--background-secondary);
+            z-index: 2;
+
+            padding: 40px;
+            position: relative; /* To stack over parallax layers */
+        }
+
+        /* == More content styles == */
+        h1 {
+            font-size: 3.5em; /* Larger, more imposing title */
+            color: var(--heading-color);
+            margin-bottom: 15px;
+            text-transform: uppercase;
+            letter-spacing: 0.05em; /* Spaced letters */
+            text-shadow: 0 0 12px var(--accent-color); /* Glowing text */
+        }
+        .subtitle {
+            font-size: 1.2em;
+            opacity: 0.8;
+            margin-bottom: 30px;
+            line-height: 1.7;
+        }
+
+        /* === Feature Grid Styling === */
+        .feature-list {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 25px;
+            list-style: none;
+            padding: 0;
+            margin-top: 40px;
+        }
+
+        .feature-list li {
+            position: relative;
+            background: var(--card-background);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 25px;
+            box-shadow: 0 4px 15px var(--shadow-color);
+            transition: all 0.3s ease;
+            overflow: hidden;
+            text-align: left;
+        }
+        .feature-list li:hover {
+            transform: translateY(-8px); /* Subtle lift */
+            box-shadow: 0 8px 25px var(--shadow-color); /* Increased shadow on hover */
+        }
+
+        .feature-list h3 {
+            font-size: 1.6em;
+            color: var(--heading-color);
+            margin-top: 0;
+            margin-bottom: 12px;
+            text-transform: uppercase;
+            letter-spacing: 0.04em;
+            text-shadow: 0 0 8px rgba(0, 191, 255, 0.3); /* Softer glow for features */
+        }
+        .feature-list p {
+            font-size: 1em;
+            line-height: 1.7;
+            opacity: 0.7;
+        }
+
+        /* ==Call-To-Action Style== */
+        .cta-info {
+            margin-top: 50px;
+            font-size: 1.05em;
+            text-align: center;
+            opacity: 0.9;
+            color: var(--text-color);
+        }
+        .cta-info a {
+            color: var(--link-color);
+            text-decoration: none;
+            font-weight: bold;
+            transition: color 0.2s ease;
+        }
+        .cta-info a:hover {
+            color: var(--accent-color); /* Bright blue on hover */
+            text-decoration: underline;
+        }
+
+        .back-link {
+            margin-top: 30px;
+            display: inline-block;
+            padding: 12px 25px;
+            background-color: var(--accent-color);
+            color: white;
+            text-decoration: none;
+            border-radius: 8px;
+            transition: all 0.3s ease;
+            font-weight: bold;
+        }
+        .back-link:hover {
+            background-color: #008ac5;
+            transform: translateY(-3px); /* Lift it a bit higher */
+            box-shadow: 0 4px 10px var(--shadow-color);
+        }
+
+        #site-logo-overlay {  /* Optional subtle branding on page load */
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 200px;  /* Adjust size */
+            height: auto;
+            z-index: 0;
+            opacity: 0.05; /* Very subtle logo opacity */
+        }
+
+    </style>
+</head>
+
+<body class="narrow dark-mode">
+
+    <div id="space-background"></div>
+    <a href="#content" class="skip">Skip to main content</a>
+    <header class="site-header">
+        <div>
+        <a href="#" class="site-name"></a>  <!-- Can act as company logo/home -->
+        <ul>
+        <li><a href="/satellites">Satellite Hub</a></li>
+        </ul>
+        </div>
+    </header>
+    <main>
+        <div id="content">
+
+            <div class="coming-soon-container">
+                <div class="content-wrapper">
+
+                    <h1>Mission Underway: Enhanced Satellite Tracking</h1>
+
+                    <p class="subtitle">
+                        The stars are aligning for an even richer view of Earth's orbital network. Our team is diligently
+                        working to expand and refine our tracking capabilities, bringing you real-time access to the
+                        most critical and interesting satellite data. Prepare for launch!
+                    </p>
+
+                    <ul class="feature-list">
+                        <li>
+                            <h3>Expanded Constellations</h3>
+                            <p>Comprehensive tracking for Orbcomm, Iridium NEXT, and other emerging satellite networks.</p>
+                        </li>
+                        <li>
+                            <h3>Launch Vehicle Tracking</h3>
+                            <p>Follow Falcon 9, Soyuz, and other rockets as they deploy payloads into orbit.</p>
+                        </li>
+                    </ul>
+
+                    <p class="cta-info">
+                        Stay connected with our progress! Let us know what constellations or features you're most interested in Discord!
+                    </p>
+                    <a href="/satellites" class="back-link">Back to Satellite Tracking Hub</a>
+                </div>
+            </div>
+
+        </div>
+    </main>
+
+
+    <script>
+        /* Basic JavaScript for the animated starfield background and optional logo fade */
+        document.addEventListener('DOMContentLoaded', () => {
+            const spaceBackground = document.getElementById('space-background');
+            const numStars = 150;
+
+            // Create the stars
+            for (let i = 0; i < numStars; i++) {
+                const star = document.createElement('div');
+                star.className = 'star';
+                star.style.width = `${Math.random() * 3}px`;
+                star.style.height = star.style.width;
+                star.style.top = `${Math.random() * 100}%`;
+                star.style.left = `${Math.random() * 100}%`;
+                spaceBackground.appendChild(star);
+            }
+
+
+           // Parallax effect (subtle)
+           const mainElement = document.querySelector('main');
+           spaceBackground.addEventListener('mousemove', (e) => {
+               const x = (window.innerWidth / 2 - e.clientX) / 50; // Reduced divisor to make parallax more gentle
+               const y = (window.innerHeight / 2 - e.clientY) / 50;
+               spaceBackground.style.transform = `translate(${x}px, ${y}px)`; // Subtle movement
+           });
+
+
+        });
+    </script>
+
+</body>
+</html>

@@ -916,11 +916,11 @@ class OperatorDetailView(DetailView):
             )
         elif self.object.name == "FlixBus":
             context["tickets_link"] = (
-                "https://www.awin1.com/cread.php?awinmid=110896&awinaffid=242611&clickref=ot"
+                "/404"
             )
         elif self.object.name == "National Express":
             context["tickets_link"] = (
-                "https://nationalexpress.prf.hn/click/camref:1011ljPYw"
+                "/404"
             )
 
         context["nocs"] = [
@@ -1241,7 +1241,7 @@ class ServiceDetailView(DetailView):
             for operator in operators:
                 if operator.name == "National Express":
                     context["tickets_link"] = (
-                        f"https://nationalexpress.prf.hn/click/camref:1011ljPYw/pubref:{self.object.line_name}"
+                        f"{self.object.line_name}/404"
                     )
                     context["links"].append(
                         {
@@ -1252,7 +1252,7 @@ class ServiceDetailView(DetailView):
                     break
                 elif operator.name == "FlixBus":
                     context["tickets_link"] = (
-                        f"https://www.awin1.com/cread.php?awinmid=110896&awinaffid=242611&clickref={self.object.line_name}"
+                        f"{self.object.line_name}/404"
                     )
                     context["links"].append(
                         {
