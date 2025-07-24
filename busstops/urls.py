@@ -29,11 +29,6 @@ urlpatterns = [
         name="index",
     ),
     path(
-        "updates",
-        TemplateView.as_view(template_name="changes.html"),
-        name="updates",
-    ),
-    path(
         "satellites/all",
         TemplateView.as_view(template_name="satellites_all.html"),
         name="all_satellites",
