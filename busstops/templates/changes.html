@@ -13,10 +13,17 @@
 <h1>Recent Site Changes</h1>
 
 <ul class="changes">
-        <li><p>Satellite Map Style updated to actually show street / place names</p></li>
-        &nbsp;
-        <li><p>Show "View Withdrawn Vehicles" on the <a href="/groups/Stagecoach/vehicles">operator group page</a>.</p></li>
+    {% for note in notes %}
+        <li>
+            <strong>{{ note.date|date:"d/m/Y" }}:</strong>
+            {{ note.note|linebreaksbr }}
+            {% if note.link_url and note.link_text %}
+                (<a href="{{ note.link_url }}">{{ note.link_text }}</a>)
+            {% endif %}
+        </li>
+    {% empty %}
+        <li>No change notes yet.</li>
+    {% endfor %}
 </ul>
-
 
 {% endblock content %}

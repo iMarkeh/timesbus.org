@@ -13,7 +13,7 @@ from sql_util.utils import SubqueryCount
 from bustimes.models import Route, RouteLink
 
 from .models import featureToggle
-
+from .models import ChangeNote
 
 
 from . import models
@@ -626,6 +626,15 @@ class FeatureToggleAdmin(admin.ModelAdmin):
     search_fields = ('name',)
     list_filter = ('enabled', 'maintenance', 'coming_soon')
     ordering = ('name',)
+
+@admin.register(ChangeNote)
+class ChangeNoteAdmin(admin.ModelAdmin):
+    list_display = ('date', 'short_note', 'link_text')
+    search_fields = ('note',)
+    list_filter = ('date',)
+
+    def short_note(self, obj):
+        return obj.note[:60] + ('...' if len(obj.note) > 60 else '')
 
 admin.site.register(models.Region)
 admin.site.register(models.District)

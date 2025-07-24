@@ -49,6 +49,9 @@ from vehicles.models import Vehicle
 from vehicles.utils import redis_client
 from vosa.models import Registration
 
+from django.shortcuts import render
+from .models import ChangeNote
+
 from . import forms
 from .models import (
     AdminArea,
@@ -1648,3 +1651,11 @@ def journey(request):
             "journeys": journeys,
         },
     )
+
+
+# baz's poop django code
+
+
+def change_notes_view(request):
+    notes = ChangeNote.objects.all()
+    return render(request, 'change_notes.html', {'notes': notes})
