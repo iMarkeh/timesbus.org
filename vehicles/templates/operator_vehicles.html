@@ -54,20 +54,28 @@ ticket machines, a byproduct of the live bus tracking and some entries requested
     <p>There's also <a href="/groups/{{ object.parent }}/vehicles">a list of all {{ object.parent }} vehicles</a>.</p>
 {% endif %}
 
+{% if request.GET.withdrawn %}
+    <ul class="horizontal">
+        <li><a href="{{ object.get_absolute_url }}/vehicles">Hide withdrawn vehicles</a></li>
+    </ul>
+{% else %}
+    <ul class="horizontal">
+        <li><a href="?withdrawn=true">View withdrawn vehicles</a></li>
+    </ul>
+{% endif %}
+
 {% if not parent %}
     <ul class="horizontal">
         <li><a href="/vehicles/edits?operator={{ object.noc }}&status=approved">Recent changes</a></li>
-    {% if request.GET.withdrawn %}
-        <li><a href="{{ object.get_absolute_url }}/vehicles">Hide withdrawn vehicles</a></li>
-    {% else %}
-        <li><a href="?withdrawn=true">View withdrawn vehicles</a></li>
-    {% endif %}
+
+
         {% if request.user.is_superuser %}
             <li><a href="/vehicles/edits?operator={{ object.noc }}&status=pending">Pending vehicle edits</a></li>
             <li><a href="{% url 'admin:vehicles_vehicle_changelist' %}?operator={{ object.noc }}">✏️</a></li>
         {% endif %}
     </ul>
 {% endif %}
+
 
 <div class="table-wrapper">
 <table class="fleet compact">
