@@ -51,15 +51,7 @@
     {% endif %}
 
     {% for ou in object.operatoruser_set.all %}
-        <p>
-            {% if user.is_superuser %}
-                <a href="/admin/busstops/operator/{{ ou.operator.noc }}/change/">{{ ou.operator }}</a>
-            {% elif ou.operator in user.operatoruser_set.values_list('operator', flat=True) %}
-                <a href="{% url 'operator_detail' ou.operator.noc %}">{{ ou.operator }}</a>
-            {% else %}
-                {{ ou.operator }}
-            {% endif %}
-        </p>
+    <p>{% if user.is_superuser %}<a href="/admin/busstops/operator/{{ ou.operator.noc }}/change/">{% endif %}{{ ou.operator }}{% if user.is_superuser %}</a>{% endif %}</p>
     {% endfor %}
     
 
