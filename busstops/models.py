@@ -1170,3 +1170,17 @@ class featureToggle(models.Model):
 
     def __str__(self):
         return f"{self.name} - {'Enabled' if self.enabled else 'Disabled'}"
+
+
+
+class ChangeNote(models.Model):
+    date = models.DateField()
+    note = models.TextField(help_text="Enter your change note here...")
+    link_text = models.CharField(max_length=255, blank=True)
+    link_url = models.URLField(blank=True)
+
+    class Meta:
+        ordering = ['-date']
+
+    def __str__(self):
+        return f"{self.date.strftime('%d/%m/%Y')}: {self.note[:50]}"
