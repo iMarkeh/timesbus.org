@@ -12,6 +12,8 @@ from fares import views as fares_views
 from fares.urls import urlpatterns as fares_urls
 from vehicles.urls import urlpatterns as vehicles_urls
 from vosa.urls import urlpatterns as vosa_urls
+from django.urls import path
+from .views import change_notes_view
 
 from . import views
 
@@ -196,3 +198,8 @@ if apps.is_installed("debug_toolbar"):
     urlpatterns += [
         path("__debug__", include(debug_toolbar.urls)),
     ]
+
+
+urlpatterns += [
+    path('rules', change_notes_view, name='change_notes'),
+]
