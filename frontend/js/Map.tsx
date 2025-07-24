@@ -42,10 +42,10 @@ const imagesByName: { [imageName: string]: string } = {
 
 // Updated mapStyles to only use timesbus.org styles
 const mapStyles: { [key: string]: string } = {
-  //timesbus_positron: "Light",
-  timesbus_dark_matter: "Dark",
-  timesbus_bright: "Light",
-  maptiler_satellite: "Satellite",
+  timesbus_positron: "AWS Light",
+  timesbus_dark_matter: "AWS Dark",
+  timesbus_bright: "OSM Bright",
+  maptiler_satellite: "AWS Satellite",
 //  timesbus_atlas: "Atlas",
 //  thunderforest_transport: "Transport",
 //  thunderforest_transport_dark: "Transport Dark",
@@ -210,7 +210,7 @@ export default function BusTimesMap(
     // Updated dark mode class logic
     const isDarkMode =
       mapStyle === "timesbus_dark_matter" ||
-      mapStyle === "thunderforest_transport_dark" || // Added Thunderforest dark
+      mapStyle === "thunderforest_transport_dark" || 
       (mapStyle === "maptiler_satellite" && darkModeQuery.matches);
     document.body.classList.toggle("dark-mode", isDarkMode);
   }, [mapStyle, darkModeQuery.matches]);
@@ -218,15 +218,15 @@ export default function BusTimesMap(
   let mapStyleURL: string;
 
   if (mapStyle === "timesbus_positron") {
-    mapStyleURL = "https://tiles.transportthing.uk/styles/positron/style.json";
+    mapStyleURL = "https://tiles.snubs.dev/styles/aws-light/style.json";
   } else if (mapStyle === "timesbus_dark_matter") {
-    mapStyleURL = "https://tiles.transportthing.uk/styles/dark-matter/style.json";
+    mapStyleURL = "https://tiles.snubs.dev/styles/aws-dark/style.json";
   } else if (mapStyle === "timesbus_atlas") {
-    mapStyleURL = "https://tiles.transportthing.uk/styles/atlas/style.json";
+    mapStyleURL = "https://tiles.snubs.dev/styles/atlas/style.json";
   } else if (mapStyle === "timesbus_bright") {
-    mapStyleURL = "https://tiles.transportthing.uk/styles/bright/style.json";
+    mapStyleURL = "https://tiles.snubs.dev/styles/bright/style.json";
   } else if (mapStyle === "maptiler_satellite") {
-      mapStyleURL = `https://tiles.transportthing.uk/styles/satellite/style.json`; 
+      mapStyleURL = `https://tiles.snubs.dev/styles/satellite/style.json`; 
   }
   // else if (mapStyle === "thunderforest_transport") {
   //     mapStyleURL = `https://api.thunderforest.com/styles/transport.json?apikey=${THUNDERFOREST_API_KEY}`;
@@ -238,7 +238,7 @@ export default function BusTimesMap(
     console.warn(
       `Unknown map style: ${mapStyle}. Falling back to timesbus_bright.`,
     );
-    mapStyleURL = "https://tiles.timesbus.org/styles/bright/style.json";
+    mapStyleURL = "https://tiles.snubs.dev/styles/bright/style.json";
   }
 
   return (
