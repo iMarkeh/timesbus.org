@@ -201,5 +201,5 @@ if apps.is_installed("debug_toolbar"):
 
 
 urlpatterns += [
-    path('rules', change_notes_view, name='change_notes'),
+    path('updates', change_notes_view, name='changes.html'),
 ]
