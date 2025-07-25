@@ -43,19 +43,17 @@
   if (storedMapStyle) {
     // A style is stored in localStorage
     if (
-      storedMapStyle === "timesbus_dark_matter" ||
-      storedMapStyle === "thunderforest_transport_dark" // Added Thunderforest dark
+      storedMapStyle === "aws_dark" ||
+      storedMapStyle === "aws_mono_dark" // Added AWS Monochrome Dark
     ) {
       applyDarkMode = true;
     } else if (
-      storedMapStyle === "maptiler_satellite" &&
+      storedMapStyle === "aws_satellite" &&
       systemPrefersDark
     ) {
       applyDarkMode = true;
     }
   } else {
-    // No style stored in localStorage, rely on system preference
-    // If system prefers dark, React component will load an appropriate dark style by default
     if (systemPrefersDark) {
       applyDarkMode = true;
     }

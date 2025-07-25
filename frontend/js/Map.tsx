@@ -42,13 +42,12 @@ const imagesByName: { [imageName: string]: string } = {
 
 // Updated mapStyles to only use timesbus.org styles
 const mapStyles: { [key: string]: string } = {
-  timesbus_positron: "AWS Light",
-  timesbus_dark_matter: "AWS Dark",
-  timesbus_bright: "OSM Bright",
-  maptiler_satellite: "AWS Satellite",
-//  timesbus_atlas: "Atlas",
-//  thunderforest_transport: "Transport",
-//  thunderforest_transport_dark: "Transport Dark",
+  aws_light: "AWS Light",
+  aws_dark: "AWS Dark",
+  aws_mono_light: "AWS Light (Mono)",
+  aws_mono_dark: "AWS Dark (Mono)",
+  osm_bright: "OSM Bright",
+  aws_satellite: "AWS Satellite",
 };
 
 type StyleSwitcherProps = {
@@ -160,14 +159,14 @@ export default function BusTimesMap(
       // ignore
     }
     return darkModeQuery.matches
-      ? "timesbus_dark_matter"
-      : "timesbus_positron";
+      ? "aws_dark"
+      : "aws_light";
   });
 
   useEffect(() => {
     const handleChange = (e: MediaQueryListEvent) => {
       setMapStyle(
-        e.matches ? "timesbus_dark_matter" : "timesbus_positron",
+        e.matches ? "aws_dark" : "aws_light",
       );
     };
 
@@ -181,8 +180,8 @@ export default function BusTimesMap(
     (e: React.ChangeEvent<HTMLInputElement>) => {
       const style = e.target.value;
       const defaultStyle = darkModeQuery.matches
-        ? "timesbus_dark_matter"
-        : "timesbus_positron";
+        ? style === "aws_dark"
+        : style === "aws_light";
       setMapStyle(style);
       try {
         if (style === defaultStyle) {
@@ -206,34 +205,30 @@ export default function BusTimesMap(
       setContextMenu(undefined);
     }
   };
+
   useEffect(() => {
-    // Updated dark mode class logic
-    const isDarkMode =
-      mapStyle === "timesbus_dark_matter" ||
-      mapStyle === "thunderforest_transport_dark" || 
-      (mapStyle === "maptiler_satellite" && darkModeQuery.matches);
-    document.body.classList.toggle("dark-mode", isDarkMode);
+    document.body.classList.toggle(
+      "dark-mode",
+      mapStyle.endsWith("_dark") ||
+        (mapStyle === "aws_satellite" && darkModeQuery.matches),
+    );
   }, [mapStyle, darkModeQuery.matches]);
   // Updated mapStyleURL logic
   let mapStyleURL: string;
 
-  if (mapStyle === "timesbus_positron") {
+  if (mapStyle === "aws_light") {
     mapStyleURL = "https://tiles.snubs.dev/styles/aws-light/style.json";
-  } else if (mapStyle === "timesbus_dark_matter") {
+  } else if (mapStyle === "aws_dark") {
     mapStyleURL = "https://tiles.snubs.dev/styles/aws-dark/style.json";
-  } else if (mapStyle === "timesbus_atlas") {
-    mapStyleURL = "https://tiles.snubs.dev/styles/atlas/style.json";
-  } else if (mapStyle === "timesbus_bright") {
-    mapStyleURL = "https://tiles.snubs.dev/styles/bright/style.json";
-  } else if (mapStyle === "maptiler_satellite") {
+  } else if (mapStyle === "aws_mono_light") {
+    mapStyleURL = "https://tiles.snubs.dev/styles/aws-mono-light/style.json";
+  } else if (mapStyle === "aws_mono_dark") {
+    mapStyleURL = "https://tiles.snubs.dev/styles/aws-mono-dark/style.json";
+  } else if (mapStyle === "aws_satellite") {
       mapStyleURL = `https://tiles.snubs.dev/styles/satellite/style.json`; 
+  } else if (mapStyle === "osm_bright") {
+      mapStyleURL = `https://tiles.snubs.dev/styles/bright/style.json`; 
   }
-  // else if (mapStyle === "thunderforest_transport") {
-  //     mapStyleURL = `https://api.thunderforest.com/styles/transport.json?apikey=${THUNDERFOREST_API_KEY}`;
-  // }
-  // else if (mapStyle === "thunderforest_transport_dark") {
-  //     mapStyleURL = `https://api.thunderforest.com/styles/transport-dark.json?apikey=${THUNDERFOREST_API_KEY}`;
-  // } 
   else {
     console.warn(
       `Unknown map style: ${mapStyle}. Falling back to timesbus_bright.`,
@@ -250,7 +245,7 @@ export default function BusTimesMap(
         touchPitch={false}
         pitchWithRotate={false}
         dragRotate={false}
-        minZoom={2}
+        minZoom={4}
         maxZoom={18}
         projection={"globe"}
         mapStyle={mapStyleURL}
