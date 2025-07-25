@@ -245,7 +245,7 @@ export default function BusTimesMap(
         touchPitch={false}
         pitchWithRotate={false}
         dragRotate={false}
-        minZoom={4}
+        minZoom={2}
         maxZoom={18}
         projection={"globe"}
         mapStyle={mapStyleURL}
