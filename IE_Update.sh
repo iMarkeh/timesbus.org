@@ -6,24 +6,28 @@ set -e
 cd /svcs/transportthing.uk
 
 operators=(
-    "Realtime Transport Operators"
-    "TFI Local Link"
     "Aircoach"
+    "Ashbourne Connect"
     "Bernard Kavanagh"
     "City Direct"
     "Citylink"
+    "Corduff Coaches"
     "Dublin Coach"
     "Express Bus"
+    "Ferries, Cable Cars, and Regional Flights"
+    "Irish NaPTAN"
     "JJ Kavanagh"
     "Kearns Transport"
     "Matthews"
     "McGrath Coaches"
     "Nitelink"
+    "Realtime Transport Operators"
     "Slieve Bloom Coach Tours"
     "Small Operators"
     "Swords Express"
+    "TFI Local Link"
+    "Westlink Coaches"
     "Wexford Bus"
-    "Ferries, Cable Cars, and Regional Flights"
 )
 
 for operator in "${operators[@]}"; do
