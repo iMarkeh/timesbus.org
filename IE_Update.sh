@@ -15,7 +15,6 @@ operators=(
     "Dublin Coach"
     "Express Bus"
     "Ferries, Cable Cars, and Regional Flights"
-    "Irish NaPTAN"
     "JJ Kavanagh"
     "Kearns Transport"
     "Matthews"
