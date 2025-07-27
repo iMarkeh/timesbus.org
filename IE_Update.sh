@@ -1,0 +1,21 @@
+# RTO - DB, BE, BEW, GAI, LUAS, IE/IR
+
+cd /svcs/transportthing.uk
+docker compose exec web uv run ./manage.py import_gtfs "Realtime Transport Operators"
+docker compose exec web uv run ./manage.py import_gtfs "TFI Local Link"
+docker compose exec web uv run ./manage.py import_gtfs "Aircoach"
+docker compose exec web uv run ./manage.py import_gtfs "Bernard Kavanagh"
+docker compose exec web uv run ./manage.py import_gtfs "City Direct"
+docker compose exec web uv run ./manage.py import_gtfs "Citylink"
+docker compose exec web uv run ./manage.py import_gtfs "Dublin Coach"
+docker compose exec web uv run ./manage.py import_gtfs "Express Bus"
+docker compose exec web uv run ./manage.py import_gtfs "JJ Kavanagh"
+docker compose exec web uv run ./manage.py import_gtfs "Kearns Transport"
+docker compose exec web uv run ./manage.py import_gtfs "Matthews"
+docker compose exec web uv run ./manage.py import_gtfs "McGrath Coaches"
+docker compose exec web uv run ./manage.py import_gtfs "Nitelink"
+docker compose exec web uv run ./manage.py import_gtfs "Slieve Bloom Coach Tours"
+docker compose exec web uv run ./manage.py import_gtfs "Small Operators"
+docker compose exec web uv run ./manage.py import_gtfs "Swords Express"
+docker compose exec web uv run ./manage.py import_gtfs "Wexford Bus"
+docker compose exec web uv run ./manage.py import_gtfs "Ferries, Cable Cars, and Regional Flights"
