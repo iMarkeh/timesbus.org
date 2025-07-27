@@ -10,6 +10,7 @@ from django.contrib.gis.geos import GEOSGeometry
 from django.core.management.base import BaseCommand
 from django.db.models import Count, Exists, OuterRef, Q
 from django.db.models.functions import Now
+from django.db.transaction import atomic
 
 from busstops.models import AdminArea, DataSource, Operator, Region, Service, StopPoint
 
@@ -24,7 +25,9 @@ MODES = {
     2: "rail",
     3: "bus",
     4: "ferry",
+    6: "cable car",
     200: "coach",
+    76: "air",  # 1100
 }
 
 
@@ -136,7 +139,10 @@ class Command(BaseCommand):
         service.service_code = line.route_id
         service.line_name = line_name
         service.description = description
-        service.mode = MODES.get(line.route_type, "")
+        if line.route_type in MODES:
+            service.mode = MODES[line.route_type]
+        else:
+            logger.warning("unknown route type %s", line)
         service.current = True
         service.source = self.source
         service.save()
@@ -414,7 +420,8 @@ class Command(BaseCommand):
                     source.datetime = last_modified
                 self.source = source
                 try:
-                    self.handle_zipfile(path)
+                    with atomic():
+                        self.handle_zipfile(path)
                 except (OSError, BadZipFile) as e:
                     logger.exception(e)
 
