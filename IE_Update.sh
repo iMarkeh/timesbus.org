@@ -1,4 +1,4 @@
-#!/usr/bin/bash
+#!/usr/bin/env bash
 set -e
 
 # RTO - DB, BE, BEW, GAI, LUAS, IE/IR
