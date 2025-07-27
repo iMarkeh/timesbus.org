@@ -29,7 +29,7 @@ urlpatterns = [
         name="goondex",
     ),
     path(
-        "/goon",
+        "goon",
         TemplateView.as_view(template_name="goon.html"),
         name="index",
     ),
