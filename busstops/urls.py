@@ -26,12 +26,12 @@ urlpatterns = [
     path(
         "",
         TemplateView.as_view(template_name="index.html"),
-        name="goondex",
+        name="index",
     ),
     path(
         "goon",
         TemplateView.as_view(template_name="goon.html"),
-        name="index",
+        name="goondex",
     ),
     path(
         "satellites/all",
