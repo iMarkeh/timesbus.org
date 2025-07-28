@@ -14,7 +14,7 @@
 
 <ul class="changes">
     {% for note in notes %}
-        <li>
+        <li style="margin-bottom: 1em;">
             <strong>{{ note.date|date:"d/m/Y" }}:</strong>
             {{ note.note|linebreaksbr }}
             {% if note.link_url and note.link_text %}
@@ -26,4 +26,6 @@
     {% endfor %}
 </ul>
 
+
 {% endblock content %}
+
