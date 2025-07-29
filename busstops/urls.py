@@ -34,6 +34,11 @@ urlpatterns = [
         name="goondex",
     ),
     path(
+        "liveries",
+        TemplateView.as_view(template_name="liveries.html"),
+        name="liveryviewer",
+    ),
+    path(
         "satellites/all",
         TemplateView.as_view(template_name="satellites_all.html"),
         name="all_satellites",
