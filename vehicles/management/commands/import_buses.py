@@ -12,8 +12,8 @@ class Command(BaseCommand):
 
     # --- Configuration for this specific script ---
     # Example: If you want vehicles SE-101, SE-102, SE-ABC, SE-XYZ
-    WANTED_CODES = []
-    OPERATOR_PREFIX = "	"
+    WANTED_CODES = [100, 271, 272, 273, 274, 275, 276, 301, 1014, 1073, 1074, 1075, 1076, 1077, 1078, 1301, 1302, 1303, 1304, 1305, 1306, 1307, 1308, 1755, 1823, 1824, 1825, 1826, 1827, 1828, 1829, 1830, 1831, 1832, 1833, 1834, 1835, 1836, 1837, 1838, 1839, 1840, 1841, 1842, 1872, 1873, 1874, 1875, 1876, 1877, 1878, 2754, 2755]
+    OPERATOR_PREFIX = "LNUD"
     VEHICLE_TABLE_NAME = "vehicles_vehicle"
     # ---------------------------------------------
 
