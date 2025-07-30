@@ -68,7 +68,7 @@ class LoginForm(AuthenticationForm):
 class UserForm(Form):
     name = CharField(
         required=False,
-        label="Username",
+        label="Display Name",
         validators=[UnicodeUsernameValidator()],
         max_length=50,
     )
@@ -82,6 +82,7 @@ class UserForm(Form):
         self.fields["name"].help_text = f"""Will be displayed publicly.
 Leave blank to be 'user {user.id}'"""
         self.fields["name"].widget.attrs["placeholder"] = f"user {user.id}"
+        self.fields["name"].widget.attrs["autocomplete"] = False
 
 
 class UserPermissionsForm(Form):
