@@ -103,6 +103,9 @@
         {% else %}
                 <li><a href="/vehicles/edits?user={{ user.id }}&status=approved" title="Approved Edits">Your Edits</a></li>
         {% endif %}
+        {% if user.is_staff %}
+                <li><a href="/admin" title="Admin Panel">Admin Panel</a></li>
+        {% endif %}
                 <li>
                     {% csrf_token %}
                     <button type="submit" class="button" style="color: white;">Log out</button>
