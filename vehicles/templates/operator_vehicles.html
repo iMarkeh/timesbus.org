@@ -56,7 +56,7 @@ ticket machines, a byproduct of the live bus tracking and some entries requested
 
 {% if request.GET.withdrawn %}
     <ul class="horizontal">
-        <li><a href="{{ object.get_absolute_url }}/vehicles">Hide withdrawn vehicles</a></li>
+        <li><a href="/groups/{{ object.parent }}/vehicles">Hide withdrawn vehicles</a></li>
     </ul>
 {% else %}
     <ul class="horizontal">
