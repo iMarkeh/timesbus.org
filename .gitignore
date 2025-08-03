@@ -21,3 +21,4 @@ bustimes_api_importer.py
 *.zip
 core
 vehicles/management/commands/import_vehicles.py
+update.sh
