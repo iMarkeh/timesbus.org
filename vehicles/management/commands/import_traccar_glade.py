@@ -18,7 +18,7 @@ def has_stop(stop):
     )
 
 class Command(ImportLiveVehiclesCommand):
-    source_name = "traccar_heritage_ops"
+    source_name = "traccar_glade_testing"
     previous_locations = {}
 
     def do_source(self):
