@@ -12,8 +12,8 @@ class Command(BaseCommand):
 
     # --- Configuration for this specific script ---
     # Example: If you want vehicles SE-101, SE-102, SE-ABC, SE-XYZ
-    WANTED_CODES = [100, 271, 272, 273, 274, 275, 276, 301, 1014, 1073, 1074, 1075, 1076, 1077, 1078, 1301, 1302, 1303, 1304, 1305, 1306, 1307, 1308, 1755, 1823, 1824, 1825, 1826, 1827, 1828, 1829, 1830, 1831, 1832, 1833, 1834, 1835, 1836, 1837, 1838, 1839, 1840, 1841, 1842, 1872, 1873, 1874, 1875, 1876, 1877, 1878, 2754, 2755]
-    OPERATOR_PREFIX = "LNUD"
+    WANTED_CODES = ["YY67_HBG", "YJ18_DHC", "YJ18_DHD", "SJ73_HSV", "SJ73_HSX", "SJ73_HSY", "SJ73_HVO", "SD74_KRJ"]
+    OPERATOR_PREFIX = "HNMI"
     VEHICLE_TABLE_NAME = "vehicles_vehicle"
     # ---------------------------------------------
 
@@ -41,9 +41,9 @@ class Command(BaseCommand):
                         # Example logic for fleet_number and fleet_code
                         # Adjust this based on your actual data requirements and schema types
                         fleet_number = None # Or an integer if applicable, e.g., int(current_code_str) if it's always numeric
-                        fleet_code = current_code_str # Often a string identifier
+                        fleet_code = "" # Often a string identifier
 
-                        reg = current_code_str
+                        reg = ""
                         colours = ""
                         name = ""
                         branding = ""
@@ -54,7 +54,7 @@ class Command(BaseCommand):
                         locked = False
                         garage_id = None
                         latest_journey_id = None
-                        livery_id = 22
+                        livery_id = None
                         operator_id = self.OPERATOR_PREFIX.upper()
                         source_id = 63
                         vehicle_type_id = None

@@ -43,7 +43,7 @@ class Command(BaseCommand):
                 "BNML", "BNSM", "BNDB", "BNGN", "BNVB", "BNFM"
             ]
             NCTR_NOCs = ["NCTR"]
-            tfl_nocs = ["TFLO", "LGEN", "FLON"]
+            tfl_nocs = ["TFLO", "LGEN", "FLON", "AVLO", "MTLN", "GAHL", "ELBG", "LONC", "DLBU", "BTRI"]
             tfi_nocs = ["ULB", "FY-", "GLE", "MET", "ACAH", "IE-", "I-"]
             midlands = ["ADER", "AMID", "AMMO", "TBTN", "KBUS", "TMTL", "NDTR", "MDCL", "BULI", "HIPK", "NOCT", "LTLS"]
             trains = ["VT", "CS", "CH", "XC", "EM", "ES", "GX", "GN", "GW", "LE", "HX", "IL", "GR", "LULD", "LD", "ME", "NT", "SR", "SW", "SE", "SN", "SX", "XR", "TL", "TP", "AW", "WM", "LM", "CC"]
@@ -51,9 +51,9 @@ class Command(BaseCommand):
             COLORS = {
                 "bee": 0xFFD700,    # Gold
                 "nctr": 0x1E90FF,   # Dodger Blue
-                "tfl": 0xA020F0,    # Purple
+                "tfl": 0xFF0000,    # Purple
                 "tfi": 0x228B22,    # Forest Green
-                "midland": 0xBB0000, # Red
+                "midland": 0xDE8122, # Red
                 "default": 0xCCCCCC # Grey
             }
 
