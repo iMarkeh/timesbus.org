@@ -112,15 +112,14 @@
                 </li>
             </ul>
         </form>
-    {% else %}
-        <form action="{% url 'login' %}" method="get">
-            <button type="submit" class="button" style="color: white;">Login</button>
-        </form>
     {% endif %}
 
     <ul>
         <li><a href="/rules">Rules & FAQ</a></li>
         <li><a href="/discord">Discord</a></li>
+    {% if not user.is_authenticated %}
+        <li><a href="/accounts/login" class="button" style="color: white;">Login</a></li>
+    {% endif %}
         <li><a href="/contact">Contact</a></li>
         <li><a href="/updates">Site Updates</a></li>
         <!--<li><a href="/data">Data sources</a></li>
