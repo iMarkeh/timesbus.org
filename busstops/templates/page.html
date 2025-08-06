@@ -27,41 +27,11 @@
 <body class="{% block bodyclass %}wide{% endblock %}{% if ad is False %} no-ads{% endif %}">
 <script>
 (function () {
-  var storedMapStyle = null;
-  try {
-    storedMapStyle = localStorage && localStorage["map-style"];
-  } catch (e) {
-    console.warn("localStorage access error:", e);
-  }
-
-  var systemPrefersDark =
-    window.matchMedia &&
-    window.matchMedia("(prefers-color-scheme: dark)").matches;
-
-  var applyDarkMode = false;
-
-  if (storedMapStyle) {
-    // A style is stored in localStorage
-    if (
-      storedMapStyle === "aws_dark" ||
-      storedMapStyle === "aws_mono_dark" // Added AWS Monochrome Dark
-    ) {
-      applyDarkMode = true;
-    } else if (
-      storedMapStyle === "aws_satellite" &&
-      systemPrefersDark
-    ) {
-      applyDarkMode = true;
+    var a = localStorage && localStorage["map-style"];
+    var m = window.matchMedia && window.matchMedia("(prefers-color-scheme: dark)").matches;
+    if ((!a || a === "aws_satellite") && m || a && a.indexOf("_dark") !== -1) {
+        document.body.classList.add("dark-mode")
     }
-  } else {
-    if (systemPrefersDark) {
-      applyDarkMode = true;
-    }
-  }
-
-  if (applyDarkMode) {
-    document.body.classList.add("dark-mode");
-  }
 })();
 </script>
 

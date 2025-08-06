@@ -155,34 +155,34 @@ export default function BusTimesMap(
     } catch {
       // ignore
     }
-    return darkModeQuery.matches
-      ? "aws_dark"
-      : "aws_light";
+    return darkModeQuery.matches ? "aws_dark" : "aws_light";
   });
 
   useEffect(() => {
     const handleChange = (e: MediaQueryListEvent) => {
-      setMapStyle(
-        e.matches ? "aws_dark" : "aws_light",
-      );
+      setMapStyle(e.matches ? "aws_dark" : "aws_light");
     };
 
-    darkModeQuery.addEventListener("change", handleChange);
-    return () => {
-      darkModeQuery.removeEventListener("change", handleChange);
-    };
-  }, [darkModeQuery]);
+    // Check if addEventListener exists for better browser compatibility
+    if (darkModeQuery.addEventListener) {
+      darkModeQuery.addEventListener("change", handleChange);
+
+      return () => {
+        darkModeQuery.removeEventListener("change", handleChange);
+      };
+    }
+    
+    // Explicit return for consistency
+    return undefined;
+  }, [darkModeQuery]); // Keep dependency on the whole object since we use it in useEffect
 
   const handleMapStyleChange = React.useCallback(
     (e: React.ChangeEvent<HTMLInputElement>) => {
       const style = e.target.value;
-      const isDarkMode = darkModeQuery.matches; // Store the boolean value in a variable for readability
-      const expectedDefaultStyle = isDarkMode ? "aws_dark" : "aws_light"; // Determine the expected default style as a string
-
+      const defaultStyle = darkModeQuery.matches ? "aws_dark" : "aws_light";
       setMapStyle(style);
-
       try {
-        if (style === expectedDefaultStyle) {
+        if (style === defaultStyle) {
           localStorage.removeItem("map-style");
         } else {
           localStorage.setItem("map-style", style);
@@ -191,7 +191,7 @@ export default function BusTimesMap(
         // ignore
       }
     },
-    [darkModeQuery],
+    [darkModeQuery.matches], // More precise dependency - only re-memoize when matches changes
   );
 
   const [contextMenu, setContextMenu] = React.useState<LngLat>();

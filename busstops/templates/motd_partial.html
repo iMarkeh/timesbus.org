@@ -35,78 +35,99 @@
     })
 </script>
 <style>
-    .quote-text {
-  /* Example with Quicksand from Google Fonts */
-  font-family: "Quicksand", sans-serif;
-  font-size: 1.5em; /* Make it a bit larger */
-  line-height: 1.6; /* Improve readability */
-  color: #f0f0f0; /* Slightly off-white for a softer look */
-  text-align: center;
-}
-
-/* For the attribution or source, if you add one later */
-.quote-source {
-  font-family: "Inter", sans-serif;
-  font-size: 0.9em;
-  color: #888; /* Softer gray */
-  margin-top: 15px;
-  text-align: center;
-  font-style: italic;
-}
+/* --- Quote Container Styling --- */
 .quote-container {
-  /* ... existing styles ... */
-  border-left: 5px solid #006c7f; /* A thin, subtle blue line on the left */
-  background-color: #1a1a1a; /* Slightly lighter dark background */
-  padding: 25px 30px; /* Adjust padding due to border */
+  /* Positioning and Spacing */
+  margin: 50px auto; /* Top/bottom margin, auto for horizontal centering */
+  padding: 25px 30px; /* Internal padding */
+  max-width: 800px; /* Max width for readability on wide screens */
+  box-sizing: border-box; /* Include padding and border in element's total width/height */
+
+  /* Colors and Visuals */
+  background-color: #212121; /* Slightly lighter dark background for the container itself */
+  border-left: 5px solid #00aaff; /* Your vibrant accent blue for the left border */
   border-radius: 8px; /* Slightly rounded corners */
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); /* Subtle shadow */
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3); /* Subtle shadow for depth */
 }
 
-/* For large, stylistic quote marks */
+/* --- Quote Text Styling --- */
+.quote-text {
+  font-family: "Museo Sans", sans-serif; /* Your primary site font */
+  font-size: 1.5em; /* Larger font size for prominence */
+  line-height: 1.6; /* Improved readability for longer lines */
+  color: #f5f5f5; /* Very light grey for excellent contrast on dark background */
+  text-align: center; /* Center align the text within the container */
+  margin: 0; /* Remove default paragraph margin */
+}
+
+/* --- Stylistic Quote Marks (Pseudo-elements) --- */
+.quote-text::before,
+.quote-text::after {
+  font-family: "Museo Sans", sans-serif; /* Consistent font for quote marks */
+  font-size: 4em; /* Large size for visual impact */
+  color: rgba(0, 170, 255, 0.3); /* Your accent blue with transparency for a subtle look */
+  line-height: 0.1; /* Adjust vertical alignment without affecting line height of text */
+  vertical-align: -0.4em; /* Pulls the quote mark up slightly */
+  display: inline-block; /* Allows margins and prevents issues with text flow */
+}
+
 .quote-text::before {
   content: "\201C"; /* Left double quotation mark */
-  font-size: 4em;
-  color: rgba(0, 170, 255, 0.3); /* Transparent blue for subtle effect */
-  line-height: 0.1;
-  margin-right: 10px;
-  vertical-align: -0.4em;
-  display: inline-block;
+  margin-right: 10px; /* Space between quote mark and text */
 }
 
 .quote-text::after {
   content: "\201D"; /* Right double quotation mark */
-  font-size: 4em;
-  color: rgba(0, 170, 255, 0.3);
-  line-height: 0.1;
-  margin-left: 10px;
-  vertical-align: -0.4em;
-  display: inline-block;
+  margin-left: 10px; /* Space between text and quote mark */
 }
+
+/* --- Optional: Quote Source/Attribution Styling --- */
+/* Add a <p class="quote-source">- BTP Official</p> below the quote-text in HTML if using */
+.quote-source {
+  font-family: "Museo Sans", sans-serif; /* Consistent font */
+  font-size: 0.9em; /* Smaller size for attribution */
+  color: #99aab5; /* A soft, complementary blue-grey */
+  margin-top: 15px; /* Space above the source */
+  text-align: center;
+  font-style: italic; /* Italicize for distinction */
+}
+
+/* --- Responsive Adjustments --- */
 @media (max-width: 768px) {
   .quote-container {
-    margin: 30px auto;
-    padding: 15px 20px;
+    margin: 30px auto; /* Reduce vertical margin on smaller screens */
+    padding: 20px 25px; /* Slightly reduce padding */
   }
 
   .quote-text {
-    font-size: 1.2em;
+    font-size: 1.3em; /* Smaller font size for better fit */
   }
 
   .quote-text::before,
   .quote-text::after {
-    font-size: 3em;
+    font-size: 3.5em; /* Smaller quote marks */
   }
 }
 
 @media (max-width: 480px) {
+  .quote-container {
+    margin: 20px auto; /* Further reduce vertical margin */
+    padding: 15px 20px; /* Further reduce padding */
+  }
+
   .quote-text {
-    font-size: 1em;
+    font-size: 1.1em; /* Even smaller font for mobile */
   }
 
   .quote-text::before,
   .quote-text::after {
-    font-size: 2.5em;
-    margin: 0 5px; /* Less margin on small screens */
+    font-size: 3em; /* Adjust quote marks for smallest screens */
+    margin: 0 5px; /* Reduce margin to avoid overflow */
+    vertical-align: -0.3em; /* Slightly adjust vertical alignment */
+  }
+
+  .quote-source {
+    font-size: 0.8em; /* Smaller source text */
   }
 }
 </style>
