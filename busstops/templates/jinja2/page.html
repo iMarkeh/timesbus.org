@@ -20,8 +20,20 @@
 <link rel="manifest" href="{{ static('manifest.webmanifest') }}">
 <link rel="stylesheet" href="/static/dist/css/style.css">
 
-<meta name="twitter:card" content="summary">
-<meta name="twitter:site" content="@timesbus_org">
+	<meta name="description" content="Track buses, check out our fleet lists of buses, trains, trams, satellites and more! ">
+
+<meta property="og:url" content="https://transportthing.uk">
+<meta property="og:type" content="website">
+<meta property="og:title" content="TransportThing">
+<meta property="og:description" content="Track buses, check out our fleet lists of buses, trains, trams, satellites and more! ">
+<meta property="og:image" content="https://opengraph.b-cdn.net/production/images/e6ba83f8-a2e3-4006-87e0-599c28688ba6.png?token=isX_Brt9jbXdVzl4_ge1sfFeiq7EPxvzrKARyreIGPE&height=399&width=1200&expires=33290495612">
+
+<meta name="twitter:card" content="summary_large_image">
+<meta property="twitter:domain" content="transportthing.uk">
+<meta property="twitter:url" content="https://transportthing.uk">
+<meta name="twitter:title" content="TransportThing">
+<meta name="twitter:description" content="Track buses, check out our fleet lists of buses, trains, trams, satellites and more! ">
+<meta name="twitter:image" content="https://opengraph.b-cdn.net/production/images/e6ba83f8-a2e3-4006-87e0-599c28688ba6.png?token=isX_Brt9jbXdVzl4_ge1sfFeiq7EPxvzrKARyreIGPE&height=399&width=1200&expires=33290495612">
 
 {% block head %}{% endblock %}
 
@@ -84,9 +96,7 @@
         <li><a href="/privacy">Privacy policy</a></li>
         {% if ad %}<li><a href="javascript:window.__tcfapi('displayConsentUi',2,function(){})">Privacy settings</a></li>{% endif %}
     </ul>
-    <div class="motd" style="margin-bottom: 20px; border-radius: 10px; border: 1px solid #1d5560; padding: 20px; box-sizing: border-box;">
     	{% include "motd_partial.html" %}
-    </div>
 <!--<script type='text/javascript' src='https://storage.ko-fi.com/cdn/widget/Widget_2.js'></script>
 <script type='text/javascript'>kofiwidget2.init('Support us on Ko-fi', '#164450', 'W7W21AYHUU');kofiwidget2.draw();</script>-->
 <!-- Matomo -->

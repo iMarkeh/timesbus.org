@@ -7,12 +7,13 @@
 {% block content %}
 
 <h1>Sorry</h1>
-
-{% if exception %}
-    <p>{{ exception }}</p>
-{% else %}
-    <p>no.</p>
-{% endif %}
-
+    {% if exception %}
+        {% if user.is_superuser %}
+            <p>{{ exception }}</p>
+        {% else %}
+            <p>Access Denied</p>
+        {% endif %}
+    {% endif %}
+            
 
 {% endblock content %}

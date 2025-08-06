@@ -13,15 +13,17 @@
     <p>Sorry, something has gone wrong. Don’t worry, it’s not your fault</p>
 
     {% if exception %}
-        <details>
-            <summary>Technical details</summary>
+        {% if user.is_superuser %}
+            <details>
+                <summary>Technical details</summary>
 
-            <p><code>{{ exception }}</code></p>
+                <p><code>{{ exception }}</code></p>
 
-            {% for line in traceback %}
-                <pre>{{ line }}</pre>
-            {% endfor %}
-        </details>
+                {% for line in traceback %}
+                    <pre>{{ line }}</pre>
+                {% endfor %}
+            </details>
+        {% endif %}
     {% endif %}
 
 {% endblock content %}
