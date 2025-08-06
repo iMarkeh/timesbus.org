@@ -3,23 +3,25 @@
     function fetchRandomQuote() {
         $.getJSON("https://eden.apilogic.uk/quotes/random?tags=tt&published=true", function (quotes) {
             if (quotes.length === 0) {
-                $("#motd-text").text(" ")
+                $(".quote-text").text(" ")
                 return;
             }
-            $("#motd-text").html(quotes.author + " : " + quotes.text)
+            $(".quote-source").text(quotes.author)
+            $(".quote-text").html(quotes.text)
         }).fail(function () {
-            $("#motd-text").text("API : There would be a quote here but I'm not responding, apparently :3")
+            $(".quote-text").text("API : There would be a quote here but I'm not responding, apparently :3")
         })
     }
     function fetchAprilQuote() {
         $.getJSON("https://eden.apilogic.uk/quotes/random?tags=tb-april&published=true", function (quotes) {
             if (quotes.length === 0) {
-                $("#motd-text").text(" ")
+                $(".quote-text").text(" ")
                 return;
             }
-            $("#motd-text").html(quotes.author + " : " + quotes.text)
+            $(".quote-source").text(quotes.author)
+            $(".quote-text").html(quotes.text)
         }).fail(function () {
-            $("#motd-text").text("API : There would be a quote here but I'm not responding, apparently :3")
+            $(".quote-text").text("API : There would be a quote here but I'm not responding, apparently :3")
         })
     }
 
@@ -32,6 +34,83 @@
         }
     })
 </script>
-<div class="motd">
-    <span id="motd-text"></span><br/>
+<style>
+    .quote-text {
+  /* Example with Quicksand from Google Fonts */
+  font-family: "Quicksand", sans-serif;
+  font-size: 1.5em; /* Make it a bit larger */
+  line-height: 1.6; /* Improve readability */
+  color: #f0f0f0; /* Slightly off-white for a softer look */
+  text-align: center;
+}
+
+/* For the attribution or source, if you add one later */
+.quote-source {
+  font-family: "Inter", sans-serif;
+  font-size: 0.9em;
+  color: #888; /* Softer gray */
+  margin-top: 15px;
+  text-align: center;
+  font-style: italic;
+}
+.quote-container {
+  /* ... existing styles ... */
+  border-left: 5px solid #006c7f; /* A thin, subtle blue line on the left */
+  background-color: #1a1a1a; /* Slightly lighter dark background */
+  padding: 25px 30px; /* Adjust padding due to border */
+  border-radius: 8px; /* Slightly rounded corners */
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); /* Subtle shadow */
+}
+
+/* For large, stylistic quote marks */
+.quote-text::before {
+  content: "\201C"; /* Left double quotation mark */
+  font-size: 4em;
+  color: rgba(0, 170, 255, 0.3); /* Transparent blue for subtle effect */
+  line-height: 0.1;
+  margin-right: 10px;
+  vertical-align: -0.4em;
+  display: inline-block;
+}
+
+.quote-text::after {
+  content: "\201D"; /* Right double quotation mark */
+  font-size: 4em;
+  color: rgba(0, 170, 255, 0.3);
+  line-height: 0.1;
+  margin-left: 10px;
+  vertical-align: -0.4em;
+  display: inline-block;
+}
+@media (max-width: 768px) {
+  .quote-container {
+    margin: 30px auto;
+    padding: 15px 20px;
+  }
+
+  .quote-text {
+    font-size: 1.2em;
+  }
+
+  .quote-text::before,
+  .quote-text::after {
+    font-size: 3em;
+  }
+}
+
+@media (max-width: 480px) {
+  .quote-text {
+    font-size: 1em;
+  }
+
+  .quote-text::before,
+  .quote-text::after {
+    font-size: 2.5em;
+    margin: 0 5px; /* Less margin on small screens */
+  }
+}
+</style>
+<div class="quote-container">
+  <p class="quote-text"></p>
+  <p class="quote-source"></p>
 </div>
