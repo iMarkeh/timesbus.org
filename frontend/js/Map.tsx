@@ -41,8 +41,8 @@ const imagesByName: { [imageName: string]: string } = {
 const mapStyles: { [key: string]: string } = {
   aws_light: "Light",
   aws_dark: "Dark",
-  aws_mono_light: "Light (Mono)",
-  aws_mono_dark: "Dark (Mono)",
+  aws_mono_light: "Light (Monochrome)",
+  aws_mono_dark: "Dark (Monochrome)",
   osm_bright: "Bright",
   aws_satellite: "Satellite",
 };
@@ -272,13 +272,13 @@ export default function BusTimesMap(
               href={`https://www.openstreetmap.org/#map=15/${contextMenu.lat}/${contextMenu.lng}`}
               rel="noopener noreferrer"
             >
-              OpenStreetMap
+              View on OpenStreetMap
             </a>
             <a
               href={`https://www.google.com/maps/search/?api=1&query=${contextMenu.lat},${contextMenu.lng}`}
               rel="noopener noreferrer"
             >
-              Google Maps
+              View on Google Maps
             </a>
           </Popup>
         ) : null}
