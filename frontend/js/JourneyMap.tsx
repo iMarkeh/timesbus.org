@@ -70,7 +70,7 @@ export const Locations = React.memo(function Locations({
   locations: VehicleJourneyLocation[];
 }) {
   const theme = React.useContext(ThemeContext);
-  const darkMode = theme.endsWith("_dark") || theme === "alidade_satellite";
+  const darkMode = theme.endsWith("_dark") || theme === "aws_satellite";
 
   const routeStyle: LayerProps = {
     type: "line",
