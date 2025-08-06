@@ -27,9 +27,6 @@ import type {
   MapStyleImageMissingEvent,
 } from "maplibre-gl";
 
-const THUNDERFOREST_API_KEY = "b39c71a7e47441c8819703265852cca5";
-const MAPTILER_API_KEY = "55Ux4HYOATM9YGB8TSb9";
-
 const imagesByName: { [imageName: string]: string } = {
   "stop-marker": stopMarker,
   "stop-marker-circle": stopMarkerCircle,
@@ -42,12 +39,12 @@ const imagesByName: { [imageName: string]: string } = {
 
 // Updated mapStyles to only use timesbus.org styles
 const mapStyles: { [key: string]: string } = {
-  aws_light: "AWS Light",
-  aws_dark: "AWS Dark",
-  aws_mono_light: "AWS Light (Mono)",
-  aws_mono_dark: "AWS Dark (Mono)",
-  osm_bright: "OSM Bright",
-  aws_satellite: "AWS Satellite",
+  aws_light: "Light",
+  aws_dark: "Dark",
+  aws_mono_light: "Light (Mono)",
+  aws_mono_dark: "Dark (Mono)",
+  osm_bright: "Bright",
+  aws_satellite: "Satellite",
 };
 
 type StyleSwitcherProps = {
@@ -179,12 +176,13 @@ export default function BusTimesMap(
   const handleMapStyleChange = React.useCallback(
     (e: React.ChangeEvent<HTMLInputElement>) => {
       const style = e.target.value;
-      const defaultStyle = darkModeQuery.matches
-        ? style === "aws_dark"
-        : style === "aws_light";
+      const isDarkMode = darkModeQuery.matches; // Store the boolean value in a variable for readability
+      const expectedDefaultStyle = isDarkMode ? "aws_dark" : "aws_light"; // Determine the expected default style as a string
+
       setMapStyle(style);
+
       try {
-        if (style === defaultStyle) {
+        if (style === expectedDefaultStyle) {
           localStorage.removeItem("map-style");
         } else {
           localStorage.setItem("map-style", style);
@@ -193,7 +191,7 @@ export default function BusTimesMap(
         // ignore
       }
     },
-    [darkModeQuery.matches],
+    [darkModeQuery],
   );
 
   const [contextMenu, setContextMenu] = React.useState<LngLat>();

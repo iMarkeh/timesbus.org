@@ -23,7 +23,7 @@ class Command(ImportLiveVehiclesCommand):
 
     def do_source(self):
         self.operators = Operator.objects.filter(
-            Q(parent=["midland Group" "Glade's Tracking"]) | Q(noc__in=["MDEM" "GLDE"])
+            Q(parent=["midland Group", "Glade's Tracking"]) | Q(noc__in=["MDEM", "GLDE"])
         ).in_bulk()
 
         return super().do_source()
