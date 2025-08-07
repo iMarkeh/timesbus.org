@@ -21,6 +21,17 @@
          font-family: 'Museo Sans';
          src: url('https://cdn.transportthing.uk/MuseoSans.woff2') format('woff2');
     }
+@media (prefers-color-scheme: dark) {
+  :root {
+    --initial-theme: dark;
+  }
+}
+
+@media (prefers-color-scheme: light) {
+  :root {
+    --initial-theme: light;
+  }
+}
 :root{
     --brand-color: #2E8A9E;
     --brand-color-darker: #339FBB;
