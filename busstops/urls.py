@@ -39,6 +39,11 @@ urlpatterns = [
         name="liveryviewer",
     ),
     path(
+        "liverydatabase",
+        TemplateView.as_view(template_name="liverydatabase.html"),
+        name="liverydatabase",
+    ),
+    path(
         "satellites/all",
         TemplateView.as_view(template_name="satellites_all.html"),
         name="all_satellites",
