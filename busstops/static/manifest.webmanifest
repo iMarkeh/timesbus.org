@@ -19,8 +19,5 @@
   "display": "standalone",
   "dir": "auto",
   "lang": "en-GB",
-  "name": "TransportThing",
-  "short_name": "TT",
   "start_url": "https://transportthing.uk/map",
-  "description": "Track Buses, Satellites and soon, trains and trams!"
 }
