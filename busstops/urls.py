@@ -39,6 +39,11 @@ urlpatterns = [
         name="liveryviewer",
     ),
     path(
+        "siridebug",
+        TemplateView.as_view(template_name="siridebug.html"),
+        name="siridebug",
+    ),
+    path(
         "liverydatabase",
         TemplateView.as_view(template_name="liverydatabase.html"),
         name="liverydatabase",

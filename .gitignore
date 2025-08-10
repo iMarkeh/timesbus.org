@@ -21,4 +21,5 @@ bustimes_api_importer.py
 *.zip
 core
 vehicles/management/commands/import_vehicles.py
+busstops/templates/siridebug.html
 update.sh

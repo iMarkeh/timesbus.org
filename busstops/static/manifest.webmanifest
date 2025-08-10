@@ -1,14 +1,26 @@
 {
-    "icons": [
-        {
-            "src": "https://cdn.transportthing.uk/favicon.svg",
-            "type": "image/svg+xml"
-        },
-        {
-            "src": "https://cdn.transportthing.uk/favicon.svg",
-            "type": "image/svg+xml"
-        }
-    ],
-    "background_color": "#006C7F",
-    "theme_color": "#006C7F"
+  "theme_color": "#8936FF",
+  "background_color": "#e7f3f9",
+  "icons": [
+    {
+      "purpose": "maskable",
+      "sizes": "512x512",
+      "src": "https://cdn.transportthing.uk/TT%20Icon.png",
+      "type": "image/png"
+    },
+    {
+      "purpose": "any",
+      "sizes": "512x512",
+      "src": "https://cdn.transportthing.uk/TT%20Icon.png",
+      "type": "image/png"
+    }
+  ],
+  "orientation": "any",
+  "display": "standalone",
+  "dir": "auto",
+  "lang": "en-GB",
+  "name": "TransportThing",
+  "short_name": "TT",
+  "start_url": "https://transportthing.uk/map",
+  "description": "Track Buses, Satellites and soon, trains and trams!"
 }

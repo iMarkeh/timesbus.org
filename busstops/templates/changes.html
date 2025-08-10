@@ -10,23 +10,70 @@
 
 {% block content %}
 
-<h1>Recent Site Changes</h1>
+<h1 style="margin-bottom: 4rem; padding-bottom: 1rem; border-bottom: 2px solid var(--brand-color-darker);">Recent Site Changes</h1>
+{% regroup notes by date as date_list %}
+
+<style>
+    .changes {
+        list-style: none;
+        padding: 0;
+        margin: 0;
+    }
+
+    /* Each date group */
+    .changes > li {
+        border-bottom: 1px solid #afdee9;
+        padding-bottom: 1em;
+        margin-bottom: 1.5em;
+    }
+
+    /* Date heading */
+    .changes h3 {
+        margin: 0 0 0.5em 0;
+        padding-bottom: 0.3em;
+        border-bottom: 1px solid #164450;
+        font-size: 1.1em;
+        color: #999999;
+    }
+
+    /* Inner note list */
+    .changes ul {
+        list-style: disc;
+        padding-left: 1.5em;
+        margin: 0;
+    }
+
+    .changes ul li {
+        margin-bottom: 0.5em;
+    }
+
+    /* Keep (link here) together on one line */
+    .note-link {
+        white-space: nowrap;
+    }
+</style>
 
 <ul class="changes">
-    {% for note in notes %}
-        <li style="margin-bottom: 1em;">
-            <strong>{{ note.date|date:"d/m/Y" }}:</strong>
-            {{ note.note|linebreaksbr }}
-            {% if note.link_url and note.link_text %}
-                (<a href="{{ note.link_url }}">{{ note.link_text }}</a>)
-            {% endif %}
+    {% for date_group in date_list %}
+        <li>
+            <h3>{{ date_group.grouper|date:"d/m/Y" }}</h3>
+            <ul>
+                {% for note in date_group.list %}
+                    <li>
+                        {{ note.note|linebreaksbr }}
+                        {% if note.link_url and note.link_text %}
+                            <span class="note-link">
+                                (<a href="{{ note.link_url }}">{{ note.link_text }}</a>)
+                            </span>
+                        {% endif %}
+                    </li>
+                {% endfor %}
+            </ul>
         </li>
     {% empty %}
         <li>No change notes yet.</li>
     {% endfor %}
 </ul>
-
-
 {% endblock content %}
 
 
