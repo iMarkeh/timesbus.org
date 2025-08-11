@@ -172,7 +172,7 @@ def error(request):
 def robots_txt(request):
     "robots.txt"
 
-    if request.get_host() in ("timesbus.org", "transportthing.uk"):  # live site
+    if request.get_host() in ("ttd.snubs.dev", "transportthing.uk"):  # live site
         content = """
             User-agent: *
             Disallow: /trips/
