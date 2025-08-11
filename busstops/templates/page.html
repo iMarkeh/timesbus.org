@@ -14,23 +14,12 @@
     {% endif %}
 {% endblock canonical %}
 <script type="application/ld+json">{"@context":"http://schema.org","@type":"WebSite","url":"https://transportthing.uk","name":"TransportThing","potentialAction":{"@type":"SearchAction","target":"https://transportthing.uk/search-query?q={q}","query-input":"required name=q"}}</script>
-<script>
-  const darkMode = window.matchMedia('(prefers-color-scheme: dark)').matches;
-  const savedStyle = localStorage.getItem('map-style');
-  
-  if (savedStyle) {
-    document.documentElement.setAttribute('savedStyle', savedStyle);
-  } else if (darkMode) {
-    document.documentElement.setAttribute('savedStyle', 'dark');
-  }
-</script>
-
 {% load static %}
 <!-- <link rel="icon" sizes="48x48" type="image/png" href="/favicon.ico"> -->
 <link rel="icon" sizes="any" type="image/svg+xml" href="https://cdn.discordapp.com/icons/1337054349267959898/bcb0fa2c5561cb082d1e8fb83f4e6566.webp?size=1024">
 <link rel="manifest" href="/static/manifest.webmanifest">
 <link rel="stylesheet" href="/static/dist/css/style.css">
-
+<meta name="description" content="check out our fleet lists of buses, trains, trams, satellites and more, all in one place!">
 <meta property="og:url" content="https://transportthing.uk">
 <meta property="og:type" content="website">
 <meta property="og:image" content="https://opengraph.b-cdn.net/production/images/e6ba83f8-a2e3-4006-87e0-599c28688ba6.png?token=isX_Brt9jbXdVzl4_ge1sfFeiq7EPxvzrKARyreIGPE&height=399&width=1200&expires=33290495612">

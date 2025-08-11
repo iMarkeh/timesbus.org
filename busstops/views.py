@@ -182,23 +182,9 @@ Disallow: /vehicles/tfl/
 Disallow: /services/*/*
 Disallow: /sources
 Disallow: /*/debug
-
-User-Agent: ImagesiftBot
-Disallow: /
-
-User-agent: Bytespider
-Disallow: /
-
-User-agent: ClaudeBot
-Disallow: /
-
-User-agent: GPTBot
-Disallow: /
 """
     else:  # staging site/other
-        content = """User-agent: Mediapartners-Google
-Disallow:
-
+        content = """
 User-agent: AdsBot-Google
 Disallow:
 
