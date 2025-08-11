@@ -173,24 +173,22 @@ def robots_txt(request):
     "robots.txt"
 
     if request.get_host() in ("timesbus.org", "transportthing.uk"):  # live site
-        content = """User-agent: *
-Disallow: /trips/
-Disallow: /api/
-Disallow: /accounts/
-Disallow: /fares/
-Disallow: /vehicles/tfl/
-Disallow: /services/*/*
-Disallow: /sources
-Disallow: /*/debug
-"""
+        content = """
+            User-agent: *
+            Disallow: /trips/
+            Disallow: /api/
+            Disallow: /accounts/
+            Disallow: /fares/
+            Disallow: /vehicles/tfl/
+            Disallow: /services/*/*
+            Disallow: /sources
+            Disallow: /*/debug
+            """
     else:  # staging site/other
         content = """
-User-agent: AdsBot-Google
-Disallow:
-
-User-agent: *
-Disallow: /
-"""
+        User-agent: *
+        Disallow: /
+        """
 
     return HttpResponse(content, content_type="text/plain")
 
