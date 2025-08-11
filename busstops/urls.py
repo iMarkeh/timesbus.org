@@ -29,11 +29,6 @@ urlpatterns = [
         name="index",
     ),
     path(
-        "goon",
-        TemplateView.as_view(template_name="goon.html"),
-        name="goondex",
-    ),
-    path(
         "liveries",
         TemplateView.as_view(template_name="liveries.html"),
         name="liveryviewer",
@@ -50,52 +45,52 @@ urlpatterns = [
     ),
     path(
         "satellites/all",
-        TemplateView.as_view(template_name="satellites_all.html"),
+        TemplateView.as_view(template_name="satellites/all.html"),
         name="all_satellites",
     ),
     path(
         "satellites",
-        TemplateView.as_view(template_name="satellites_home.html"),
+        TemplateView.as_view(template_name="satellites/home.html"),
         name="satellites",
     ),
     path(
         "satellites/starlink",
-        TemplateView.as_view(template_name="starlink_satellites.html"),
+        TemplateView.as_view(template_name="satellites/starlink.html"),
         name="sl_satellites",
     ),
     path(
         "satellites/oneweb",
-        TemplateView.as_view(template_name="oneweb_satellites.html"),
+        TemplateView.as_view(template_name="satellites/oneweb.html"),
         name="ow_satellites",
     ),
     path(
         "satellites/gps",
-        TemplateView.as_view(template_name="gps_satellites.html"),
+        TemplateView.as_view(template_name="satellites/gps.html"),
         name="gps_satellites",
     ),
     path(
         "satellites/visual",
-        TemplateView.as_view(template_name="visual_satellites.html"),
+        TemplateView.as_view(template_name="satellites/visual.html"),
         name="visual_satellites",
     ),
     path(
         "satellites/weather",
-        TemplateView.as_view(template_name="weather_satellites.html"),
+        TemplateView.as_view(template_name="satellites/weather.html"),
         name="weather_satellites",
     ),
     path(
         "satellites/goes",
-        TemplateView.as_view(template_name="goes_satellites.html"),
+        TemplateView.as_view(template_name="satellites/goes.html"),
         name="goes_satellites",
     ),
     path(
         "satellites/kuiper",
-        TemplateView.as_view(template_name="kuiper_satellites.html"),
+        TemplateView.as_view(template_name="satellites/kuiper.html"),
         name="kuiper_satellites",
     ),
     path(
         "satellites/soon",
-        TemplateView.as_view(template_name="satellites_soon.html"),
+        TemplateView.as_view(template_name="satellites/soon.html"),
         name="coming_soon_sat",
     ),
     path(
