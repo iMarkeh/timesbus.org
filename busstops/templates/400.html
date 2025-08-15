@@ -1,6 +1,6 @@
 {% extends 'page.html' %}
 
-{% block title %}403 – transportthing.uk{% endblock %}
+{% block title %}400 – transportthing.uk{% endblock %}
 
 {% block bodyclass %}narrow{% endblock %}
 
@@ -11,7 +11,7 @@
         {% if user.is_superuser %}
             <p>{{ exception }}</p>
         {% else %}
-            <img src="https://http.cat/403" alt="403 Forbidden" />
+            <img src="https://http.cat/400" alt="400 Bad Request" />
         {% endif %}
     {% endif %}
             

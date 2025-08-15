@@ -1,6 +1,6 @@
 {% extends 'page.html' %}
 
-{% block title %}Error 500{% endblock %}
+{% block title %}500 - transportthing.uk{% endblock %}
 
 {% block bodyclass %}narrow{% endblock %}
 
@@ -11,6 +11,7 @@
     <h1>Error</h1>
 
     <p>Sorry, something has gone wrong. Don’t worry, it’s not your fault</p>
+    <img src="https://http.cat/500" alt="500 Internal Server Error" />
 
     {% if exception %}
         {% if user.is_superuser %}
