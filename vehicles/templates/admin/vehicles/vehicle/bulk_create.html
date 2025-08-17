@@ -5,7 +5,7 @@
 
 {% block extrahead %}
     {{ block.super }}
-    {{ form.media }}
+    {{ form.media.css }}
 {% endblock %}
 
 {% block breadcrumbs %}
@@ -168,4 +168,5 @@ SJ73_HSX</pre>
 
 {% block extrajs %}
     {{ block.super }}
+    {{ form.media.js }}
 {% endblock %}
