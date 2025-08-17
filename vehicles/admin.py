@@ -3,12 +3,11 @@ from django.contrib import admin, messages
 from django.contrib.auth import get_user_model
 from django.db import IntegrityError, connection, transaction
 from django.db.models import Exists, OuterRef, Q
-from django.urls import reverse, path
+from django.urls import reverse
 from django.utils.html import format_html
-from django.shortcuts import render, redirect
 from simple_history.admin import SimpleHistoryAdmin
 from sql_util.utils import SubqueryCount
-from busstops.models import Operator, DataSource
+
 
 from . import models
 
@@ -31,12 +30,6 @@ class BulkVehicleCreationForm(ModelForm):
     class Meta:
         model = models.Vehicle
         fields = ['operator', 'source', 'vehicle_type', 'livery']
-        help_texts = {
-            'operator': 'Select the operator for these vehicles',
-            'source': 'Select the data source for these vehicles',
-            'vehicle_type': 'Optional: Vehicle type to assign to all vehicles',
-            'livery': 'Optional: Livery to assign to all vehicles',
-        }
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -45,11 +38,13 @@ class BulkVehicleCreationForm(ModelForm):
         self.fields['vehicle_type'].required = False
         self.fields['livery'].required = False
 
-        # Configure querysets
-        self.fields['operator'].queryset = Operator.objects.all().order_by('name')
-        self.fields['source'].queryset = DataSource.objects.all().order_by('name')
-        self.fields['vehicle_type'].queryset = models.VehicleType.objects.all().order_by('name')
-        self.fields['livery'].queryset = models.Livery.objects.filter(published=True).order_by('name')
+
+class BulkVehicleCreation(models.Vehicle):
+    """Proxy model for bulk vehicle creation"""
+    class Meta:
+        proxy = True
+        verbose_name = "Bulk Vehicle Creation"
+        verbose_name_plural = "Bulk Vehicle Creation"
 
 
 @admin.register(models.VehicleType)
@@ -292,53 +287,7 @@ class VehicleAdmin(admin.ModelAdmin):
     def unlock(self, request, queryset):
         queryset.update(locked=False)
 
-    def get_urls(self):
-        """Add custom URLs for bulk vehicle creation"""
-        urls = super().get_urls()
-        custom_urls = [
-            path(
-                'bulk-create/',
-                self.admin_site.admin_view(self.bulk_create_view),
-                name='vehicles_vehicle_bulk_create',
-            ),
-        ]
-        return custom_urls + urls
 
-    def bulk_create_view(self, request):
-        """Custom view for bulk vehicle creation with proper autocomplete"""
-        if request.method == 'POST':
-            form = BulkVehicleCreationForm(request.POST)
-            if form.is_valid():
-                try:
-                    result = self._perform_bulk_creation(form.cleaned_data)
-                    messages.success(
-                        request,
-                        f"Successfully processed {result['attempted']} vehicles. "
-                        f"Created {result['created']} new vehicles, "
-                        f"skipped {result['skipped']} existing ones."
-                    )
-                    return redirect('admin:vehicles_vehicle_changelist')
-                except Exception as e:
-                    messages.error(request, f"Error creating vehicles: {e}")
-        else:
-            form = BulkVehicleCreationForm()
-
-        # Apply the same autocomplete widgets that VehicleAdmin uses
-        for field_name in ['vehicle_type', 'livery']:
-            if field_name in form.fields:
-                model_field = models.Vehicle._meta.get_field(field_name)
-                admin_formfield = self.formfield_for_foreignkey(model_field, request)
-                if admin_formfield:
-                    form.fields[field_name].widget = admin_formfield.widget
-
-        context = {
-            'form': form,
-            'title': 'Bulk Create Vehicles',
-            'opts': self.model._meta,
-            'has_view_permission': self.has_view_permission(request),
-            'has_add_permission': self.has_add_permission(request),
-        }
-        return render(request, 'admin/vehicles/vehicle/bulk_create.html', context)
 
 
 
@@ -350,6 +299,44 @@ class VehicleAdmin(admin.ModelAdmin):
     def get_changelist_form(self, request, **kwargs):
         kwargs.setdefault("form", VehicleAdminForm)
         return super().get_changelist_form(request, **kwargs)
+
+
+@admin.register(BulkVehicleCreation)
+class BulkVehicleCreationAdmin(admin.ModelAdmin):
+    """Admin for bulk vehicle creation - inherits autocomplete from VehicleAdmin"""
+    form = BulkVehicleCreationForm
+    autocomplete_fields = ("vehicle_type", "livery")
+    raw_id_fields = ("operator", "source")
+
+    def has_module_permission(self, request):
+        return request.user.has_perm('vehicles.add_vehicle')
+
+    def has_view_permission(self, request, obj=None):
+        return False
+
+    def has_change_permission(self, request, obj=None):
+        return False
+
+    def has_delete_permission(self, request, obj=None):
+        return False
+
+    def save_model(self, request, obj, form, change):
+        # Handle the bulk creation logic here
+        try:
+            # Get the VehicleAdmin instance to call the method
+            vehicle_admin = VehicleAdmin(models.Vehicle, admin.site)
+            result = vehicle_admin._perform_bulk_creation(form.cleaned_data)
+            messages.success(
+                request,
+                f"Successfully processed {result['attempted']} vehicles. "
+                f"Created {result['created']} new vehicles, "
+                f"skipped {result['skipped']} existing ones."
+            )
+        except Exception as e:
+            messages.error(request, f"Error creating vehicles: {e}")
+
+        # Don't actually save the proxy object
+        pass
 
 
 
