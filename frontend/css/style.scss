@@ -33,7 +33,8 @@
     }
 }
 
-.dark-mode {
+.dark-mode,
+html.dark-mode body {
     #closeBox circle {
         fill: #fff!important;
     }

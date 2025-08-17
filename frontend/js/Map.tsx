@@ -205,11 +205,12 @@ export default function BusTimesMap(
   };
 
   useEffect(() => {
-    document.body.classList.toggle(
-      "dark-mode",
-      mapStyle.endsWith("_dark") ||
-        (mapStyle === "aws_satellite" && darkModeQuery.matches),
-    );
+    const isDarkMode = mapStyle.endsWith("_dark") ||
+      (mapStyle === "aws_satellite" && darkModeQuery.matches);
+
+    // Set dark mode on both html and body for compatibility
+    document.documentElement.classList.toggle("dark-mode", isDarkMode);
+    document.body.classList.toggle("dark-mode", isDarkMode);
   }, [mapStyle, darkModeQuery.matches]);
   // Updated mapStyleURL logic
   let mapStyleURL: string;

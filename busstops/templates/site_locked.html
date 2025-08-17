@@ -1,57 +1,118 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en-GB">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Site Locked | TransportThing</title>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="theme-color" content="#2E8A9E" media="(prefers-color-scheme: light)">
+  <meta name="theme-color" content="#111111" media="(prefers-color-scheme: dark)">
+  <meta name="color-scheme" content="dark light">
+  <title>Site Under Maintenance | TransportThing</title>
+  <link rel="icon" sizes="any" type="image/svg+xml" href="https://cdn.transportthing.uk/TT%20Icon.png">
+
   <style>
+    /* CSS Variables for consistent theming */
+    :root {
+      --brand-color: #2E8A9E;
+      --brand-color-darker: #339FBB;
+      --brand-color-darker-darker: #339FBB;
+      --ppborder: #164450;
+      --background-color: #c5c5c5;
+      --text-color: #222;
+      --link-color: #173a58;
+      --card-background: #fff;
+      --card-shadow: rgba(0, 0, 0, 0.1);
+      --logo-url: url('//cdn.transportthing.uk/light_logo.svg');
+      color-scheme: light;
+    }
+
+    .dark-mode {
+      --brand-color: #006C7F;
+      --brand-color-darker: #1D5560;
+      --brand-color-darker-darker: #1D5560;
+      --background-color: #0f0f0f;
+      --text-color: #fff;
+      --link-color: #afdde9;
+      --ppborder: #afdee9;
+      --card-background: #1a1a1a;
+      --card-shadow: rgba(255, 255, 255, 0.1);
+      --logo-url: url('//cdn.transportthing.uk/dark_logo.svg');
+      color-scheme: dark;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
     body {
-      font-family: Arial, sans-serif;
-      text-align: center;
-      background: #333333;
-      color: #333;
-      height: 100vh;
-      display: flex;
-      justify-content: center;
-      align-items: center;
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+      background-color: var(--background-color);
+      color: var(--text-color);
       margin: 0;
-      overflow: hidden;
+      padding: 20px;
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      line-height: 1.6;
     }
 
-    .container {
-      max-width: 650px;
-      background: #cecece;
-      padding: 30px;
-      border-radius: 12px;
-      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
-      animation: fadeIn 0.8s ease;
+    .maintenance-container {
+      max-width: 600px;
+      width: 100%;
+      background: var(--card-background);
+      border-radius: 16px;
+      box-shadow: 0 8px 32px var(--card-shadow);
+      border: 2px solid transparent;
+      padding: 40px;
+      text-align: center;
+      animation: slideIn 0.6s ease-out;
+      transition: border-color 0.3s ease;
     }
 
-    @keyframes fadeIn {
-      from { opacity: 0; transform: scale(0.95); }
-      to { opacity: 1; transform: scale(1); }
+    @keyframes slideIn {
+      from {
+        opacity: 0;
+        transform: translateY(20px) scale(0.95);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+      }
+    }
+
+    .logo {
+      width: 150px;
+      height: 32px;
+      background-image: var(--logo-url);
+      background-repeat: no-repeat;
+      background-size: contain;
+      background-position: center;
+      margin: 0 auto 30px;
     }
 
     h1 {
-      color: #0078a0;
-      font-size: 28px;
-      margin-bottom: 10px;
+      color: var(--brand-color);
+      font-size: clamp(24px, 5vw, 32px);
+      font-weight: 600;
+      margin: 0 0 20px 0;
+      letter-spacing: -0.5px;
     }
 
-    p {
-      font-size: 16px;
-      line-height: 1.6;
-      margin: 10px 0;
+    .status-indicator {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 12px;
+      margin: 30px 0;
     }
 
     .loader {
-      border: 5px solid #f3f3f3;
-      border-top: 5px solid #0078a0;
+      width: 40px;
+      height: 40px;
+      border: 3px solid var(--background-color);
+      border-top: 3px solid var(--brand-color);
       border-radius: 50%;
-      width: 50px;
-      height: 50px;
       animation: spin 1s linear infinite;
-      margin: 20px auto;
     }
 
     @keyframes spin {
@@ -60,10 +121,10 @@
     }
 
     .checkmark {
-      width: 50px;
-      height: 50px;
-      margin: 20px auto;
+      width: 40px;
+      height: 40px;
       display: none;
+      color: #22c55e;
     }
 
     .checkmark svg {
@@ -71,41 +132,162 @@
       height: 100%;
     }
 
+    p {
+      font-size: 16px;
+      margin: 16px 0;
+      opacity: 0.9;
+    }
+
+    .message {
+      background: var(--background-color);
+      border-radius: 12px;
+      padding: 20px;
+      margin: 24px 0;
+      border-left: 4px solid var(--brand-color);
+    }
+
+    .eta {
+      font-weight: 600;
+      color: var(--brand-color);
+      font-size: 18px;
+    }
+
     .links {
-      margin-top: 20px;
+      margin-top: 32px;
+      padding-top: 24px;
+      border-top: 1px solid var(--background-color);
     }
 
-    .links a {
+    .links p {
+      margin-bottom: 16px;
+      font-weight: 500;
+    }
+
+    .link-buttons {
+      display: flex;
+      gap: 12px;
+      justify-content: center;
+      flex-wrap: wrap;
+    }
+
+    .link-button {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 12px 20px;
+      background: var(--brand-color);
+      color: white;
       text-decoration: none;
-      color: #0078a0;
-      font-weight: bold;
-      margin: 0 10px;
-      transition: color 0.3s;
+      border-radius: 8px;
+      font-weight: 500;
+      transition: all 0.2s ease;
+      border: 2px solid var(--brand-color);
     }
 
-    .links a:hover {
-      color: #005670;
+    .link-button:hover {
+      background: var(--brand-color-darker);
+      border-color: var(--brand-color-darker);
+      transform: translateY(-1px);
+    }
+
+    .link-button.secondary {
+      background: transparent;
+      color: var(--brand-color);
+    }
+
+    .link-button.secondary:hover {
+      background: var(--brand-color);
+      color: white;
+    }
+
+    @media (max-width: 480px) {
+      .maintenance-container {
+        padding: 24px;
+        margin: 10px;
+      }
+
+      .link-buttons {
+        flex-direction: column;
+      }
+
+      .link-button {
+        justify-content: center;
+      }
+    }
+
+    /* Accessibility improvements */
+    @media (prefers-reduced-motion: reduce) {
+      .maintenance-container {
+        animation: none;
+      }
+
+      .loader {
+        animation: none;
+        border-top-color: var(--brand-color);
+      }
     }
   </style>
 </head>
 <body>
-  <div class="container">
-    <h1 id="text">TransportThing is Locked</h1>
-    <div class="loader" id="loader"></div>
-    <div class="checkmark" id="checkmark">
-      <svg viewBox="0 0 52 52">
-        <path fill="none" stroke="#164450" stroke-width="6" d="M10 30 L22 42 L40 18"/>
-      </svg>
+<script>
+(function () {
+    var a = localStorage && localStorage["map-style"];
+    var m = window.matchMedia && window.matchMedia("(prefers-color-scheme: dark)").matches;
+    if ((!a || a === "aws_satellite") && m || a && a.indexOf("_dark") !== -1) {
+        document.body.classList.add("dark-mode")
+    }
+})();
+</script>
+  <div class="maintenance-container">
+    <div class="logo" aria-label="TransportThing Logo"></div>
+
+    <h1 id="text">🚧 Site Under Maintenance</h1>
+
+    <div class="status-indicator">
+      <div class="loader" id="loader" aria-label="Loading"></div>
+      <div class="checkmark" id="checkmark" style="display: none;">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M20 6L9 17l-5-5"></path>
+        </svg>
+      </div>
+      <span id="status-text">Working on improvements...</span>
     </div>
+
+    <p>We're currently performing scheduled maintenance to improve your experience with TransportThing.</p>
+
     {% if message %}
-      <p>{{ message }}</p>
+      <div class="message">
+        <p><strong>Update:</strong> {{ message }}</p>
+      </div>
     {% endif %}
-    <p>The service is expected to be back online within <strong>{{ hours }} hours</strong>.</p>
+
+    <p class="eta">Expected back online within <strong>{{ hours }} hour{{ hours|pluralize }}</strong></p>
+
     <p>We'll send out another announcement once TransportThing is back up and running. Thank you for your patience!</p>
+
     <div class="links">
-      <p>Stay updated:</p>
-      <a href="https://status.snubs.dev">?? Status Page</a> |
-      <a href="https://transportthing.uk/discord">?? Join us on Discord</a>
+      <p>Stay updated on our progress:</p>
+      <div class="link-buttons">
+        <a href="https://discord.gg/transportthing" target="_blank" rel="noopener" class="link-button">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+            <path d="M20.317 4.37a19.791 19.791 0 0 0-4.885-1.515.074.074 0 0 0-.079.037c-.21.375-.444.864-.608 1.25a18.27 18.27 0 0 0-5.487 0 12.64 12.64 0 0 0-.617-1.25.077.077 0 0 0-.079-.037A19.736 19.736 0 0 0 3.677 4.37a.07.07 0 0 0-.032.027C.533 9.046-.32 13.58.099 18.057a.082.082 0 0 0 .031.057 19.9 19.9 0 0 0 5.993 3.03.078.078 0 0 0 .084-.028 14.09 14.09 0 0 0 1.226-1.994.076.076 0 0 0-.041-.106 13.107 13.107 0 0 1-1.872-.892.077.077 0 0 1-.008-.128 10.2 10.2 0 0 0 .372-.292.074.074 0 0 1 .077-.01c3.928 1.793 8.18 1.793 12.062 0a.074.074 0 0 1 .078.01c.12.098.246.198.373.292a.077.077 0 0 1-.006.127 12.299 12.299 0 0 1-1.873.892.077.077 0 0 0-.041.107c.36.698.772 1.362 1.225 1.993a.076.076 0 0 0 .084.028 19.839 19.839 0 0 0 6.002-3.03.077.077 0 0 0 .032-.054c.5-5.177-.838-9.674-3.549-13.66a.061.061 0 0 0-.031-.03zM8.02 15.33c-1.183 0-2.157-1.085-2.157-2.419 0-1.333.956-2.419 2.157-2.419 1.21 0 2.176 1.096 2.157 2.42 0 1.333-.956 2.418-2.157 2.418zm7.975 0c-1.183 0-2.157-1.085-2.157-2.419 0-1.333.955-2.419 2.157-2.419 1.21 0 2.176 1.096 2.157 2.42 0 1.333-.946 2.418-2.157 2.418z"/>
+          </svg>
+          Discord
+        </a>
+        <a href="https://twitter.com/transportthing" target="_blank" rel="noopener" class="link-button secondary">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+            <path d="M23.953 4.57a10 10 0 01-2.825.775 4.958 4.958 0 002.163-2.723c-.951.555-2.005.959-3.127 1.184a4.92 4.92 0 00-8.384 4.482C7.69 8.095 4.067 6.13 1.64 3.162a4.822 4.822 0 00-.666 2.475c0 1.71.87 3.213 2.188 4.096a4.904 4.904 0 01-2.228-.616v.06a4.923 4.923 0 003.946 4.827 4.996 4.996 0 01-2.212.085 4.936 4.936 0 004.604 3.417 9.867 9.867 0 01-6.102 2.105c-.39 0-.779-.023-1.17-.067a13.995 13.995 0 007.557 2.209c9.053 0 13.998-7.496 13.998-13.985 0-.21 0-.42-.015-.63A9.935 9.935 0 0024 4.59z"/>
+          </svg>
+          Twitter
+        </a>
+        <a href="https://status.snubs.dev" target="_blank" rel="noopener" class="link-button secondary">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="12" cy="12" r="10"></circle>
+            <path d="m9 12 2 2 4-4"></path>
+          </svg>
+          Status Page
+        </a>
+      </div>
     </div>
   </div>
 
@@ -126,20 +308,55 @@
           const titleMatch = html.match(/<title>(.*?)<\/title>/);
           if (titleMatch && titleMatch[1]) {
             const pageTitle = titleMatch[1];
-            if (pageTitle !== "Site Locked | TransportThing" && pageTitle !== "Maintenance | TransportThing") {
-              document.getElementById("loader").style.display = "none";
-              document.getElementById("checkmark").style.display = "block";
-              document.getElementById("text").textContent = "We're Back Online!";
+            if (pageTitle !== "Site Under Maintenance | TransportThing" &&
+                pageTitle !== "Site Locked | TransportThing" &&
+                pageTitle !== "Maintenance | TransportThing") {
+              // Site is back online
+              const loader = document.getElementById("loader");
+              const checkmark = document.getElementById("checkmark");
+              const text = document.getElementById("text");
+              const statusText = document.getElementById("status-text");
+
+              if (loader) loader.style.display = "none";
+              if (checkmark) checkmark.style.display = "block";
+              if (text) text.textContent = "🎉 We're Back Online!";
+              if (statusText) statusText.textContent = "Redirecting you now...";
+
+              // Add success styling
+              const container = document.querySelector('.maintenance-container');
+              if (container) container.style.borderColor = '#22c55e';
+
+              setTimeout(() => {
+                window.location.href = targetUrl;
+              }, 3000);
             }
           }
         })
         .catch(error => {
-          console.log("Error checking site:", error);
+          console.error("Error checking site:", error);
+          // Update status to show we're still checking
+          const statusText = document.getElementById("status-text");
+          if (statusText && statusText.textContent.includes("Working on improvements")) {
+            statusText.textContent = "Still working on improvements...";
+          }
         });
     }
 
-    checkSite();
-    setInterval(checkSite, 10000); // Check every 10 seconds
+    // Check every 30 seconds
+    setInterval(checkSite, 30000);
+
+    // Initial check after 5 seconds
+    setTimeout(checkSite, 5000);
+
+    // Add some visual feedback for the loading state
+    let dots = 0;
+    setInterval(() => {
+      const statusText = document.getElementById("status-text");
+      if (statusText && statusText.textContent.includes("Working on improvements")) {
+        dots = (dots + 1) % 4;
+        statusText.textContent = "Working on improvements" + ".".repeat(dots);
+      }
+    }, 1000);
   </script>
 </body>
 </html>
