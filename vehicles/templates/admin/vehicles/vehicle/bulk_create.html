@@ -3,6 +3,10 @@
 
 {% block title %}{{ title }} | {{ site_title|default:_('Django site admin') }}{% endblock %}
 
+{% block extrahead %}
+    {{ form.media }}
+{% endblock %}
+
 {% block breadcrumbs %}
 <div class="breadcrumbs">
 <a href="{% url 'admin:index' %}">{% trans 'Home' %}</a>
@@ -159,4 +163,15 @@ SJ73_HSX</pre>
     <p><strong>Note:</strong> Vehicles with duplicate slugs (operator + code combination) will be skipped to avoid conflicts.</p>
 </div>
 
+{% endblock %}
+
+{% block extrajs %}
+    {{ block.super }}
+    <script>
+        // Initialize autocomplete widgets after page load
+        document.addEventListener('DOMContentLoaded', function() {
+            // Initialize all autocomplete widgets
+            django.jQuery('.admin-autocomplete').djangoAdminSelect2();
+        });
+    </script>
 {% endblock %}

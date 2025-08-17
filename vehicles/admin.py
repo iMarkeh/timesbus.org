@@ -1,6 +1,7 @@
-from django.forms import ModelForm, Textarea, TextInput, Form, CharField, ChoiceField, IntegerField
+from django.forms import ModelForm, Textarea, TextInput, Form, CharField, ModelChoiceField, IntegerField
 from django.contrib import admin, messages
 from django.contrib.auth import get_user_model
+from django.contrib.admin.widgets import AutocompleteSelect
 from django.db import IntegrityError, connection, transaction
 from django.db.models import Exists, OuterRef, Q
 from django.urls import reverse, path
@@ -19,14 +20,16 @@ UserModel = get_user_model()
 class BulkVehicleCreationForm(Form):
     """Form for bulk vehicle creation"""
 
-    operator = ChoiceField(
-        choices=[],
-        help_text="Select the operator for these vehicles"
+    operator = ModelChoiceField(
+        queryset=Operator.objects.all(),
+        help_text="Select the operator for these vehicles",
+        empty_label="--- Select Operator ---"
     )
 
-    source = ChoiceField(
-        choices=[],
-        help_text="Select the data source for these vehicles"
+    source = ModelChoiceField(
+        queryset=DataSource.objects.all(),
+        help_text="Select the data source for these vehicles",
+        empty_label="--- Select Source ---"
     )
 
     vehicle_codes = CharField(
@@ -39,52 +42,44 @@ class BulkVehicleCreationForm(Form):
         help_text="Optional: Starting fleet number (will auto-increment for each vehicle)"
     )
 
-    vehicle_type = ChoiceField(
-        choices=[('', '--- None ---')],
+    vehicle_type = ModelChoiceField(
+        queryset=models.VehicleType.objects.all(),
         required=False,
-        help_text="Optional: Vehicle type to assign to all vehicles"
+        help_text="Optional: Vehicle type to assign to all vehicles",
+        empty_label="--- None ---"
     )
 
-    livery = ChoiceField(
-        choices=[('', '--- None ---')],
+    livery = ModelChoiceField(
+        queryset=models.Livery.objects.filter(published=True),
         required=False,
-        help_text="Optional: Livery to assign to all vehicles"
+        help_text="Optional: Livery to assign to all vehicles",
+        empty_label="--- None ---"
     )
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
 
-        # Populate operator choices
-        operator_choices = [('', '--- Select Operator ---')]
-        operator_choices.extend([
-            (op.noc, f"{op.noc} - {op.name}")
-            for op in Operator.objects.all().order_by('name')
-        ])
-        self.fields['operator'].choices = operator_choices
-
-        # Populate source choices
-        source_choices = [('', '--- Select Source ---')]
-        source_choices.extend([
-            (ds.id, f"{ds.id} - {ds.name}")
-            for ds in DataSource.objects.all().order_by('name')
-        ])
-        self.fields['source'].choices = source_choices
-
-        # Populate vehicle type choices
-        vtype_choices = [('', '--- None ---')]
-        vtype_choices.extend([
-            (vt.id, vt.name)
-            for vt in models.VehicleType.objects.all().order_by('name')
-        ])
-        self.fields['vehicle_type'].choices = vtype_choices
-
-        # Populate livery choices
-        livery_choices = [('', '--- None ---')]
-        livery_choices.extend([
-            (l.id, l.name)
-            for l in models.Livery.objects.filter(published=True).order_by('name')
-        ])
-        self.fields['livery'].choices = livery_choices
+        # Set up autocomplete widgets for better UX
+        self.fields['operator'].widget = AutocompleteSelect(
+            models.Vehicle.operator.field,
+            admin.site,
+            attrs={'class': 'admin-autocomplete'}
+        )
+        self.fields['source'].widget = AutocompleteSelect(
+            models.Vehicle.source.field,
+            admin.site,
+            attrs={'class': 'admin-autocomplete'}
+        )
+        self.fields['vehicle_type'].widget = AutocompleteSelect(
+            models.Vehicle.vehicle_type.field,
+            admin.site,
+            attrs={'class': 'admin-autocomplete'}
+        )
+        self.fields['livery'].widget = AutocompleteSelect(
+            models.Vehicle.livery.field,
+            admin.site,
+            attrs={'class': 'admin-autocomplete'}
+        )
 
 
 @admin.register(models.VehicleType)
@@ -385,12 +380,12 @@ class VehicleAdmin(admin.ModelAdmin):
 
     def _perform_bulk_creation(self, cleaned_data):
         """Perform the actual bulk vehicle creation"""
-        operator_noc = cleaned_data['operator']
-        source_id = int(cleaned_data['source'])
+        operator = cleaned_data['operator']
+        source = cleaned_data['source']
         vehicle_codes_text = cleaned_data['vehicle_codes']
         fleet_number_start = cleaned_data.get('fleet_number_start')
-        vehicle_type_id = cleaned_data.get('vehicle_type')
-        livery_id = cleaned_data.get('livery')
+        vehicle_type = cleaned_data.get('vehicle_type')
+        livery = cleaned_data.get('livery')
 
         # Parse vehicle codes
         vehicle_codes = [
@@ -402,9 +397,11 @@ class VehicleAdmin(admin.ModelAdmin):
         if not vehicle_codes:
             raise ValueError("No vehicle codes provided")
 
-        # Convert IDs to actual values for foreign keys
-        vehicle_type_id = int(vehicle_type_id) if vehicle_type_id else None
-        livery_id = int(livery_id) if livery_id else None
+        # Get IDs for foreign keys
+        operator_noc = operator.noc if operator else None
+        source_id = source.id if source else None
+        vehicle_type_id = vehicle_type.id if vehicle_type else None
+        livery_id = livery.id if livery else None
 
         with transaction.atomic():
             with connection.cursor() as cursor:
