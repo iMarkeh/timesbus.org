@@ -4,6 +4,7 @@
 {% block title %}{{ title }} | {{ site_title|default:_('Django site admin') }}{% endblock %}
 
 {% block extrahead %}
+    {{ block.super }}
     {{ form.media }}
 {% endblock %}
 
@@ -167,11 +168,4 @@ SJ73_HSX</pre>
 
 {% block extrajs %}
     {{ block.super }}
-    <script>
-        // Initialize autocomplete widgets after page load
-        document.addEventListener('DOMContentLoaded', function() {
-            // Initialize all autocomplete widgets
-            django.jQuery('.admin-autocomplete').djangoAdminSelect2();
-        });
-    </script>
 {% endblock %}
