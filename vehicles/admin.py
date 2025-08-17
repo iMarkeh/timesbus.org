@@ -3,10 +3,9 @@ from django.contrib import admin, messages
 from django.contrib.auth import get_user_model
 from django.db import IntegrityError, connection, transaction
 from django.db.models import Exists, OuterRef, Q
-from django.urls import reverse
+from django.urls import reverse, path
 from django.utils.html import format_html
-from django.shortcuts import render
-from django.http import HttpResponseRedirect
+from django.shortcuts import render, redirect
 from simple_history.admin import SimpleHistoryAdmin
 from sql_util.utils import SubqueryCount
 from busstops.models import Operator, DataSource
@@ -188,7 +187,6 @@ class VehicleAdmin(admin.ModelAdmin):
         "spare_ticket_machine",
         "lock",
         "unlock",
-        "bulk_create_vehicles",
     )
     inlines = [VehicleCodeInline]
     readonly_fields = ["latest_journey_data"]
@@ -294,6 +292,54 @@ class VehicleAdmin(admin.ModelAdmin):
     def unlock(self, request, queryset):
         queryset.update(locked=False)
 
+    def get_urls(self):
+        """Add custom URLs for bulk vehicle creation"""
+        urls = super().get_urls()
+        custom_urls = [
+            path(
+                'bulk-create/',
+                self.admin_site.admin_view(self.bulk_create_view),
+                name='vehicles_vehicle_bulk_create',
+            ),
+        ]
+        return custom_urls + urls
+
+    def bulk_create_view(self, request):
+        """Custom view for bulk vehicle creation with proper autocomplete"""
+        if request.method == 'POST':
+            form = BulkVehicleCreationForm(request.POST)
+            if form.is_valid():
+                try:
+                    result = self._perform_bulk_creation(form.cleaned_data)
+                    messages.success(
+                        request,
+                        f"Successfully processed {result['attempted']} vehicles. "
+                        f"Created {result['created']} new vehicles, "
+                        f"skipped {result['skipped']} existing ones."
+                    )
+                    return redirect('admin:vehicles_vehicle_changelist')
+                except Exception as e:
+                    messages.error(request, f"Error creating vehicles: {e}")
+        else:
+            form = BulkVehicleCreationForm()
+
+        # Apply the same autocomplete widgets that VehicleAdmin uses
+        for field_name in ['vehicle_type', 'livery']:
+            if field_name in form.fields:
+                model_field = models.Vehicle._meta.get_field(field_name)
+                admin_formfield = self.formfield_for_foreignkey(model_field, request)
+                if admin_formfield:
+                    form.fields[field_name].widget = admin_formfield.widget
+
+        context = {
+            'form': form,
+            'title': 'Bulk Create Vehicles',
+            'opts': self.model._meta,
+            'has_view_permission': self.has_view_permission(request),
+            'has_add_permission': self.has_add_permission(request),
+        }
+        return render(request, 'admin/vehicles/vehicle/bulk_create.html', context)
+
 
 
     @admin.display(ordering="latest_journey__datetime")
@@ -307,38 +353,7 @@ class VehicleAdmin(admin.ModelAdmin):
 
 
 
-    def bulk_create_vehicles(self, request, queryset):
-        """Admin action for bulk vehicle creation"""
-        form = BulkVehicleCreationForm()
 
-        if 'apply' in request.POST:
-            form = BulkVehicleCreationForm(request.POST)
-            if form.is_valid():
-                try:
-                    result = self._perform_bulk_creation(form.cleaned_data)
-                    self.message_user(
-                        request,
-                        f"Successfully processed {result['attempted']} vehicles. "
-                        f"Created {result['created']} new vehicles, "
-                        f"skipped {result['skipped']} existing ones.",
-                        messages.SUCCESS
-                    )
-                    return HttpResponseRedirect(request.get_full_path())
-                except Exception as e:
-                    self.message_user(request, f"Error creating vehicles: {e}", messages.ERROR)
-
-        context = {
-            'form': form,
-            'title': 'Bulk Create Vehicles',
-            'action_checkbox_name': admin.ACTION_CHECKBOX_NAME,
-            'queryset': queryset,
-            'opts': self.model._meta,
-            'action': 'bulk_create_vehicles',
-        }
-
-        return render(request, 'admin/vehicles/vehicle/bulk_create_vehicles.html', context)
-
-    bulk_create_vehicles.short_description = "Bulk create vehicles"
 
     def _perform_bulk_creation(self, cleaned_data):
         """Perform the actual bulk vehicle creation"""

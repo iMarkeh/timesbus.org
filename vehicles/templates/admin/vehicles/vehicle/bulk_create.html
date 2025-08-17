@@ -1,12 +1,7 @@
-{% extends "admin/base_site.html" %}
+{% extends "admin/change_form.html" %}
 {% load i18n admin_urls static %}
 
 {% block title %}{{ title }} | {{ site_title|default:_('Django site admin') }}{% endblock %}
-
-{% block extrahead %}
-    {{ block.super }}
-    {{ form.media }}
-{% endblock %}
 
 {% block breadcrumbs %}
 <div class="breadcrumbs">
@@ -23,7 +18,7 @@
 <form method="post">
 {% csrf_token %}
 
-<div class="module aligned">
+<fieldset class="module aligned">
     <h2>Bulk Vehicle Creation</h2>
     
     <div class="form-row">
@@ -91,12 +86,10 @@
             {{ form.livery.errors }}
         </div>
     </div>
-</div>
+</fieldset>
 
 <div class="submit-row">
-    <input type="hidden" name="action" value="{{ action }}">
-    <input type="hidden" name="{{ action_checkbox_name }}" value="1">
-    <input type="submit" value="Create Vehicles" class="default" name="apply">
+    <input type="submit" value="Create Vehicles" class="default" name="_save">
     <a href="{% url opts|admin_urlname:'changelist' %}" class="button cancel-link">Cancel</a>
 </div>
 
