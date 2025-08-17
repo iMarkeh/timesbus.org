@@ -1,0 +1,162 @@
+{% extends "admin/base_site.html" %}
+{% load i18n admin_urls static admin_modify %}
+
+{% block title %}{{ title }} | {{ site_title|default:_('Django site admin') }}{% endblock %}
+
+{% block breadcrumbs %}
+<div class="breadcrumbs">
+<a href="{% url 'admin:index' %}">{% trans 'Home' %}</a>
+&rsaquo; <a href="{% url 'admin:app_list' app_label=opts.app_label %}">{{ opts.app_config.verbose_name }}</a>
+&rsaquo; <a href="{% url 'admin:vehicles_vehicle_changelist' %}">{{ opts.verbose_name_plural|capfirst }}</a>
+&rsaquo; {{ title }}
+</div>
+{% endblock %}
+
+{% block content %}
+<h1>{{ title }}</h1>
+
+<div class="module aligned">
+    <p>This tool allows you to bulk create vehicles for a specific operator. Enter vehicle codes one per line, and optionally set common properties for all vehicles.</p>
+    
+    <form method="post" novalidate>
+        {% csrf_token %}
+        
+        <fieldset class="module aligned">
+            <h2>Required Settings</h2>
+            
+            <div class="form-row">
+                <div>
+                    <label for="{{ form.operator.id_for_label }}" class="required">{{ form.operator.label }}:</label>
+                    {{ form.operator }}
+                    {% if form.operator.help_text %}
+                        <p class="help">{{ form.operator.help_text }}</p>
+                    {% endif %}
+                    {% if form.operator.errors %}
+                        <ul class="errorlist">
+                            {% for error in form.operator.errors %}
+                                <li>{{ error }}</li>
+                            {% endfor %}
+                        </ul>
+                    {% endif %}
+                </div>
+            </div>
+            
+            <div class="form-row">
+                <div>
+                    <label for="{{ form.source.id_for_label }}" class="required">{{ form.source.label }}:</label>
+                    {{ form.source }}
+                    {% if form.source.help_text %}
+                        <p class="help">{{ form.source.help_text }}</p>
+                    {% endif %}
+                    {% if form.source.errors %}
+                        <ul class="errorlist">
+                            {% for error in form.source.errors %}
+                                <li>{{ error }}</li>
+                            {% endfor %}
+                        </ul>
+                    {% endif %}
+                </div>
+            </div>
+            
+            <div class="form-row">
+                <div>
+                    <label for="{{ form.vehicle_codes.id_for_label }}" class="required">{{ form.vehicle_codes.label }}:</label>
+                    {{ form.vehicle_codes }}
+                    {% if form.vehicle_codes.help_text %}
+                        <p class="help">{{ form.vehicle_codes.help_text }}</p>
+                    {% endif %}
+                    {% if form.vehicle_codes.errors %}
+                        <ul class="errorlist">
+                            {% for error in form.vehicle_codes.errors %}
+                                <li>{{ error }}</li>
+                            {% endfor %}
+                        </ul>
+                    {% endif %}
+                </div>
+            </div>
+        </fieldset>
+        
+        <fieldset class="module aligned">
+            <h2>Optional Settings</h2>
+            
+            <div class="form-row">
+                <div>
+                    <label for="{{ form.fleet_number_start.id_for_label }}">{{ form.fleet_number_start.label }}:</label>
+                    {{ form.fleet_number_start }}
+                    {% if form.fleet_number_start.help_text %}
+                        <p class="help">{{ form.fleet_number_start.help_text }}</p>
+                    {% endif %}
+                    {% if form.fleet_number_start.errors %}
+                        <ul class="errorlist">
+                            {% for error in form.fleet_number_start.errors %}
+                                <li>{{ error }}</li>
+                            {% endfor %}
+                        </ul>
+                    {% endif %}
+                </div>
+            </div>
+            
+            <div class="form-row">
+                <div>
+                    <label for="{{ form.vehicle_type.id_for_label }}">{{ form.vehicle_type.label }}:</label>
+                    {{ form.vehicle_type }}
+                    {% if form.vehicle_type.help_text %}
+                        <p class="help">{{ form.vehicle_type.help_text }}</p>
+                    {% endif %}
+                    {% if form.vehicle_type.errors %}
+                        <ul class="errorlist">
+                            {% for error in form.vehicle_type.errors %}
+                                <li>{{ error }}</li>
+                            {% endfor %}
+                        </ul>
+                    {% endif %}
+                </div>
+            </div>
+            
+            <div class="form-row">
+                <div>
+                    <label for="{{ form.livery.id_for_label }}">{{ form.livery.label }}:</label>
+                    {{ form.livery }}
+                    {% if form.livery.help_text %}
+                        <p class="help">{{ form.livery.help_text }}</p>
+                    {% endif %}
+                    {% if form.livery.errors %}
+                        <ul class="errorlist">
+                            {% for error in form.livery.errors %}
+                                <li>{{ error }}</li>
+                            {% endfor %}
+                        </ul>
+                    {% endif %}
+                </div>
+            </div>
+        </fieldset>
+        
+        <div class="submit-row">
+            <input type="submit" value="Create Vehicles" class="default" />
+            <a href="{% url 'admin:vehicles_vehicle_changelist' %}" class="button cancel-link">Cancel</a>
+        </div>
+    </form>
+</div>
+
+<div class="module">
+    <h2>Instructions</h2>
+    <ul>
+        <li><strong>Operator:</strong> Select the operator that will own these vehicles</li>
+        <li><strong>Source:</strong> Select the data source for tracking where these vehicles came from</li>
+        <li><strong>Vehicle Codes:</strong> Enter one vehicle code per line. These will be used as the vehicle's code field and combined with the operator to create unique slugs</li>
+        <li><strong>Fleet Number Start:</strong> If provided, fleet numbers will be assigned starting from this number and incrementing for each vehicle</li>
+        <li><strong>Vehicle Type:</strong> If selected, all created vehicles will be assigned this vehicle type</li>
+        <li><strong>Livery:</strong> If selected, all created vehicles will be assigned this livery</li>
+    </ul>
+    
+    <h3>Example Vehicle Codes:</h3>
+    <pre>YY67_HBG
+YJ18_DHC
+YJ18_DHD
+SJ73_HSV
+SJ73_HSX</pre>
+    
+    <p><strong>Note:</strong> Vehicles with duplicate slugs (operator + code combination) will be skipped to avoid conflicts.</p>
+</div>
+
+{% endblock %}

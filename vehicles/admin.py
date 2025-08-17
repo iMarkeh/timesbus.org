@@ -1,16 +1,90 @@
-from django.forms import ModelForm, Textarea, TextInput
+from django.forms import ModelForm, Textarea, TextInput, Form, CharField, ChoiceField, IntegerField
 from django.contrib import admin, messages
 from django.contrib.auth import get_user_model
-from django.db import IntegrityError
+from django.db import IntegrityError, connection, transaction
 from django.db.models import Exists, OuterRef, Q
-from django.urls import reverse
+from django.urls import reverse, path
 from django.utils.html import format_html
+from django.shortcuts import render, redirect
+from django.http import HttpResponseRedirect
 from simple_history.admin import SimpleHistoryAdmin
 from sql_util.utils import SubqueryCount
+from busstops.models import Operator, DataSource
 
 from . import models
 
 UserModel = get_user_model()
+
+
+class BulkVehicleCreationForm(Form):
+    """Form for bulk vehicle creation"""
+
+    operator = ChoiceField(
+        choices=[],
+        help_text="Select the operator for these vehicles"
+    )
+
+    source = ChoiceField(
+        choices=[],
+        help_text="Select the data source for these vehicles"
+    )
+
+    vehicle_codes = CharField(
+        widget=Textarea(attrs={'rows': 10, 'cols': 50}),
+        help_text="Enter vehicle codes, one per line (e.g., YY67_HBG, YJ18_DHC)"
+    )
+
+    fleet_number_start = IntegerField(
+        required=False,
+        help_text="Optional: Starting fleet number (will auto-increment for each vehicle)"
+    )
+
+    vehicle_type = ChoiceField(
+        choices=[('', '--- None ---')],
+        required=False,
+        help_text="Optional: Vehicle type to assign to all vehicles"
+    )
+
+    livery = ChoiceField(
+        choices=[('', '--- None ---')],
+        required=False,
+        help_text="Optional: Livery to assign to all vehicles"
+    )
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+
+        # Populate operator choices
+        operator_choices = [('', '--- Select Operator ---')]
+        operator_choices.extend([
+            (op.noc, f"{op.noc} - {op.name}")
+            for op in Operator.objects.all().order_by('name')
+        ])
+        self.fields['operator'].choices = operator_choices
+
+        # Populate source choices
+        source_choices = [('', '--- Select Source ---')]
+        source_choices.extend([
+            (ds.id, f"{ds.id} - {ds.name}")
+            for ds in DataSource.objects.all().order_by('name')
+        ])
+        self.fields['source'].choices = source_choices
+
+        # Populate vehicle type choices
+        vtype_choices = [('', '--- None ---')]
+        vtype_choices.extend([
+            (vt.id, vt.name)
+            for vt in models.VehicleType.objects.all().order_by('name')
+        ])
+        self.fields['vehicle_type'].choices = vtype_choices
+
+        # Populate livery choices
+        livery_choices = [('', '--- None ---')]
+        livery_choices.extend([
+            (l.id, l.name)
+            for l in models.Livery.objects.filter(published=True).order_by('name')
+        ])
+        self.fields['livery'].choices = livery_choices
 
 
 @admin.register(models.VehicleType)
@@ -148,6 +222,7 @@ class VehicleAdmin(admin.ModelAdmin):
         "spare_ticket_machine",
         "lock",
         "unlock",
+        "bulk_create_vehicles",
     )
     inlines = [VehicleCodeInline]
     readonly_fields = ["latest_journey_data"]
@@ -253,6 +328,12 @@ class VehicleAdmin(admin.ModelAdmin):
     def unlock(self, request, queryset):
         queryset.update(locked=False)
 
+    def bulk_create_vehicles(self, request, queryset):
+        """Action to redirect to bulk vehicle creation form"""
+        return HttpResponseRedirect(reverse('admin:vehicles_vehicle_bulk_create'))
+
+    bulk_create_vehicles.short_description = "Bulk create vehicles"
+
     @admin.display(ordering="latest_journey__datetime")
     def last_seen(self, obj):
         if obj.latest_journey:
@@ -261,6 +342,135 @@ class VehicleAdmin(admin.ModelAdmin):
     def get_changelist_form(self, request, **kwargs):
         kwargs.setdefault("form", VehicleAdminForm)
         return super().get_changelist_form(request, **kwargs)
+
+    def get_urls(self):
+        """Add custom URLs for bulk vehicle creation"""
+        urls = super().get_urls()
+        custom_urls = [
+            path(
+                'bulk-create/',
+                self.admin_site.admin_view(self.bulk_create_view),
+                name='vehicles_vehicle_bulk_create',
+            ),
+        ]
+        return custom_urls + urls
+
+    def bulk_create_view(self, request):
+        """View for bulk vehicle creation"""
+        if request.method == 'POST':
+            form = BulkVehicleCreationForm(request.POST)
+            if form.is_valid():
+                try:
+                    result = self._perform_bulk_creation(form.cleaned_data)
+                    messages.success(
+                        request,
+                        f"Successfully processed {result['attempted']} vehicles. "
+                        f"Created {result['created']} new vehicles, "
+                        f"skipped {result['skipped']} existing ones."
+                    )
+                    return redirect('admin:vehicles_vehicle_changelist')
+                except Exception as e:
+                    messages.error(request, f"Error creating vehicles: {e}")
+        else:
+            form = BulkVehicleCreationForm()
+
+        context = {
+            'form': form,
+            'title': 'Bulk Create Vehicles',
+            'opts': self.model._meta,
+            'has_view_permission': self.has_view_permission(request),
+            'has_add_permission': self.has_add_permission(request),
+        }
+        return render(request, 'admin/vehicles/vehicle/bulk_create.html', context)
+
+    def _perform_bulk_creation(self, cleaned_data):
+        """Perform the actual bulk vehicle creation"""
+        operator_noc = cleaned_data['operator']
+        source_id = int(cleaned_data['source'])
+        vehicle_codes_text = cleaned_data['vehicle_codes']
+        fleet_number_start = cleaned_data.get('fleet_number_start')
+        vehicle_type_id = cleaned_data.get('vehicle_type')
+        livery_id = cleaned_data.get('livery')
+
+        # Parse vehicle codes
+        vehicle_codes = [
+            code.strip()
+            for code in vehicle_codes_text.split('\n')
+            if code.strip()
+        ]
+
+        if not vehicle_codes:
+            raise ValueError("No vehicle codes provided")
+
+        # Convert IDs to actual values for foreign keys
+        vehicle_type_id = int(vehicle_type_id) if vehicle_type_id else None
+        livery_id = int(livery_id) if livery_id else None
+
+        with transaction.atomic():
+            with connection.cursor() as cursor:
+                vehicle_insert_data = []
+                current_fleet_number = fleet_number_start
+
+                for code in vehicle_codes:
+                    # Create slug using operator prefix and code
+                    slug = f"{operator_noc}-{code}"
+
+                    # Prepare fleet number
+                    fleet_number = current_fleet_number
+                    if current_fleet_number is not None:
+                        current_fleet_number += 1
+
+                    vehicle_insert_data.append((
+                        slug,                    # slug
+                        code,                    # code
+                        fleet_number,            # fleet_number
+                        "",                      # fleet_code
+                        "",                      # reg
+                        "",                      # colours
+                        "",                      # name
+                        "",                      # branding
+                        "",                      # notes
+                        None,                    # latest_journey_data
+                        False,                   # withdrawn
+                        None,                    # data
+                        False,                   # locked
+                        None,                    # garage_id
+                        None,                    # latest_journey_id
+                        livery_id,               # livery_id
+                        operator_noc,            # operator_id
+                        source_id,               # source_id
+                        vehicle_type_id,         # vehicle_type_id
+                    ))
+
+                if not vehicle_insert_data:
+                    raise ValueError("No valid vehicle data to insert")
+
+                # Construct bulk insert SQL
+                placeholders = ", ".join(["%s"] * len(vehicle_insert_data[0]))
+                values_list_placeholders = [
+                    f"({placeholders})" for _ in vehicle_insert_data
+                ]
+                flat_values = [item for sublist in vehicle_insert_data for item in sublist]
+
+                insert_sql = f"""
+                INSERT INTO vehicles_vehicle (
+                    slug, code, fleet_number, fleet_code, reg, colours, name,
+                    branding, notes, latest_journey_data, withdrawn, data,
+                    locked, garage_id, latest_journey_id, livery_id,
+                    operator_id, source_id, vehicle_type_id
+                )
+                VALUES {','.join(values_list_placeholders)}
+                ON CONFLICT (slug) DO NOTHING;
+                """
+
+                cursor.execute(insert_sql, flat_values)
+                rows_created = cursor.rowcount
+
+                return {
+                    'attempted': len(vehicle_insert_data),
+                    'created': rows_created,
+                    'skipped': len(vehicle_insert_data) - rows_created
+                }
 
 
 class UserFilter(admin.SimpleListFilter):
