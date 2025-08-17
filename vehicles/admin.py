@@ -60,25 +60,38 @@ class BulkVehicleCreationForm(Form):
         super().__init__(*args, **kwargs)
 
         # Set up autocomplete widgets for better UX
+        # Use the actual model fields for the autocomplete widgets
         self.fields['operator'].widget = AutocompleteSelect(
-            models.Vehicle.operator.field,
+            models.Vehicle._meta.get_field('operator'),
             admin.site,
             attrs={'class': 'admin-autocomplete'}
         )
         self.fields['source'].widget = AutocompleteSelect(
-            models.Vehicle.source.field,
+            models.Vehicle._meta.get_field('source'),
             admin.site,
             attrs={'class': 'admin-autocomplete'}
         )
         self.fields['vehicle_type'].widget = AutocompleteSelect(
-            models.Vehicle.vehicle_type.field,
+            models.Vehicle._meta.get_field('vehicle_type'),
             admin.site,
             attrs={'class': 'admin-autocomplete'}
         )
         self.fields['livery'].widget = AutocompleteSelect(
-            models.Vehicle.livery.field,
+            models.Vehicle._meta.get_field('livery'),
             admin.site,
             attrs={'class': 'admin-autocomplete'}
+        )
+
+    class Media:
+        # Include autocomplete assets
+        css = {
+            'screen': ('admin/css/vendor/select2/select2.min.css', 'admin/css/autocomplete.css'),
+        }
+        js = (
+            'admin/js/vendor/jquery/jquery.min.js',
+            'admin/js/vendor/select2/select2.full.min.js',
+            'admin/js/jquery.init.js',
+            'admin/js/autocomplete.js',
         )
 
 
