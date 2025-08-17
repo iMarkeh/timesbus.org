@@ -3,9 +3,9 @@ from django.contrib import admin, messages
 from django.contrib.auth import get_user_model
 from django.db import IntegrityError, connection, transaction
 from django.db.models import Exists, OuterRef, Q
-from django.urls import reverse, path
+from django.urls import reverse
 from django.utils.html import format_html
-from django.shortcuts import render, redirect
+from django.shortcuts import render
 from django.http import HttpResponseRedirect
 from simple_history.admin import SimpleHistoryAdmin
 from sql_util.utils import SubqueryCount
@@ -309,54 +309,40 @@ class VehicleAdmin(admin.ModelAdmin):
         kwargs.setdefault("form", VehicleAdminForm)
         return super().get_changelist_form(request, **kwargs)
 
-    def get_urls(self):
-        """Add custom URLs for bulk vehicle creation"""
-        urls = super().get_urls()
-        custom_urls = [
-            path(
-                'bulk-create/',
-                self.admin_site.admin_view(self.bulk_create_view),
-                name='vehicles_vehicle_bulk_create',
-            ),
-        ]
-        return custom_urls + urls
 
-    def bulk_create_view(self, request):
-        """View for bulk vehicle creation"""
-        if request.method == 'POST':
+
+    def bulk_create_vehicles(self, request, queryset):
+        """Admin action for bulk vehicle creation"""
+        form = BulkVehicleCreationForm()
+
+        if 'apply' in request.POST:
             form = BulkVehicleCreationForm(request.POST)
             if form.is_valid():
                 try:
                     result = self._perform_bulk_creation(form.cleaned_data)
-                    messages.success(
+                    self.message_user(
                         request,
                         f"Successfully processed {result['attempted']} vehicles. "
                         f"Created {result['created']} new vehicles, "
-                        f"skipped {result['skipped']} existing ones."
+                        f"skipped {result['skipped']} existing ones.",
+                        messages.SUCCESS
                     )
-                    return redirect('admin:vehicles_vehicle_changelist')
+                    return HttpResponseRedirect(request.get_full_path())
                 except Exception as e:
-                    messages.error(request, f"Error creating vehicles: {e}")
-        else:
-            form = BulkVehicleCreationForm()
-
-        # Apply the same widgets that the main VehicleAdmin uses
-        for field_name in ['vehicle_type', 'livery']:
-            if field_name in form.fields:
-                # Use the same formfield_for_foreignkey method that creates autocomplete widgets
-                model_field = models.Vehicle._meta.get_field(field_name)
-                admin_formfield = self.formfield_for_foreignkey(model_field, request)
-                if admin_formfield:
-                    form.fields[field_name].widget = admin_formfield.widget
+                    self.message_user(request, f"Error creating vehicles: {e}", messages.ERROR)
 
         context = {
             'form': form,
             'title': 'Bulk Create Vehicles',
+            'action_checkbox_name': admin.ACTION_CHECKBOX_NAME,
+            'queryset': queryset,
             'opts': self.model._meta,
-            'has_view_permission': self.has_view_permission(request),
-            'has_add_permission': self.has_add_permission(request),
+            'action': 'bulk_create_vehicles',
         }
-        return render(request, 'admin/vehicles/vehicle/bulk_create.html', context)
+
+        return render(request, 'admin/vehicles/vehicle/bulk_create_vehicles.html', context)
+
+    bulk_create_vehicles.short_description = "Bulk create vehicles"
 
     def _perform_bulk_creation(self, cleaned_data):
         """Perform the actual bulk vehicle creation"""
