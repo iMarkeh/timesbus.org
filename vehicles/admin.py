@@ -300,8 +300,21 @@ class VehicleAdmin(admin.ModelAdmin):
         kwargs.setdefault("form", VehicleAdminForm)
         return super().get_changelist_form(request, **kwargs)
 
+    def get_urls(self):
+        from django.urls import path
+        urls = super().get_urls()
+        custom_urls = [
+            path('bulk-add/', self.admin_site.admin_view(self.bulk_add_view), name='vehicles_vehicle_bulk_add'),
+        ]
+        return custom_urls + urls
 
-@admin.register(BulkVehicleCreation)
+    def bulk_add_view(self, request):
+        """Custom view for bulk vehicle creation"""
+        # Create a temporary admin instance for the bulk creation form
+        bulk_admin = BulkVehicleCreationAdmin(BulkVehicleCreation, self.admin_site)
+        return bulk_admin.add_view(request)
+
+
 class BulkVehicleCreationAdmin(admin.ModelAdmin):
     """Admin for bulk vehicle creation - inherits autocomplete from VehicleAdmin"""
     form = BulkVehicleCreationForm
