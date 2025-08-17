@@ -1,7 +1,7 @@
+from django import forms
 from django.forms import ModelForm, Textarea, TextInput, Form, CharField, ModelChoiceField, IntegerField
 from django.contrib import admin, messages
 from django.contrib.auth import get_user_model
-from django.contrib.admin.widgets import AutocompleteSelect
 from django.db import IntegrityError, connection, transaction
 from django.db.models import Exists, OuterRef, Q
 from django.urls import reverse, path
@@ -13,6 +13,7 @@ from sql_util.utils import SubqueryCount
 from busstops.models import Operator, DataSource
 
 from . import models
+from .forms import AutocompleteWidget
 
 UserModel = get_user_model()
 
@@ -22,8 +23,9 @@ class BulkVehicleCreationForm(Form):
 
     operator = ModelChoiceField(
         queryset=Operator.objects.all(),
+        widget=AutocompleteWidget(field=models.Vehicle.operator.field),
         help_text="Select the operator for these vehicles",
-        empty_label="--- Select Operator ---"
+        empty_label=""
     )
 
     source = ModelChoiceField(
@@ -44,55 +46,41 @@ class BulkVehicleCreationForm(Form):
 
     vehicle_type = ModelChoiceField(
         queryset=models.VehicleType.objects.all(),
+        widget=AutocompleteWidget(field=models.Vehicle.vehicle_type.field),
         required=False,
         help_text="Optional: Vehicle type to assign to all vehicles",
-        empty_label="--- None ---"
+        empty_label=""
     )
 
     livery = ModelChoiceField(
         queryset=models.Livery.objects.filter(published=True),
+        widget=AutocompleteWidget(field=models.Vehicle.livery.field),
         required=False,
         help_text="Optional: Livery to assign to all vehicles",
-        empty_label="--- None ---"
+        empty_label=""
     )
+
+    @property
+    def media(self):
+        return forms.Media(
+            js=(
+                "admin/js/vendor/jquery/jquery.min.js",
+                "admin/js/vendor/select2/select2.full.min.js",
+                "js/edit-vehicle.js",
+            ),
+            css={
+                "screen": ("admin/css/vendor/select2/select2.min.css",),
+            },
+        )
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
 
-        # Set up autocomplete widgets for better UX
-        # Use the actual model fields for the autocomplete widgets
-        self.fields['operator'].widget = AutocompleteSelect(
-            models.Vehicle._meta.get_field('operator'),
-            admin.site,
-            attrs={'class': 'admin-autocomplete'}
-        )
-        self.fields['source'].widget = AutocompleteSelect(
-            models.Vehicle._meta.get_field('source'),
-            admin.site,
-            attrs={'class': 'admin-autocomplete'}
-        )
-        self.fields['vehicle_type'].widget = AutocompleteSelect(
-            models.Vehicle._meta.get_field('vehicle_type'),
-            admin.site,
-            attrs={'class': 'admin-autocomplete'}
-        )
-        self.fields['livery'].widget = AutocompleteSelect(
-            models.Vehicle._meta.get_field('livery'),
-            admin.site,
-            attrs={'class': 'admin-autocomplete'}
-        )
-
-    class Media:
-        # Include autocomplete assets
-        css = {
-            'screen': ('admin/css/vendor/select2/select2.min.css', 'admin/css/autocomplete.css'),
-        }
-        js = (
-            'admin/js/vendor/jquery/jquery.min.js',
-            'admin/js/vendor/select2/select2.full.min.js',
-            'admin/js/jquery.init.js',
-            'admin/js/autocomplete.js',
-        )
+        # Configure the fields for better display
+        self.fields['operator'].queryset = Operator.objects.all().order_by('name')
+        self.fields['source'].queryset = DataSource.objects.all().order_by('name')
+        self.fields['vehicle_type'].queryset = models.VehicleType.objects.all().order_by('name')
+        self.fields['livery'].queryset = models.Livery.objects.filter(published=True).order_by('name')
 
 
 @admin.register(models.VehicleType)
