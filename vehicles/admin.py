@@ -294,11 +294,7 @@ class VehicleAdmin(admin.ModelAdmin):
     def unlock(self, request, queryset):
         queryset.update(locked=False)
 
-    def bulk_create_vehicles(self, request, queryset):
-        """Action to redirect to bulk vehicle creation form"""
-        return HttpResponseRedirect(reverse('admin:vehicles_vehicle_bulk_create'))
 
-    bulk_create_vehicles.short_description = "Bulk create vehicles"
 
     @admin.display(ordering="latest_journey__datetime")
     def last_seen(self, obj):
