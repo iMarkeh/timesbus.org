@@ -1,5 +1,4 @@
-from django import forms
-from django.forms import ModelForm, Textarea, TextInput, Form, CharField, ModelChoiceField, IntegerField
+from django.forms import ModelForm, Textarea, TextInput, CharField, IntegerField
 from django.contrib import admin, messages
 from django.contrib.auth import get_user_model
 from django.db import IntegrityError, connection, transaction
@@ -13,26 +12,12 @@ from sql_util.utils import SubqueryCount
 from busstops.models import Operator, DataSource
 
 from . import models
-from .forms import AutocompleteWidget
 
 UserModel = get_user_model()
 
 
-class BulkVehicleCreationForm(Form):
+class BulkVehicleCreationForm(ModelForm):
     """Form for bulk vehicle creation"""
-
-    operator = ModelChoiceField(
-        queryset=Operator.objects.all(),
-        widget=AutocompleteWidget(field=models.Vehicle.operator.field),
-        help_text="Select the operator for these vehicles",
-        empty_label=""
-    )
-
-    source = ModelChoiceField(
-        queryset=DataSource.objects.all(),
-        help_text="Select the data source for these vehicles",
-        empty_label="--- Select Source ---"
-    )
 
     vehicle_codes = CharField(
         widget=Textarea(attrs={'rows': 10, 'cols': 50}),
@@ -44,39 +29,24 @@ class BulkVehicleCreationForm(Form):
         help_text="Optional: Starting fleet number (will auto-increment for each vehicle)"
     )
 
-    vehicle_type = ModelChoiceField(
-        queryset=models.VehicleType.objects.all(),
-        widget=AutocompleteWidget(field=models.Vehicle.vehicle_type.field),
-        required=False,
-        help_text="Optional: Vehicle type to assign to all vehicles",
-        empty_label=""
-    )
-
-    livery = ModelChoiceField(
-        queryset=models.Livery.objects.filter(published=True),
-        widget=AutocompleteWidget(field=models.Vehicle.livery.field),
-        required=False,
-        help_text="Optional: Livery to assign to all vehicles",
-        empty_label=""
-    )
-
-    @property
-    def media(self):
-        return forms.Media(
-            js=(
-                "admin/js/vendor/jquery/jquery.min.js",
-                "admin/js/vendor/select2/select2.full.min.js",
-                "js/edit-vehicle.js",
-            ),
-            css={
-                "screen": ("admin/css/vendor/select2/select2.min.css",),
-            },
-        )
+    class Meta:
+        model = models.Vehicle
+        fields = ['operator', 'source', 'vehicle_type', 'livery']
+        help_texts = {
+            'operator': 'Select the operator for these vehicles',
+            'source': 'Select the data source for these vehicles',
+            'vehicle_type': 'Optional: Vehicle type to assign to all vehicles',
+            'livery': 'Optional: Livery to assign to all vehicles',
+        }
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
 
-        # Configure the fields for better display
+        # Make vehicle_type and livery optional
+        self.fields['vehicle_type'].required = False
+        self.fields['livery'].required = False
+
+        # Configure querysets
         self.fields['operator'].queryset = Operator.objects.all().order_by('name')
         self.fields['source'].queryset = DataSource.objects.all().order_by('name')
         self.fields['vehicle_type'].queryset = models.VehicleType.objects.all().order_by('name')
@@ -369,6 +339,15 @@ class VehicleAdmin(admin.ModelAdmin):
                     messages.error(request, f"Error creating vehicles: {e}")
         else:
             form = BulkVehicleCreationForm()
+
+        # Apply the same widgets that the main VehicleAdmin uses
+        for field_name in ['vehicle_type', 'livery']:
+            if field_name in form.fields:
+                # Use the same formfield_for_foreignkey method that creates autocomplete widgets
+                model_field = models.Vehicle._meta.get_field(field_name)
+                admin_formfield = self.formfield_for_foreignkey(model_field, request)
+                if admin_formfield:
+                    form.fields[field_name].widget = admin_formfield.widget
 
         context = {
             'form': form,
