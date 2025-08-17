@@ -11,8 +11,12 @@ from django.contrib.auth import get_user_model
 User = get_user_model()
 
 
-from .models import featureToggle
-from django.shortcuts import render, redirect
+from .models import FeatureToggle
+from django.shortcuts import render
+from django.core.cache import cache
+import logging
+
+logger = logging.getLogger(__name__)
 
 class WhiteNoiseWithFallbackMiddleware(WhiteNoiseMiddleware):
     def immutable_file_test(self, path, url):
@@ -55,26 +59,70 @@ class GZipIfNotStreamingMiddleware(GZipMiddleware):
 
         return super().process_response(request, response)
 
-EXEMPT_PATHS = ['/admin/', '/accounts/login', '/queue/', '/ads.txt', '/robots.txt']
+EXEMPT_PATHS = ['/admin/', '/accounts/login', '/accounts/logout', '/queue/', '/ads.txt', '/robots.txt', '/favicon.ico']
 
 class SiteLockMiddleware:
+    """
+    Middleware to handle site-wide maintenance mode and feature toggles.
+
+    Checks for maintenance mode features and blocks access for non-superusers
+    when maintenance is enabled.
+    """
+
     def __init__(self, get_response):
         self.get_response = get_response
+        self.cache_timeout = 60  # Cache feature toggle for 1 minute
 
     def __call__(self, request):
-        # Exempt login and admin pages
-        exempt_paths = EXEMPT_PATHS
-        if any(request.path.startswith(path) for path in exempt_paths):
+        # Always allow access to exempt paths
+        if any(request.path.startswith(path) for path in EXEMPT_PATHS):
             return self.get_response(request)
 
-        try:
-            feature = featureToggle.objects.get(name='admin_lockdown')
-            if feature.enabled and not request.user.is_superuser:
-               context = {
-                    'hours': feature.coming_soon_percent,
-               }
-               return render(request, 'site_locked.html', context, status=401)
-        except featureToggle.DoesNotExist:
-            pass
+        # Check for site-wide maintenance mode
+        maintenance_feature = self._get_maintenance_feature()
+
+        if maintenance_feature and self._should_block_user(maintenance_feature, request.user):
+            context = self._get_maintenance_context(maintenance_feature)
+            return render(request, 'site_locked.html', context, status=503)
 
         return self.get_response(request)
+
+    def _get_maintenance_feature(self):
+        """Get the maintenance feature toggle, with caching"""
+        cache_key = 'site_maintenance_feature'
+        feature = cache.get(cache_key)
+
+        if feature is None:
+            try:
+                # Look for any feature with maintenance enabled
+                feature = FeatureToggle.objects.filter(
+                    maintenance=True,
+                    enabled=True
+                ).first()
+
+                # Cache the result (or None if no maintenance feature found)
+                cache.set(cache_key, feature, self.cache_timeout)
+
+            except Exception as e:
+                logger.error(f"Error checking maintenance feature: {e}")
+                feature = None
+
+        return feature
+
+    def _should_block_user(self, feature, user):
+        """Determine if user should be blocked based on feature settings"""
+        # Always allow superusers during maintenance
+        if user and user.is_superuser:
+            return False
+
+        # Block if maintenance is enabled
+        return feature.maintenance and feature.enabled
+
+    def _get_maintenance_context(self, feature):
+        """Get context for the maintenance template"""
+        context = {
+            'hours': feature.estimated_hours or 2,  # Default to 2 hours if not set
+            'message': feature.maintenance_message or 'The site is currently under maintenance.',
+            'feature_name': feature.name,
+        }
+        return context

@@ -97,6 +97,9 @@
         <path fill="none" stroke="#164450" stroke-width="6" d="M10 30 L22 42 L40 18"/>
       </svg>
     </div>
+    {% if message %}
+      <p>{{ message }}</p>
+    {% endif %}
     <p>The service is expected to be back online within <strong>{{ hours }} hours</strong>.</p>
     <p>We'll send out another announcement once TransportThing is back up and running. Thank you for your patience!</p>
     <div class="links">

@@ -12,8 +12,7 @@ from sql_util.utils import SubqueryCount
 
 from bustimes.models import Route, RouteLink
 
-from .models import featureToggle
-from .models import ChangeNote
+from .models import FeatureToggle, ChangeNote
 
 
 from . import models
@@ -619,19 +618,45 @@ class PaymentMethodAdmin(admin.ModelAdmin):
     def operators(obj):
         return obj.operators
 
-@admin.register(featureToggle)
+@admin.register(FeatureToggle)
 class FeatureToggleAdmin(admin.ModelAdmin):
-    list_display = ('name', 'enabled', 'maintenance', 'coming_soon', 'coming_soon_percent')
-    list_editable = ('enabled', 'maintenance', 'coming_soon', 'coming_soon_percent')
-    search_fields = ('name',)
-    list_filter = ('enabled', 'maintenance', 'coming_soon')
+    list_display = ('name', 'status_text', 'enabled', 'maintenance', 'super_user_only', 'estimated_hours', 'updated_at')
+    list_editable = ('enabled', 'maintenance', 'super_user_only', 'estimated_hours')
+    search_fields = ('name', 'maintenance_message')
+    list_filter = ('enabled', 'maintenance', 'coming_soon', 'super_user_only', 'created_at')
     ordering = ('name',)
+    readonly_fields = ('created_at', 'updated_at', 'status_text')
+
+    fieldsets = (
+        ('Basic Settings', {
+            'fields': ('name', 'enabled', 'status_text')
+        }),
+        ('Access Control', {
+            'fields': ('maintenance', 'super_user_only', 'coming_soon')
+        }),
+        ('Maintenance Settings', {
+            'fields': ('maintenance_message', 'estimated_hours'),
+            'classes': ('collapse',)
+        }),
+        ('Advanced', {
+            'fields': ('coming_soon_percent',),
+            'classes': ('collapse',)
+        }),
+        ('Timestamps', {
+            'fields': ('created_at', 'updated_at'),
+            'classes': ('collapse',)
+        }),
+    )
+
+    def get_queryset(self, request):
+        return super().get_queryset(request).select_related()
 
 @admin.register(ChangeNote)
 class ChangeNoteAdmin(admin.ModelAdmin):
-    list_display = ('date', 'short_note', 'link_text')
+    list_display = ('datetime', 'short_note', 'link_text')
     search_fields = ('note',)
-    list_filter = ('date',)
+    list_filter = ('datetime',)
+    readonly_fields = ('datetime',)  # Make datetime read-only since it's auto_now_add
 
     def short_note(self, obj):
         return obj.note[:60] + ('...' if len(obj.note) > 60 else '')

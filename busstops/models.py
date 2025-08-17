@@ -21,6 +21,7 @@ from django.urls import reverse
 from django.utils.html import escape, format_html
 from django.utils.safestring import mark_safe
 from django.utils.text import slugify
+from django.utils import timezone
 
 from bustimes.models import Route, StopTime, TimetableDataSource, Trip
 from bustimes.timetables import Timetable, get_stop_usages
@@ -1149,13 +1150,36 @@ class SIRISource(models.Model):
     def is_poorly(self):
         return cache.get(self.get_poorly_key())
 
-class featureToggle(models.Model):
-    name = models.CharField(max_length=255, unique=True)
-    enabled = models.BooleanField(default=True)
-    maintenance = models.BooleanField(default=False)
+class FeatureToggle(models.Model):
+    name = models.CharField(max_length=255, unique=True, help_text="Feature identifier (e.g., 'site_maintenance', 'new_feature')")
+    enabled = models.BooleanField(default=True, help_text="Whether this feature is enabled")
+    maintenance = models.BooleanField(default=False, help_text="Whether this feature is in maintenance mode")
     super_user_only = models.BooleanField(default=False, help_text="Only superusers can access this feature")
-    coming_soon = models.BooleanField(default=False)
-    coming_soon_percent = models.IntegerField(default=0, validators=[MinValueValidator(0), MaxValueValidator(100)], blank=True, null=True)
+    coming_soon = models.BooleanField(default=False, help_text="Whether this feature is coming soon")
+    coming_soon_percent = models.IntegerField(
+        default=0,
+        validators=[MinValueValidator(0), MaxValueValidator(100)],
+        blank=True,
+        null=True,
+        help_text="Percentage for gradual rollout (0-100)"
+    )
+    maintenance_message = models.TextField(
+        blank=True,
+        help_text="Custom message to display during maintenance"
+    )
+    estimated_hours = models.PositiveIntegerField(
+        default=0,
+        blank=True,
+        null=True,
+        help_text="Estimated hours until feature is back online"
+    )
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        ordering = ['name']
+        verbose_name = "Feature Toggle"
+        verbose_name_plural = "Feature Toggles"
 
     @property
     def status_text(self):
@@ -1163,24 +1187,46 @@ class featureToggle(models.Model):
             return "Under Maintenance"
         elif self.coming_soon:
             return "Coming Soon"
-        elif self.enabled:
-            return "Enabled"
-        else:
+        elif not self.enabled:
             return "Disabled"
+        elif self.super_user_only:
+            return "Superuser Only"
+        else:
+            return "Enabled"
+
+    @property
+    def is_accessible_for_user(self, user=None):
+        """Check if feature is accessible for given user"""
+        if self.maintenance:
+            return user and user.is_superuser
+        if not self.enabled:
+            return False
+        if self.super_user_only:
+            return user and user.is_superuser
+        return True
 
     def __str__(self):
-        return f"{self.name} - {'Enabled' if self.enabled else 'Disabled'}"
+        return f"{self.name} - {self.status_text}"
+
+
+# Backward compatibility alias
+featureToggle = FeatureToggle
 
 
 
 class ChangeNote(models.Model):
-    date = models.DateField()
+    datetime = models.DateTimeField(default=timezone.now)
     note = models.TextField(help_text="Enter your change note here...")
     link_text = models.CharField(max_length=255, blank=True)
     link_url = models.URLField(blank=True)
 
     class Meta:
-        ordering = ['-date']
+        ordering = ['-datetime']
 
     def __str__(self):
-        return f"{self.date.strftime('%d/%m/%Y')}: {self.note[:50]}"
+        return f"{self.datetime.strftime('%d/%m/%Y %H:%M')}: {self.note[:50]}"
+
+    @property
+    def date(self):
+        """Backward compatibility property for templates that still use .date"""
+        return self.datetime.date()
