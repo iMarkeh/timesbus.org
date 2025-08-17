@@ -143,7 +143,7 @@ class Command(ImportLiveVehiclesCommand):
 
             # Try to find existing vehicle
             vehicle = Vehicle.objects.filter(
-                operator=self.space_operator,
+                operator=self.operator,
                 code=satellite_id
             ).first()
 
@@ -152,13 +152,13 @@ class Command(ImportLiveVehiclesCommand):
                 # Update name if it has changed
                 if vehicle.name != satellite_name:
                     vehicle.name = satellite_name
-                    vehicle.notes = f"Satellite: {satellite_name}"
+                    vehicle.notes = f"NORAD ID: {satellite_name}"
                     vehicle.save(update_fields=['name', 'notes'])
                 return vehicle, False
 
             # Create new vehicle for this satellite
             vehicle = Vehicle.objects.create(
-                operator=self.space_operator,
+                operator=self.operator,
                 source=self.source,
                 code=satellite_id,
                 fleet_code=satellite_id,
@@ -208,34 +208,10 @@ class Command(ImportLiveVehiclesCommand):
                 destination="Orbit",
                 route_name="Orbit"
             )
+
     def create_vehicle_location(self, item):
+        position = item["position"]
         return VehicleLocation(
-            latlong=GEOSGeometry(f"POINT({item['lo']} {item['la']})"),
-            heading=item.get("hg"),
+            latlong=GEOSGeometry(f"POINT({position['longitude']} {position['latitude']})"),
+            heading=position.get("azimuth"),
         )
-    def create_vehicle_location(self, item):
-        try:
-            position = item["position"]
-
-            # Validate coordinates
-            longitude = float(position["longitude"])
-            latitude = float(position["latitude"])
-
-            if not (-180 <= longitude <= 180):
-                self.stderr.write(f"Invalid longitude: {longitude}")
-                return None
-
-            if not (-90 <= latitude <= 90):
-                self.stderr.write(f"Invalid latitude: {latitude}")
-                return None
-
-            return VehicleLocation(
-                latlong=Point(longitude, latitude),
-                heading=position.get("azimuth", 0),
-                # Could store altitude in a custom field if available
-                # altitude=position.get("altitude", 0)
-            )
-
-        except (KeyError, ValueError, TypeError) as e:
-            self.stderr.write(f"Error creating vehicle location: {e}")
-            return None
