@@ -351,6 +351,12 @@ class BulkVehicleCreationAdmin(admin.ModelAdmin):
         # Don't actually save the proxy object
         pass
 
+    def response_add(self, request, obj, post_url_continue=None):
+        # Redirect to the vehicle changelist after bulk creation
+        from django.http import HttpResponseRedirect
+        from django.urls import reverse
+        return HttpResponseRedirect(reverse('admin:vehicles_vehicle_changelist'))
+
 
 
 
