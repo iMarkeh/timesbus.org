@@ -56,3 +56,21 @@ def get_custom_style():
     """Get the active custom style for today"""
     from busstops.models import CustomStyle
     return CustomStyle.get_active_style_for_date()
+
+
+@register.inclusion_tag('banners/notification_banners.html')
+def render_notification_banners(banners):
+    """Render notification banners with proper styling"""
+    return {'banners': banners}
+
+
+@register.simple_tag
+def banner_css_class(banner_type):
+    """Get CSS class for banner type"""
+    classes = {
+        'info': 'banner-info',
+        'warning': 'banner-warning',
+        'error': 'banner-error',
+        'success': 'banner-success',
+    }
+    return classes.get(banner_type, 'banner-info')

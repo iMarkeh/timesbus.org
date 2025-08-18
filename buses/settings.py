@@ -188,6 +188,7 @@ TEMPLATES = [
                 "buses.context_processors.ad",
                 "vehicles.context_processors.liveries_css_version",
                 "busstops.context_processors.custom_styles",
+                "busstops.context_processors.notification_banners",
             ],
             "loaders": [
                 (

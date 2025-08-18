@@ -1252,6 +1252,106 @@ class ChangeNote(models.Model):
         return ", ".join(tag.name for tag in self.tags.all())
 
 
+class NotificationBanner(models.Model):
+    """Notification banners for specific paths or site-wide"""
+
+    BANNER_TYPES = [
+        ('info', 'Info (Blue)'),
+        ('warning', 'Warning (Orange)'),
+        ('error', 'Error (Red)'),
+        ('success', 'Success (Green)'),
+    ]
+
+    name = models.CharField(max_length=100, help_text="Internal name for this banner (e.g., 'OXBC Service Disruption')")
+    message = models.TextField(help_text="Banner message to display to users")
+    banner_type = models.CharField(max_length=10, choices=BANNER_TYPES, default='info', help_text="Banner style/color")
+
+    # Path matching
+    path_pattern = models.CharField(
+        max_length=255,
+        blank=True,
+        help_text="URL path pattern (e.g., '/operators/oxbc', '/services/1-*', '/vehicles'). Leave blank for site-wide banner."
+    )
+    exact_match = models.BooleanField(
+        default=False,
+        help_text="If checked, path must match exactly. If unchecked, banner shows if URL starts with this pattern."
+    )
+
+    # Scheduling
+    start_datetime = models.DateTimeField(help_text="When to start showing this banner")
+    end_datetime = models.DateTimeField(blank=True, null=True, help_text="When to stop showing this banner (leave blank for indefinite)")
+
+    # Display options
+    active = models.BooleanField(default=True, help_text="Whether this banner is active")
+    dismissible = models.BooleanField(default=True, help_text="Whether users can dismiss this banner")
+    priority = models.IntegerField(default=0, help_text="Higher numbers show first (if multiple banners match)")
+
+    # Optional link
+    link_text = models.CharField(max_length=100, blank=True, help_text="Optional link text (e.g., 'More Info')")
+    link_url = models.URLField(blank=True, help_text="Optional link URL")
+
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        ordering = ['-priority', '-start_datetime']
+        verbose_name = "Notification Banner"
+        verbose_name_plural = "Notification Banners"
+
+    def __str__(self):
+        return f"{self.name} ({self.get_banner_type_display()})"
+
+    def is_active_now(self):
+        """Check if banner should be shown right now"""
+        if not self.active:
+            return False
+
+        now = timezone.now()
+        if now < self.start_datetime:
+            return False
+
+        if self.end_datetime and now > self.end_datetime:
+            return False
+
+        return True
+
+    def matches_path(self, path):
+        """Check if this banner should show for the given path"""
+        if not self.path_pattern:
+            return True  # Site-wide banner
+
+        if self.exact_match:
+            return path == self.path_pattern
+        else:
+            # Support wildcard matching
+            if '*' in self.path_pattern:
+                import fnmatch
+                return fnmatch.fnmatch(path, self.path_pattern)
+            else:
+                return path.startswith(self.path_pattern)
+
+    @classmethod
+    def get_active_banners_for_path(cls, path):
+        """Get all active banners that should show for the given path"""
+        now = timezone.now()
+
+        # Get all potentially active banners
+        banners = cls.objects.filter(
+            active=True,
+            start_datetime__lte=now
+        ).filter(
+            models.Q(end_datetime__isnull=True) | models.Q(end_datetime__gte=now)
+        )
+
+        # Filter by path matching
+        matching_banners = []
+        for banner in banners:
+            if banner.matches_path(path):
+                matching_banners.append(banner)
+
+        return matching_banners
+
+
 class CustomStyle(models.Model):
     """Custom styles for specific dates (e.g., holidays, special events)"""
 

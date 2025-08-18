@@ -1,0 +1,185 @@
+{% load custom_styles %}
+
+{% if banners %}
+<div class="notification-banners">
+    {% for banner in banners %}
+        <div class="notification-banner {% banner_css_class banner.banner_type %}" 
+             data-banner-id="{{ banner.id }}"
+             {% if banner.dismissible %}data-dismissible="true"{% endif %}>
+            
+            <div class="banner-content">
+                <div class="banner-message">
+                    {{ banner.message|linebreaksbr }}
+                </div>
+                
+                {% if banner.link_url and banner.link_text %}
+                    <div class="banner-link">
+                        <a href="{{ banner.link_url }}" target="_blank" rel="noopener">
+                            {{ banner.link_text }}
+                        </a>
+                    </div>
+                {% endif %}
+            </div>
+            
+            {% if banner.dismissible %}
+                <button class="banner-dismiss" onclick="dismissBanner({{ banner.id }})" aria-label="Dismiss notification">
+                    ×
+                </button>
+            {% endif %}
+        </div>
+    {% endfor %}
+</div>
+
+<style>
+.notification-banners {
+    position: relative;
+    z-index: 1000;
+}
+
+.notification-banner {
+    display: flex;
+    align-items: center;
+    padding: 0.75rem 1rem;
+    margin-bottom: 0.5rem;
+    border-radius: 4px;
+    border-left: 4px solid;
+    font-size: 0.9rem;
+    line-height: 1.4;
+}
+
+.notification-banner.dismissed {
+    display: none;
+}
+
+.banner-content {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+
+.banner-message {
+    flex: 1;
+}
+
+.banner-link a {
+    font-weight: 500;
+    text-decoration: underline;
+    color: inherit;
+}
+
+.banner-link a:hover {
+    text-decoration: none;
+}
+
+.banner-dismiss {
+    background: none;
+    border: none;
+    font-size: 1.2rem;
+    font-weight: bold;
+    cursor: pointer;
+    padding: 0.25rem;
+    margin-left: 1rem;
+    opacity: 0.7;
+    color: inherit;
+}
+
+.banner-dismiss:hover {
+    opacity: 1;
+}
+
+/* Banner type styles */
+.banner-info {
+    background-color: #d1ecf1;
+    border-left-color: #17a2b8;
+    color: #0c5460;
+}
+
+.banner-warning {
+    background-color: #fff3cd;
+    border-left-color: #ffc107;
+    color: #856404;
+}
+
+.banner-error {
+    background-color: #f8d7da;
+    border-left-color: #dc3545;
+    color: #721c24;
+}
+
+.banner-success {
+    background-color: #d4edda;
+    border-left-color: #28a745;
+    color: #155724;
+}
+
+/* Dark mode support */
+.dark-mode .banner-info {
+    background-color: #1a2a3a;
+    color: #87ceeb;
+}
+
+.dark-mode .banner-warning {
+    background-color: #3a3020;
+    color: #ffd700;
+}
+
+.dark-mode .banner-error {
+    background-color: #3a1a1a;
+    color: #ff6b6b;
+}
+
+.dark-mode .banner-success {
+    background-color: #1a3a1a;
+    color: #90ee90;
+}
+
+/* Mobile responsive */
+@media (max-width: 600px) {
+    .notification-banner {
+        padding: 0.5rem;
+        font-size: 0.85rem;
+    }
+    
+    .banner-content {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 0.5rem;
+    }
+    
+    .banner-dismiss {
+        position: absolute;
+        top: 0.5rem;
+        right: 0.5rem;
+        margin: 0;
+    }
+}
+</style>
+
+<script>
+function dismissBanner(bannerId) {
+    const banner = document.querySelector(`[data-banner-id="${bannerId}"]`);
+    if (banner) {
+        banner.classList.add('dismissed');
+        
+        // Store dismissal in localStorage so it stays dismissed
+        const dismissedBanners = JSON.parse(localStorage.getItem('dismissedBanners') || '[]');
+        if (!dismissedBanners.includes(bannerId)) {
+            dismissedBanners.push(bannerId);
+            localStorage.setItem('dismissedBanners', JSON.stringify(dismissedBanners));
+        }
+    }
+}
+
+// Check for previously dismissed banners on page load
+document.addEventListener('DOMContentLoaded', function() {
+    const dismissedBanners = JSON.parse(localStorage.getItem('dismissedBanners') || '[]');
+    dismissedBanners.forEach(bannerId => {
+        const banner = document.querySelector(`[data-banner-id="${bannerId}"]`);
+        if (banner && banner.dataset.dismissible === 'true') {
+            banner.classList.add('dismissed');
+        }
+    });
+});
+</script>
+{% endif %}
