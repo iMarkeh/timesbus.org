@@ -1,5 +1,4 @@
-{% extends 'page.html' %}
-{% load favourites %}
+{% extends 'jinja2/page.html' %}
 
 {% block title %}{{ object }} – {% if operators %}{{ operators.0 }} – {% endif %}TransportThing{% endblock %}
 
@@ -71,7 +70,11 @@
         {% endif %}
         <span class="description">{{ object.description }}</span>
     </h1>
-    {% favourite_button object css_class="large service-favourite" %}
+    {% if request.user.is_authenticated %}
+        {% set content_type_id = get_content_type_id(object) %}
+        {% set is_fav = is_favourited(request.user, object) %}
+        {% include 'favourites/favourite_button.html' with user=request.user object=object is_favourited=is_fav css_class="large service-favourite" content_type_id=content_type_id object_id=object.pk %}
+    {% endif %}
 </div>
 
 <p>
