@@ -1641,5 +1641,7 @@ def journey(request):
 
 
 def change_notes_view(request):
-    notes = ChangeNote.objects.all()
-    return render(request, 'changes.html', {'notes': notes})
+    from .models import ChangeNoteTag
+    notes = ChangeNote.objects.prefetch_related('tags').all()
+    all_tags = ChangeNoteTag.objects.all().order_by('name')
+    return render(request, 'changes.html', {'notes': notes, 'all_tags': all_tags})

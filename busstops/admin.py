@@ -651,15 +651,71 @@ class FeatureToggleAdmin(admin.ModelAdmin):
     def get_queryset(self, request):
         return super().get_queryset(request).select_related()
 
+@admin.register(models.ChangeNoteTag)
+class ChangeNoteTagAdmin(admin.ModelAdmin):
+    list_display = ('name', 'color_preview', 'color', 'description', 'usage_count')
+    search_fields = ('name', 'description')  # Required for autocomplete
+    list_editable = ('color',)
+    ordering = ('name',)
+
+    def usage_count(self, obj):
+        return obj.changenote_set.count()
+    usage_count.short_description = 'Used in notes'
+
+    def color_preview(self, obj):
+        return format_html(
+            '<div style="width: 20px; height: 20px; background-color: {}; border: 1px solid #ccc; display: inline-block;"></div>',
+            obj.color
+        )
+    color_preview.short_description = 'Color'
+
+
 @admin.register(ChangeNote)
 class ChangeNoteAdmin(admin.ModelAdmin):
-    list_display = ('datetime', 'short_note', 'link_text')
+    list_display = ('datetime', 'short_note', 'get_tags_display', 'link_text')
     search_fields = ('note',)
-    list_filter = ('datetime',)
+    list_filter = ('datetime', 'tags')
     readonly_fields = ('datetime',)  # Make datetime read-only since it's auto_now_add
+    autocomplete_fields = ('tags',)  # Enable autocomplete for tags
+    filter_horizontal = ('tags',)  # Better widget for many-to-many field
+    date_hierarchy = 'datetime'
+
+    fieldsets = (
+        ('Change Note', {
+            'fields': ('note', 'tags')
+        }),
+        ('Link (Optional)', {
+            'fields': ('link_text', 'link_url'),
+            'classes': ('collapse',)
+        }),
+        ('Metadata', {
+            'fields': ('datetime',),
+            'classes': ('collapse',)
+        }),
+    )
 
     def short_note(self, obj):
         return obj.note[:60] + ('...' if len(obj.note) > 60 else '')
+
+    def get_tags_display(self, obj):
+        tags = obj.tags.all()
+        if not tags:
+            return '-'
+
+        tag_html = []
+        for tag in tags:
+            tag_html.append(
+                format_html(
+                    '<span style="background-color: {}; color: white; padding: 2px 6px; border-radius: 3px; font-size: 11px; margin-right: 4px;">{}</span>',
+                    tag.color,
+                    tag.name
+                )
+            )
+        return format_html(''.join(tag_html))
+    get_tags_display.short_description = 'Tags'
+
+    def get_queryset(self, request):
+        return super().get_queryset(request).prefetch_related('tags')
 
 
 @admin.register(models.CustomStyle)
