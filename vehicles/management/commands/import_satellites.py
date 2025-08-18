@@ -1,3 +1,4 @@
+import requests
 from datetime import datetime, timezone
 
 from django.contrib.gis.geos import Point
@@ -38,13 +39,125 @@ class Command(ImportLiveVehiclesCommand):
     source_name = "Satellites"
     previous_locations = {}
 
+    # API configuration - using the same API as import_iss.py
+    API_BASE_URL = "https://eden.apilogic.uk"
+    API_KEY = "timesbus-vm"
+
+    # Popular satellites to track (NORAD IDs)
+    # This is a curated list of interesting satellites - you can expand this
+    SATELLITE_IDS = [
+        25544,  # ISS (ZARYA)
+        20580,  # HUBBLE SPACE TELESCOPE
+        43013,  # STARLINK-1007
+        43070,  # STARLINK-1130
+        43071,  # STARLINK-1131
+        43072,  # STARLINK-1132
+        43073,  # STARLINK-1133
+        43074,  # STARLINK-1134
+        43075,  # STARLINK-1135
+        43076,  # STARLINK-1136
+        43077,  # STARLINK-1137
+        43078,  # STARLINK-1138
+        43079,  # STARLINK-1139
+        43080,  # STARLINK-1140
+        43081,  # STARLINK-1141
+        43082,  # STARLINK-1142
+        43083,  # STARLINK-1143
+        43084,  # STARLINK-1144
+        43085,  # STARLINK-1145
+        43086,  # STARLINK-1146
+        43087,  # STARLINK-1147
+        43088,  # STARLINK-1148
+        43089,  # STARLINK-1149
+        43090,  # STARLINK-1150
+        43091,  # STARLINK-1151
+        43092,  # STARLINK-1152
+        43093,  # STARLINK-1153
+        43094,  # STARLINK-1154
+        43095,  # STARLINK-1155
+        43096,  # STARLINK-1156
+        43097,  # STARLINK-1157
+        43098,  # STARLINK-1158
+        43099,  # STARLINK-1159
+        43100,  # STARLINK-1160
+        # Add more satellite IDs as needed
+        # You can get a full list from https://celestrak.com/NORAD/elements/
+    ]
+
+    @staticmethod
+    def add_arguments(parser):
+        parser.add_argument(
+            '--fetch-catalog',
+            action='store_true',
+            help='Fetch satellite IDs from online catalog (gets 11k+ satellites)'
+        )
+        parser.add_argument(
+            '--max-satellites',
+            type=int,
+            default=100,
+            help='Maximum number of satellites to process (default: 100)'
+        )
+        ImportLiveVehiclesCommand.add_arguments(parser)
+
+    def handle(self, **options):
+        self.fetch_catalog = options.get('fetch_catalog', False)
+        self.max_satellites = options.get('max_satellites', 100)
+
+        if self.fetch_catalog:
+            self.stdout.write("Fetching satellite catalog...")
+            self.SATELLITE_IDS = self.get_satellite_catalog()
+
+        # Limit the number of satellites to process
+        if len(self.SATELLITE_IDS) > self.max_satellites:
+            self.stdout.write(f"Limiting to {self.max_satellites} satellites (out of {len(self.SATELLITE_IDS)} available)")
+            self.SATELLITE_IDS = self.SATELLITE_IDS[:self.max_satellites]
+
+        super().handle(**options)
+
+    def get_satellite_catalog(self):
+        """Fetch a list of active satellites from Celestrak or similar source"""
+        try:
+            # Try to get active satellites from Celestrak
+            catalog_urls = [
+                "https://celestrak.com/NORAD/elements/gp.php?GROUP=active&FORMAT=json",
+                "https://celestrak.com/NORAD/elements/gp.php?GROUP=stations&FORMAT=json",
+                "https://celestrak.com/NORAD/elements/gp.php?GROUP=starlink&FORMAT=json",
+            ]
+
+            all_satellite_ids = []
+
+            for url in catalog_urls:
+                try:
+                    self.stdout.write(f"Fetching from {url}")
+                    response = requests.get(url, timeout=30)
+                    response.raise_for_status()
+                    data = response.json()
+
+                    if isinstance(data, list):
+                        for sat in data:
+                            if isinstance(sat, dict) and 'NORAD_CAT_ID' in sat:
+                                all_satellite_ids.append(int(sat['NORAD_CAT_ID']))
+
+                except requests.exceptions.RequestException as e:
+                    self.stderr.write(f"Error fetching from {url}: {e}")
+                    continue
+
+            # Remove duplicates and sort
+            unique_ids = sorted(list(set(all_satellite_ids)))
+            self.stdout.write(f"Found {len(unique_ids)} satellites in catalog")
+
+            return unique_ids if unique_ids else self.SATELLITE_IDS
+
+        except Exception as e:
+            self.stderr.write(f"Error fetching satellite catalog: {e}")
+            self.stdout.write("Falling back to default satellite list")
+            return self.SATELLITE_IDS
+
     def do_source(self):
         # Get the DataSource named "Satellites" - it should already exist
         try:
             from busstops.models import DataSource
             self.source = DataSource.objects.get(name=self.source_name)
-            if self.source.url:
-                self.url = self.source.url
         except DataSource.DoesNotExist:
             raise Exception(f'DataSource named "{self.source_name}" does not exist. Please create it first.')
 
@@ -73,63 +186,73 @@ class Command(ImportLiveVehiclesCommand):
         items = []
         vehicle_codes = []
 
-        try:
-            # Get the raw satellite data (should be a list)
-            raw_data = super().get_items()
+        self.stdout.write(f"Fetching data for {len(self.SATELLITE_IDS)} satellites...")
 
-            # Handle case where data might be wrapped in an object
-            if isinstance(raw_data, dict) and 'satellites' in raw_data:
-                satellite_list = raw_data['satellites']
-            elif isinstance(raw_data, list):
-                satellite_list = raw_data
-            else:
-                self.stderr.write(f"Unexpected data format: {type(raw_data)}")
-                return []
+        # Fetch data for each satellite individually using the same API as import_iss.py
+        for satellite_id in self.SATELLITE_IDS:
+            try:
+                url = f"{self.API_BASE_URL}/satellite/{satellite_id}/positions?api_key={self.API_KEY}"
+                response = requests.get(url, timeout=10)
+                response.raise_for_status()
+                data = response.json()
 
-            # Build list of satellites that have moved
-            for item in satellite_list:
-                if not isinstance(item, dict) or 'info' not in item or 'position' not in item:
-                    self.stderr.write(f"Skipping invalid satellite item: {item}")
+                # Check if we got valid data
+                if not data.get("positions") or len(data["positions"]) == 0:
+                    self.stderr.write(f"No position data for satellite {satellite_id}")
                     continue
 
-                try:
-                    satellite_id = str(item["info"]["satelliteId"])
-                    position = item["position"]
+                # Get the latest position
+                position = data["positions"][0]
+                satellite_info = data.get("info", {})
 
-                    # Validate required position fields
-                    required_fields = ["timestamp", "latitude", "longitude"]
-                    if not all(field in position for field in required_fields):
-                        self.stderr.write(f"Skipping satellite {satellite_id}: missing position fields")
-                        continue
+                # Create a unique key for tracking movement
+                key = str(satellite_id)
+                value = (
+                    position["timestamp"],
+                    round(position["latitude"], 6),  # Round to avoid tiny movements
+                    round(position["longitude"], 6),
+                    round(position.get("altitude", 0), 1)
+                )
 
-                    # Create a unique key for tracking movement
-                    key = satellite_id
-                    value = (
-                        position["timestamp"],
-                        round(position["latitude"], 6),  # Round to avoid tiny movements
-                        round(position["longitude"], 6),
-                        round(position.get("altitude", 0), 1)
-                    )
+                # Only process if satellite has moved
+                if self.previous_locations.get(key) != value:
+                    # Convert to the format expected by the rest of the code
+                    item = {
+                        "info": {
+                            "satelliteId": satellite_id,
+                            "satelliteName": satellite_info.get("satelliteName", f"SATELLITE-{satellite_id}")
+                        },
+                        "position": {
+                            "timestamp": position["timestamp"],
+                            "latitude": position["latitude"],
+                            "longitude": position["longitude"],
+                            "altitude": position.get("altitude", 0),
+                            "azimuth": position.get("azimuth", 0),
+                            "elevation": position.get("elevation", 0),
+                            "ra": position.get("ra", 0),
+                            "dec": position.get("dec", 0)
+                        }
+                    }
 
-                    if self.previous_locations.get(key) != value:
-                        items.append(item)
-                        vehicle_codes.append(satellite_id)
-                        self.previous_locations[key] = value
+                    items.append(item)
+                    vehicle_codes.append(str(satellite_id))
+                    self.previous_locations[key] = value
 
-                except (KeyError, ValueError, TypeError) as e:
-                    self.stderr.write(f"Error processing satellite item: {e}")
-                    continue
+            except requests.exceptions.RequestException as e:
+                self.stderr.write(f"Error fetching data for satellite {satellite_id}: {e}")
+                continue
+            except (KeyError, ValueError, TypeError) as e:
+                self.stderr.write(f"Error processing satellite {satellite_id}: {e}")
+                continue
 
-            self.prefetch_vehicles(vehicle_codes)
+        self.prefetch_vehicles(vehicle_codes)
 
-            if items:
-                self.stdout.write(f"Processing {len(items)} satellite updates")
+        if items:
+            self.stdout.write(f"Processing {len(items)} satellite updates out of {len(self.SATELLITE_IDS)} satellites")
+        else:
+            self.stdout.write("No satellite updates to process")
 
-            return items
-
-        except Exception as e:
-            self.stderr.write(f"Error in get_items: {e}")
-            return []
+        return items
 
     def get_vehicle(self, item) -> tuple[Vehicle, bool]:
         try:
