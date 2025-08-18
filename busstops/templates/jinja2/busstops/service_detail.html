@@ -73,7 +73,9 @@
     {% if request.user.is_authenticated %}
         {% set content_type_id = get_content_type_id(object) %}
         {% set is_fav = is_favourited(request.user, object) %}
-        {% include 'favourites/favourite_button.html' with user=request.user object=object is_favourited=is_fav css_class="large service-favourite" content_type_id=content_type_id object_id=object.pk %}
+        {% with user=request.user, object=object, is_favourited=is_fav, css_class="large service-favourite", content_type_id=content_type_id, object_id=object.pk %}
+            {% include 'favourites/favourite_button.html' %}
+        {% endwith %}
     {% endif %}
 </div>
 
