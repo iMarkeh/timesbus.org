@@ -1,6 +1,6 @@
 {% extends 'page.html' %}
 
-{% block title %}Account Suspended – transportthing.uk{% endblock %}
+{% block title %}Registration Unavailable – transportthing.uk{% endblock %}
 
 {% block bodyclass %}narrow{% endblock %}
 
@@ -9,22 +9,21 @@
 <div style="text-align: center; padding: 2rem 0;">
     <div style="font-size: 4rem; margin-bottom: 1rem;">🚫</div>
     
-    <h1 style="color: #dc3545; margin-bottom: 1rem;">Account Suspended</h1>
+    <h1 style="color: #dc3545; margin-bottom: 1rem;">Registration Unavailable</h1>
     
     <div style="background: var(--background-color); border: 1px solid var(--border-color); border-radius: 8px; padding: 2rem; margin: 2rem 0; text-align: left;">
-        <h3 style="margin-top: 0; color: var(--text-color);">Your account has been suspended</h3>
+        <h3 style="margin-top: 0; color: var(--text-color);">Account creation is currently restricted</h3>
         
-        <p style="color: var(--text-color);">Your account has been temporarily suspended from editing vehicles and other content on transportthing.uk. This may be due to:</p>
-
+        <p style="color: var(--text-color);">We're unable to create a new account at this time. This may be due to:</p>
+        
         <ul style="margin: 1rem 0; color: var(--text-color);">
-            <li><strong>Repeated violations</strong> of our <a href="/rules">community guidelines</a></li>
-            <li>Submitting inaccurate or spam content</li>
-            <li>Automated or suspicious activity</li>
-            <li>Other terms of service violations</li>
+            <li><strong>Previous account issues</strong> from this location</li>
+            <li><strong>Security measures</strong> to prevent abuse</li>
+            <li><strong>Network restrictions</strong> or shared IP addresses</li>
         </ul>
-
-        <p style="color: var(--text-color);"><strong>Don't worry:</strong> You can still browse and enjoy all the main features of transportthing.uk, including:</p>
-
+        
+        <p style="color: var(--text-color);"><strong>Don't worry:</strong> You can still enjoy all the main features of transportthing.uk without an account, including:</p>
+        
         <ul style="margin: 1rem 0; color: var(--text-color);">
             <li>✅ Viewing vehicle information and fleet lists</li>
             <li>✅ Searching for buses, routes, and operators</li>
@@ -34,17 +33,21 @@
     </div>
     
     <div style="background: var(--background-color-lighter, var(--background-color)); border: 1px solid var(--border-color); border-radius: 8px; padding: 1.5rem; margin: 2rem 0;">
-        <h4 style="margin-top: 0; color: var(--brand-color);">Want to appeal or get help?</h4>
-        <p style="margin-bottom: 1rem; color: var(--text-color);">If you believe this suspension was made in error or would like to discuss your account status:</p>
+        <h4 style="margin-top: 0; color: var(--brand-color);">Need help or have questions?</h4>
+        <p style="margin-bottom: 1rem; color: var(--text-color);">If you believe this restriction was applied in error or need assistance:</p>
         
         <div style="display: flex; gap: 1rem; justify-content: center; flex-wrap: wrap;">
             <a href="/contact" class="button" style="background: #007bff; color: white; padding: 0.75rem 1.5rem; text-decoration: none; border-radius: 4px; display: inline-block;">
-                📧 Contact Us
+                📧 Contact Support
             </a>
             <a href="https://transportthing.uk/discord" target="_blank" rel="noopener" class="button" style="background: #5865f2; color: white; padding: 0.75rem 1.5rem; text-decoration: none; border-radius: 4px; display: inline-block;">
-                💬 Discord Support
+                💬 Discord Community
             </a>
         </div>
+        
+        <p style="margin-top: 1rem; font-size: 0.9em; color: var(--text-color-muted, var(--text-color)); text-align: center;">
+            You can also suggest edits <a href="/contact" style="color: var(--brand-color);">by email</a> or through our Discord community.
+        </p>
     </div>
     
     <div style="margin-top: 2rem;">

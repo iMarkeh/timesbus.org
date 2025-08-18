@@ -29,7 +29,13 @@ You can also suggest edits <a href="/contact">by email</a> or <a href="https://t
     if request.method == "POST":
         form = forms.RegistrationForm(request.POST)
         if form.is_valid():
-            form.save(request=request)
+            try:
+                form.save(request=request)
+            except forms.IPBannedException:
+                from django.http import HttpResponseForbidden
+                return HttpResponseForbidden(
+                    render(request, 'registration_blocked.html').content
+                )
     else:
         form = forms.RegistrationForm()
 
