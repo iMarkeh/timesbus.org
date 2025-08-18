@@ -1411,12 +1411,7 @@ class CustomStyle(models.Model):
 
     def matches_path(self, path):
         """Check if this style should apply to the given path"""
-        # Debug print - remove this after fixing
-        print(f"DEBUG: matches_path called for style '{self.name}' with path '{path}'")
-        print(f"DEBUG: path_patterns = {repr(self.path_patterns)}")
-
         if not self.path_patterns.strip():
-            print(f"DEBUG: No patterns, returning True (site-wide)")
             return True  # Site-wide style
 
         # Handle different line endings and clean up patterns
@@ -1426,26 +1421,20 @@ class CustomStyle(models.Model):
             if pattern:
                 patterns.append(pattern)
 
-        print(f"DEBUG: Parsed patterns: {patterns}")
-
         for pattern in patterns:
             if self.exact_match:
                 if path == pattern:
-                    print(f"DEBUG: Exact match found: '{path}' == '{pattern}'")
                     return True
             else:
                 # Support wildcard matching
                 if '*' in pattern:
                     import fnmatch
                     if fnmatch.fnmatch(path, pattern):
-                        print(f"DEBUG: Wildcard match found: '{path}' matches '{pattern}'")
                         return True
                 else:
                     if path.startswith(pattern):
-                        print(f"DEBUG: Prefix match found: '{path}' starts with '{pattern}'")
                         return True
 
-        print(f"DEBUG: No match found for path '{path}'")
         return False
 
     @classmethod
