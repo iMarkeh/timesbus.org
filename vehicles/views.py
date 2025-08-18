@@ -714,6 +714,25 @@ def record_ip_address(request):
         request.user.save(update_fields=["ip_address"])
 
 
+class UserBannedException(Exception):
+    """Custom exception for banned users"""
+    pass
+
+
+def handle_banned_user(view_func):
+    """Decorator to handle UserBannedException and show banned user template"""
+    def wrapper(request, *args, **kwargs):
+        try:
+            return view_func(request, *args, **kwargs)
+        except UserBannedException:
+            from django.shortcuts import render
+            from django.http import HttpResponseForbidden
+            return HttpResponseForbidden(
+                render(request, 'user_banned.html').content
+            )
+    return wrapper
+
+
 def check_user(request):
     if settings.DISABLE_EDITING and not request.user.has_perm(
         "vehicles.change_vehicle"
@@ -725,7 +744,7 @@ def check_user(request):
         )
 
     if request.user.trusted is False:
-        raise PermissionDenied
+        raise UserBannedException("User account is banned")
 
     if (
         not request.user.trusted
@@ -748,6 +767,7 @@ revision_display_related_fields = (
 
 
 @login_required
+@handle_banned_user
 def edit_vehicle(request, **kwargs):
     record_ip_address(request)
     check_user(request)
@@ -882,6 +902,7 @@ def edit_vehicle(request, **kwargs):
 
 @require_POST
 @login_required
+@handle_banned_user
 @transaction.atomic
 def vehicle_revision_action(request, revision_id, action):
     revision = get_object_or_404(
@@ -897,6 +918,8 @@ def vehicle_revision_action(request, revision_id, action):
         revision.delete()  # cancel one's own edit
         return HttpResponse("")
     else:
+        if request.user.trusted is False:
+            raise UserBannedException("User account is banned")
         assert request.user.trusted
 
     revision.disapproved_reason = unquote(request.headers.get("HX-Prompt", ""))
