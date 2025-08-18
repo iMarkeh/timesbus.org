@@ -367,8 +367,8 @@ class BulkVehicleCreationAdmin(admin.ModelAdmin):
 
         with transaction.atomic():
             for vehicle_code in vehicle_codes:
-                # Check if vehicle already exists
-                if models.Vehicle.objects.filter(code=vehicle_code).exists():
+                # Check if vehicle already exists for this operator
+                if models.Vehicle.objects.filter(code=vehicle_code, operator=operator).exists():
                     skipped_count += 1
                     continue
 
