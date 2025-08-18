@@ -19,8 +19,7 @@
 <link rel="icon" sizes="any" type="image/svg+xml" href="https://cdn.transportthing.uk/TT%20Icon.png">
 <link rel="manifest" href="{{ static('manifest.webmanifest') }}">
 <link rel="stylesheet" href="/static/dist/css/style.css">
-
-	<meta name="description" content="check out our fleet lists of buses, trains, trams, satellites and more, all in one place!">
+<meta name="description" content="check out our fleet lists of buses, trains, trams, satellites and more, all in one place!">
 
 <meta property="og:url" content="https://transportthing.uk">
 <meta property="og:type" content="website">
@@ -30,7 +29,7 @@
 <meta property="twitter:domain" content="transportthing.uk">
 <meta property="twitter:url" content="https://transportthing.uk">
 <meta name="twitter:image" content="https://opengraph.b-cdn.net/production/images/e6ba83f8-a2e3-4006-87e0-599c28688ba6.png?token=isX_Brt9jbXdVzl4_ge1sfFeiq7EPxvzrKARyreIGPE&height=399&width=1200&expires=33290495612">
-
+{{ custom_style_css(request) }}
 {% block head %}{% endblock %}
 
 {% block fuse %}

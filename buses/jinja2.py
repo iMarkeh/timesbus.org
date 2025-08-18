@@ -8,6 +8,8 @@ from jinja2.ext import Extension
 
 from busstops.templatetags.urlise import urlise
 from vehicles.context_processors import _liveries_css_version
+from busstops.models import Favourite, CustomStyle
+from django.contrib.contenttypes.models import ContentType
 
 # based on https://jinja.palletsprojects.com/en/3.1.x/extensions/#cache
 
@@ -68,6 +70,55 @@ def environment(**options):
     env = Environment(extensions=[FragmentCacheExtension], **options)
     env.lstrip_blocks = True
     env.trim_blocks = True
+    
+    def is_favourited(user, obj):
+        """Check if an object is favourited by the user"""
+        return Favourite.is_favourited(user, obj)
+    
+    def get_content_type_id(obj):
+        """Get content type ID for an object"""
+        return ContentType.objects.get_for_model(obj).id
+    
+    def custom_style_css(request=None):
+        """Generate custom CSS for the current date and path"""
+        try:
+            path = request.path if request else None
+            active_style = CustomStyle.get_active_style_for_date(path=path)
+            if not active_style:
+                return ""
+            
+            css_parts = []
+            
+            # Light mode variables
+            light_variables = active_style.get_css_variables(dark_mode=False)
+            if light_variables:
+                light_css = ":root {\n"
+                for var, value in light_variables.items():
+                    light_css += f"  {var}: {value};\n"
+                light_css += "}"
+                css_parts.append(light_css)
+            
+            # Dark mode variables
+            dark_variables = active_style.get_css_variables(dark_mode=True)
+            if dark_variables:
+                dark_css = ".dark-mode,\nhtml.dark-mode body {\n"
+                for var, value in dark_variables.items():
+                    dark_css += f"  {var}: {value};\n"
+                dark_css += "}"
+                css_parts.append(dark_css)
+            
+            # Additional CSS
+            if active_style.additional_css:
+                css_parts.append(active_style.additional_css)
+            
+            if css_parts:
+                full_css = f"<style>\n/* Custom styles for {active_style.name} */\n" + "\n\n".join(css_parts) + "\n</style>"
+                return mark_safe(full_css)
+            
+            return ""
+        except Exception:
+            return ""
+    
     env.globals.update(
         {
             "static": static,
@@ -76,6 +127,9 @@ def environment(**options):
             "urlise": urlise,
             "linebreaksbr": mark_safe(linebreaksbr),
             "linebreaks": mark_safe(linebreaks),
+            "is_favourited": is_favourited,
+            "get_content_type_id": get_content_type_id,
+            "custom_style_css": custom_style_css,
         }
     )
     return env
