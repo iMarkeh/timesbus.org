@@ -1453,10 +1453,27 @@ class CustomStyle(models.Model):
         if path is None:
             return active_styles.first()
 
-        # Filter by path matching
+        # Separate styles into path-specific and site-wide
+        path_specific_styles = []
+        site_wide_styles = []
+
         for style in active_styles:
-            if style.matches_path(path):
-                return style
+            if style.path_patterns and style.path_patterns.strip():
+                # This style has path restrictions
+                if style.matches_path(path):
+                    path_specific_styles.append(style)
+            else:
+                # This is a site-wide style
+                site_wide_styles.append(style)
+
+        # Return the highest priority path-specific style first
+        if path_specific_styles:
+            return path_specific_styles[0]  # Already ordered by priority
+
+        # If no path-specific match, return highest priority site-wide style
+        if site_wide_styles:
+            return site_wide_styles[0]
+
         return None
 
     def get_css_variables(self, dark_mode=False):

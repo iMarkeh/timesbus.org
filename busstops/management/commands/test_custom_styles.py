@@ -25,16 +25,20 @@ class Command(BaseCommand):
             self.stdout.write(f"\nStyle: {style.name}")
             self.stdout.write(f"  Date range: {style.start_date} to {style.end_date}")
             self.stdout.write(f"  Priority: {style.priority}")
-            
+
             # Check if the new fields exist
             if hasattr(style, 'path_patterns'):
                 self.stdout.write(f"  Path patterns: {repr(style.path_patterns)}")
                 self.stdout.write(f"  Exact match: {style.exact_match}")
-                
+
+                # Determine if this is site-wide or path-specific
+                is_site_wide = not (style.path_patterns and style.path_patterns.strip())
+                self.stdout.write(f"  Type: {'Site-wide' if is_site_wide else 'Path-specific'}")
+
                 # Test if it matches
                 matches = style.matches_path(path)
                 self.stdout.write(f"  Matches path '{path}': {matches}")
-                
+
                 if matches:
                     self.stdout.write(self.style.SUCCESS(f"  ✓ This style would apply!"))
                 else:
