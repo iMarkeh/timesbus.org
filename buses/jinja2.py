@@ -74,15 +74,14 @@ def environment(**options):
     def is_favourited(user, obj):
         """Check if an object is favourited by the user"""
         try:
-            # Check if the object has an integer primary key
-            if not isinstance(obj.pk, int):
-                # For non-integer primary keys (like string PKs), favourites won't work
-                # This is a limitation of the current Favourite model design
-                return False
             return Favourite.is_favourited(user, obj)
         except (ValueError, TypeError, AttributeError):
-            # Handle cases where object_id is not compatible with the database field
+            # Handle any database compatibility issues
             return False
+    
+    def can_be_favourited(obj):
+        """Check if an object can be favourited (now supports both int and string PKs)"""
+        return obj.pk is not None
     
     def get_content_type_id(obj):
         """Get content type ID for an object"""
@@ -139,6 +138,7 @@ def environment(**options):
             "is_favourited": is_favourited,
             "get_content_type_id": get_content_type_id,
             "custom_style_css": custom_style_css,
+            "can_be_favourited": can_be_favourited,
         }
     )
     return env

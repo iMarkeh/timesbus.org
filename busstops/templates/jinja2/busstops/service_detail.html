@@ -70,7 +70,7 @@
         {% endif %}
         <span class="description">{{ object.description }}</span>
     </h1>
-    {% if request.user.is_authenticated %}
+    {% if request.user.is_authenticated and can_be_favourited(object) %}
         {% set content_type_id = get_content_type_id(object) %}
         {% set is_fav = is_favourited(request.user, object) %}
         {% with user=request.user, object=object, is_favourited=is_fav, css_class="large service-favourite", content_type_id=content_type_id, object_id=object.pk %}

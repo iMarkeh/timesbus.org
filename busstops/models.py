@@ -1522,13 +1522,14 @@ class Favourite(models.Model):
 
     # Generic foreign key to allow favouriting different types of objects
     content_type = models.ForeignKey(ContentType, on_delete=models.CASCADE)
-    object_id = models.PositiveIntegerField()
+    object_id = models.PositiveIntegerField(null=True, blank=True)  # For integer PKs
+    object_id_str = models.CharField(max_length=100, null=True, blank=True)  # For string PKs
     content_object = GenericForeignKey('content_type', 'object_id')
 
     created_at = models.DateTimeField(auto_now_add=True)
 
     class Meta:
-        unique_together = ('user', 'content_type', 'object_id')
+        unique_together = ('user', 'content_type', 'object_id', 'object_id_str')
         verbose_name = "Favourite"
         verbose_name_plural = "Favourites"
         ordering = ['-created_at']
@@ -1559,18 +1560,25 @@ class Favourite(models.Model):
         if not user.is_authenticated:
             return False
 
-        # Check if the object has an integer primary key
-        # The current Favourite model design only supports integer object_ids
-        if not isinstance(obj.pk, int):
-            return False
-
         try:
             content_type = ContentType.objects.get_for_model(obj)
-            return cls.objects.filter(
-                user=user,
-                content_type=content_type,
-                object_id=obj.pk
-            ).exists()
+            
+            if isinstance(obj.pk, int):
+                # Integer primary key
+                return cls.objects.filter(
+                    user=user,
+                    content_type=content_type,
+                    object_id=obj.pk,
+                    object_id_str__isnull=True
+                ).exists()
+            else:
+                # String primary key
+                return cls.objects.filter(
+                    user=user,
+                    content_type=content_type,
+                    object_id__isnull=True,
+                    object_id_str=str(obj.pk)
+                ).exists()
         except (ValueError, TypeError):
             # Handle any other database compatibility issues
             return False
@@ -1581,19 +1589,26 @@ class Favourite(models.Model):
         if not user.is_authenticated:
             return None, False
 
-        # Check if the object has an integer primary key
-        # The current Favourite model design only supports integer object_ids
-        if not isinstance(obj.pk, int):
-            return None, False
-
         try:
             content_type = ContentType.objects.get_for_model(obj)
-            favourite, created = cls.objects.get_or_create(
-                user=user,
-                content_type=content_type,
-                object_id=obj.pk,
-                defaults={'content_object': obj}
-            )
+            
+            if isinstance(obj.pk, int):
+                # Integer primary key
+                favourite, created = cls.objects.get_or_create(
+                    user=user,
+                    content_type=content_type,
+                    object_id=obj.pk,
+                    object_id_str=None,
+                    defaults={'content_object': obj}
+                )
+            else:
+                # String primary key
+                favourite, created = cls.objects.get_or_create(
+                    user=user,
+                    content_type=content_type,
+                    object_id=None,
+                    object_id_str=str(obj.pk)
+                )
 
             if not created:
                 # Already exists, so remove it
