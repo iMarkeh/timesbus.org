@@ -1671,7 +1671,12 @@ def toggle_favourite(request):
         # Get the content type and object
         content_type = get_object_or_404(ContentType, id=content_type_id)
         model_class = content_type.model_class()
-        obj = get_object_or_404(model_class, id=object_id)
+        
+        # Get the primary key field name
+        pk_field = model_class._meta.pk.name
+        
+        # Get the object using the correct primary key field
+        obj = get_object_or_404(model_class, **{pk_field: object_id})
 
         # Toggle favourite
         favourite, created = Favourite.toggle_favourite(request.user, obj)
