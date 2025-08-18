@@ -1414,7 +1414,12 @@ class CustomStyle(models.Model):
         if not self.path_patterns.strip():
             return True  # Site-wide style
 
-        patterns = [pattern.strip() for pattern in self.path_patterns.split('\n') if pattern.strip()]
+        # Handle different line endings and clean up patterns
+        patterns = []
+        for line in self.path_patterns.replace('\r\n', '\n').replace('\r', '\n').split('\n'):
+            pattern = line.strip()
+            if pattern:
+                patterns.append(pattern)
 
         # Debug logging
         import logging
@@ -1454,15 +1459,26 @@ class CustomStyle(models.Model):
             end_date__gte=check_date
         )
 
+        # Debug logging
+        import logging
+        logger = logging.getLogger(__name__)
+        logger.debug(f"get_active_style_for_date: path='{path}', date={check_date}")
+        logger.debug(f"Found {active_styles.count()} active styles for date")
+
         # If no path specified, return the first (highest priority) style
         if path is None:
-            return active_styles.first()
+            result = active_styles.first()
+            logger.debug(f"No path specified, returning: {result}")
+            return result
 
         # Filter by path matching
         for style in active_styles:
+            logger.debug(f"Testing style: {style.name} (priority: {style.priority})")
             if style.matches_path(path):
+                logger.debug(f"Path match found, returning: {style.name}")
                 return style
 
+        logger.debug("No matching style found")
         return None
 
     def get_css_variables(self, dark_mode=False):
