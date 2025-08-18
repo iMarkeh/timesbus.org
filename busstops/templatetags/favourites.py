@@ -37,13 +37,13 @@ def favourite_button(context, obj, css_class=""):
 def favourites_list(user, limit=None):
     """Render a list of user's favourites"""
     if not user.is_authenticated:
-        return {'favourites': []}
-    
+        return {'favourites': [], 'grouped_favourites': {}, 'user': user}
+
     favourites = Favourite.get_user_favourites(user)
-    
+
     if limit:
         favourites = favourites[:limit]
-    
+
     # Group by content type for better display
     grouped_favourites = {}
     for fav in favourites:
@@ -51,7 +51,7 @@ def favourites_list(user, limit=None):
         if content_type not in grouped_favourites:
             grouped_favourites[content_type] = []
         grouped_favourites[content_type].append(fav)
-    
+
     return {
         'favourites': favourites,
         'grouped_favourites': grouped_favourites,
