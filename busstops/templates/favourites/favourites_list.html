@@ -28,7 +28,7 @@
                                     </div>
                                     {% if favourite.content_object.operator %}
                                         <div class="favourite-operator">
-                                            {{ favourite.content_object.operator.name }}
+                                            {{ favourite.content_object.operator.noc }}
                                         </div>
                                     {% endif %}
                                 </div>
@@ -66,10 +66,6 @@
         <div class="no-favourites-icon">⭐</div>
         <h3>No favourites yet</h3>
         <p>Start exploring and add your favourite services and operators!</p>
-        <div class="no-favourites-links">
-            <a href="/services" class="btn btn-primary">Browse Services</a>
-            <a href="/operators" class="btn btn-secondary">Browse Operators</a>
-        </div>
     </div>
 {% endif %}
 
