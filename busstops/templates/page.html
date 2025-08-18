@@ -65,6 +65,12 @@
     </div>
 </header>
 {% endblock header %}
+
+<!-- Notification Banners -->
+{% if has_notification_banners %}
+    {% render_notification_banners notification_banners %}
+{% endif %}
+
 <main>
 {% load maintenance_tags %}
 {% show_maintenance_alert %}

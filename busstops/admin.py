@@ -12,7 +12,7 @@ from sql_util.utils import SubqueryCount
 
 from bustimes.models import Route, RouteLink
 
-from .models import FeatureToggle, ChangeNote
+from .models import FeatureToggle, ChangeNote, NotificationBanner
 
 
 from . import models
@@ -716,6 +716,37 @@ class ChangeNoteAdmin(admin.ModelAdmin):
 
     def get_queryset(self, request):
         return super().get_queryset(request).prefetch_related('tags')
+
+
+@admin.register(NotificationBanner)
+class NotificationBannerAdmin(admin.ModelAdmin):
+    list_display = ('name', 'banner_type', 'path_pattern', 'is_active_now', 'start_datetime', 'end_datetime', 'priority')
+    list_filter = ('banner_type', 'active', 'dismissible', 'exact_match', 'start_datetime')
+    search_fields = ('name', 'message', 'path_pattern')
+    date_hierarchy = 'start_datetime'
+    ordering = ('-priority', '-start_datetime')
+
+    fieldsets = (
+        ('Basic Information', {
+            'fields': ('name', 'message', 'banner_type', 'active', 'priority')
+        }),
+        ('Path Targeting', {
+            'fields': ('path_pattern', 'exact_match'),
+            'description': 'Control where this banner appears. Examples: "/operators/oxbc", "/services/1-*", "/vehicles"'
+        }),
+        ('Scheduling', {
+            'fields': ('start_datetime', 'end_datetime'),
+        }),
+        ('Display Options', {
+            'fields': ('dismissible', 'link_text', 'link_url'),
+            'classes': ('collapse',)
+        }),
+    )
+
+    def is_active_now(self, obj):
+        return obj.is_active_now()
+    is_active_now.boolean = True
+    is_active_now.short_description = 'Active Now'
 
 
 @admin.register(models.CustomStyle)
