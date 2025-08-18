@@ -1374,6 +1374,16 @@ class CustomStyle(models.Model):
     # Additional CSS overrides
     additional_css = models.TextField(blank=True, help_text="Additional CSS to inject (advanced users only)")
 
+    # Path targeting (similar to NotificationBanner)
+    path_patterns = models.TextField(
+        blank=True,
+        help_text='URL path patterns, one per line (e.g., "/operators/nasa", "/vehicles/nasa-*"). Leave blank for site-wide styling.'
+    )
+    exact_match = models.BooleanField(
+        default=False,
+        help_text="If checked, paths must match exactly. If unchecked, style applies if URL starts with any pattern."
+    )
+
     # Control
     active = models.BooleanField(default=True, help_text="Whether this custom style is active")
     priority = models.IntegerField(default=0, help_text="Priority (higher numbers take precedence if dates overlap)")
@@ -1399,17 +1409,52 @@ class CustomStyle(models.Model):
 
         return self.start_date <= check_date <= self.end_date
 
+    def matches_path(self, path):
+        """Check if this style should apply to the given path"""
+        if not self.path_patterns.strip():
+            return True  # Site-wide style
+
+        patterns = [pattern.strip() for pattern in self.path_patterns.split('\n') if pattern.strip()]
+
+        for pattern in patterns:
+            if self.exact_match:
+                if path == pattern:
+                    return True
+            else:
+                # Support wildcard matching
+                if '*' in pattern:
+                    import fnmatch
+                    if fnmatch.fnmatch(path, pattern):
+                        return True
+                else:
+                    if path.startswith(pattern):
+                        return True
+
+        return False
+
     @classmethod
-    def get_active_style_for_date(cls, check_date=None):
-        """Get the highest priority active style for a given date"""
+    def get_active_style_for_date(cls, check_date=None, path=None):
+        """Get the highest priority active style for a given date and path"""
         if check_date is None:
             check_date = timezone.now().date()
 
-        return cls.objects.filter(
+        # Get all potentially active styles for the date
+        active_styles = cls.objects.filter(
             active=True,
             start_date__lte=check_date,
             end_date__gte=check_date
-        ).first()  # Already ordered by priority, start_date
+        )
+
+        # If no path specified, return the first (highest priority) style
+        if path is None:
+            return active_styles.first()
+
+        # Filter by path matching
+        for style in active_styles:
+            if style.matches_path(path):
+                return style
+
+        return None
 
     def get_css_variables(self, dark_mode=False):
         """Generate CSS variables for this custom style"""
