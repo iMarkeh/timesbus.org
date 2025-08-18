@@ -35,9 +35,34 @@ class Command(BaseCommand):
                 is_site_wide = not (style.path_patterns and style.path_patterns.strip())
                 self.stdout.write(f"  Type: {'Site-wide' if is_site_wide else 'Path-specific'}")
 
-                # Test if it matches
+                # Test if it matches with detailed debugging
                 matches = style.matches_path(path)
                 self.stdout.write(f"  Matches path '{path}': {matches}")
+
+                # Debug the matching logic step by step
+                if style.path_patterns and style.path_patterns.strip():
+                    patterns = []
+                    for line in style.path_patterns.replace('\r\n', '\n').replace('\r', '\n').split('\n'):
+                        pattern = line.strip()
+                        if pattern:
+                            patterns.append(pattern)
+
+                    self.stdout.write(f"  Parsed patterns: {patterns}")
+
+                    for pattern in patterns:
+                        if style.exact_match:
+                            pattern_matches = (path == pattern)
+                            self.stdout.write(f"    Pattern '{pattern}' (exact): {pattern_matches}")
+                        else:
+                            if '*' in pattern:
+                                import fnmatch
+                                pattern_matches = fnmatch.fnmatch(path, pattern)
+                                self.stdout.write(f"    Pattern '{pattern}' (wildcard): {pattern_matches}")
+                            else:
+                                pattern_matches = path.startswith(pattern)
+                                self.stdout.write(f"    Pattern '{pattern}' (prefix): {pattern_matches}")
+                else:
+                    self.stdout.write(f"  No patterns = site-wide style")
 
                 if matches:
                     self.stdout.write(self.style.SUCCESS(f"  ✓ This style would apply!"))
