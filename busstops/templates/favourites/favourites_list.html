@@ -40,12 +40,7 @@
                                         {{ favourite.content_object.name }}
                                     </div>
                                     <div class="favourite-subtitle">
-                                        {% if favourite.content_object.vehicle_mode %}
-                                            {{ favourite.content_object.vehicle_mode|title }} operator
-                                        {% else %}
-                                            Transport operator
-                                        {% endif %}
-                                        {% if favourite.content_object.noc %} ({{ favourite.content_object.noc }}){% endif %}
+                                        ({{ favourite.content_object.noc }})
                                     </div>
                                 </div>
                             </a>
