@@ -8,13 +8,6 @@ def custom_styles(request):
         # Get active style for current date and path
         active_style = CustomStyle.get_active_style_for_date(path=request.path)
 
-        # Debug logging (remove this after testing)
-        import logging
-        logger = logging.getLogger(__name__)
-        logger.debug(f"Path: {request.path}, Active style: {active_style}")
-        if active_style and hasattr(active_style, 'path_patterns'):
-            logger.debug(f"Style patterns: {active_style.path_patterns}")
-
         context = {
             'custom_style': active_style,
             'has_custom_style': active_style is not None,
@@ -32,11 +25,8 @@ def custom_styles(request):
             })
 
         return context
-    except Exception as e:
-        # Log the actual error for debugging
-        import logging
-        logger = logging.getLogger(__name__)
-        logger.error(f"Error in custom_styles context processor: {e}")
+    except Exception:
+        # Fail silently if there's any issue (e.g., during migrations)
         return {
             'custom_style': None,
             'has_custom_style': False,
