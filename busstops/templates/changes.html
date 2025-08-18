@@ -10,7 +10,22 @@
 
 {% block content %}
 
-<h1 style="margin-bottom: 4rem; padding-bottom: 1rem; border-bottom: 2px solid var(--brand-color-darker);">Recent Site Changes</h1>
+<h1 style="margin-bottom: 2rem; padding-bottom: 1rem; border-bottom: 2px solid var(--brand-color-darker);">Recent Site Changes</h1>
+
+<!-- Tag Filter -->
+{% if all_tags %}
+<div class="tag-filter">
+    <h4>Filter by Tags:</h4>
+    <div class="tag-buttons">
+        <button class="tag-button active" data-tag="">All</button>
+        {% for tag in all_tags %}
+            <button class="tag-button" data-tag="{{ tag.name }}" style="background-color: {{ tag.color }};">
+                {{ tag.name }}
+            </button>
+        {% endfor %}
+    </div>
+</div>
+{% endif %}
 {% regroup notes by datetime.date as date_list %}
 
 <style>
@@ -57,6 +72,67 @@
         color: #666;
         font-size: 0.9em;
     }
+
+    /* Tag styles */
+    .note-tags {
+        margin-top: 0.3em;
+        margin-bottom: 0.2em;
+    }
+
+    .tag {
+        display: inline-block;
+        padding: 2px 8px;
+        border-radius: 12px;
+        font-size: 0.75em;
+        font-weight: 500;
+        color: white;
+        margin-right: 6px;
+        margin-bottom: 2px;
+        text-shadow: 0 1px 1px rgba(0,0,0,0.2);
+    }
+
+    .tag:last-child {
+        margin-right: 0;
+    }
+
+    /* Tag filter styles */
+    .tag-filter {
+        margin-bottom: 2rem;
+        padding: 1rem;
+        background: var(--background-color);
+        border-radius: 8px;
+        border: 1px solid var(--border-color);
+    }
+
+    .tag-filter h4 {
+        margin: 0 0 0.5rem 0;
+        color: var(--text-color);
+    }
+
+    .tag-buttons {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.5rem;
+    }
+
+    .tag-button {
+        padding: 0.25rem 0.75rem;
+        border: none;
+        border-radius: 1rem;
+        font-size: 0.875rem;
+        cursor: pointer;
+        transition: opacity 0.2s;
+        color: white;
+        background-color: #6c757d;
+    }
+
+    .tag-button:hover {
+        opacity: 0.8;
+    }
+
+    .tag-button.active {
+        box-shadow: 0 0 0 2px var(--brand-color);
+    }
 </style>
 
 <ul class="changes">
@@ -72,6 +148,13 @@
                                 (<a href="{{ note.link_url }}">{{ note.link_text }}</a>)
                             </span>
                         {% endif %}
+                        {% if note.tags.exists %}
+                            <div class="note-tags">
+                                {% for tag in note.tags.all %}
+                                    <span class="tag" style="background-color: {{ tag.color }};">{{ tag.name }}</span>
+                                {% endfor %}
+                            </div>
+                        {% endif %}
                     </li>
                 {% endfor %}
             </ul>
@@ -80,6 +163,42 @@
         <li>No change notes yet.</li>
     {% endfor %}
 </ul>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const tagButtons = document.querySelectorAll('.tag-button');
+    const changeNotes = document.querySelectorAll('.changes li');
+
+    tagButtons.forEach(button => {
+        button.addEventListener('click', function() {
+            // Remove active class from all buttons
+            tagButtons.forEach(btn => btn.classList.remove('active'));
+            // Add active class to clicked button
+            this.classList.add('active');
+
+            const selectedTag = this.dataset.tag;
+
+            // Filter change notes
+            changeNotes.forEach(note => {
+                if (!selectedTag) {
+                    // Show all notes
+                    note.style.display = '';
+                } else {
+                    // Check if note has the selected tag
+                    const noteTags = note.querySelectorAll('.tag');
+                    let hasTag = false;
+                    noteTags.forEach(tag => {
+                        if (tag.textContent.trim() === selectedTag) {
+                            hasTag = true;
+                        }
+                    });
+                    note.style.display = hasTag ? '' : 'none';
+                }
+            });
+        });
+    });
+});
+</script>
 {% endblock content %}
 
 

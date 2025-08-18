@@ -1214,11 +1214,27 @@ featureToggle = FeatureToggle
 
 
 
+class ChangeNoteTag(models.Model):
+    """Tags for categorizing change notes"""
+    name = models.CharField(max_length=50, unique=True, help_text="Tag name (e.g., 'Bug Fix', 'Feature', 'Maintenance')")
+    color = models.CharField(max_length=7, default='#2E8A9E', help_text="Hex color for the tag (e.g., #ff0000)")
+    description = models.TextField(blank=True, help_text="Optional description of what this tag represents")
+
+    class Meta:
+        ordering = ['name']
+        verbose_name = "Change Note Tag"
+        verbose_name_plural = "Change Note Tags"
+
+    def __str__(self):
+        return self.name
+
+
 class ChangeNote(models.Model):
     datetime = models.DateTimeField(default=timezone.now)
     note = models.TextField(help_text="Enter your change note here...")
     link_text = models.CharField(max_length=255, blank=True)
     link_url = models.URLField(blank=True)
+    tags = models.ManyToManyField(ChangeNoteTag, blank=True, help_text="Tags to categorize this change note")
 
     class Meta:
         ordering = ['-datetime']
@@ -1230,6 +1246,10 @@ class ChangeNote(models.Model):
     def date(self):
         """Backward compatibility property for templates that still use .date"""
         return self.datetime.date()
+
+    def get_tags_display(self):
+        """Get a comma-separated list of tag names"""
+        return ", ".join(tag.name for tag in self.tags.all())
 
 
 class CustomStyle(models.Model):
