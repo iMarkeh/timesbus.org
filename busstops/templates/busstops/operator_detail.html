@@ -1,14 +1,49 @@
 {% extends 'page.html' %}
+{% load favourites %}
 
 {% block head %}
     <meta property="og:title" content="{{ object }}">
+    <style>
+        .operator-header-wrapper {
+            display: flex;
+            align-items: flex-start;
+            gap: 1rem;
+            margin-bottom: 1rem;
+        }
+
+        .operator-header-wrapper h1 {
+            flex: 1;
+            margin: 0;
+        }
+
+        .operator-favourite {
+            flex-shrink: 0;
+            margin-top: 0.25rem;
+        }
+
+        @media (max-width: 600px) {
+            .operator-header-wrapper {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 0.5rem;
+            }
+
+            .operator-favourite {
+                align-self: flex-end;
+                margin-top: 0;
+            }
+        }
+    </style>
 {% endblock head %}
 
 {% block bodyclass %}{% endblock %}
 
 {% block content %}
 
-<h1>{{ object }}</h1>
+<div class="operator-header-wrapper">
+    <h1>{{ object }}</h1>
+    {% favourite_button object css_class="large operator-favourite" %}
+</div>
 
 <p>{{ object.get_a_mode }} operator
     {% if operator.regions.all %}

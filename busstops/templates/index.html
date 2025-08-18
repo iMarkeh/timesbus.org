@@ -1,4 +1,5 @@
 {% extends 'page.html' %}
+{% load favourites %}
 
 {% block canonical %}
     <link rel="canonical" href="https://transportthing.uk">
@@ -33,6 +34,26 @@
         <p><a href="/region/TT" class="button" style="color: white">Fancy a Train List? We've Got You!</a></p>
     </div>
 </div>
+
+{% if user.is_authenticated %}
+    {% get_user_favourites user as user_favourites %}
+    {% if user_favourites %}
+        <div class="favourites-section">
+            <div class="section-header">
+                <h2>
+                    <span class="icon">⭐</span>
+                    Your Favourites
+                </h2>
+                <a href="/favourites/" class="view-all-link">View all</a>
+            </div>
+
+            <div class="favourites-preview">
+                {% favourites_list user limit=6 %}
+            </div>
+        </div>
+    {% endif %}
+{% endif %}
+
 <h2>Regions</h2>
 
 <ul class="regions">
@@ -87,3 +108,104 @@
     </li>
 </ul>
 {% endblock content %}
+
+{% block extra_css %}
+<style>
+.favourites-section {
+    margin: 2rem 0;
+    padding: 1.5rem;
+    background: var(--background-color, #fff);
+    border: 1px solid var(--border-color, #ddd);
+    border-radius: 8px;
+}
+
+.section-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1rem;
+    padding-bottom: 0.5rem;
+    border-bottom: 1px solid var(--border-color-light, #eee);
+}
+
+.section-header h2 {
+    margin: 0;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    color: var(--text-color, #333);
+    font-size: 1.5rem;
+}
+
+.section-header .icon {
+    font-size: 1.8rem;
+}
+
+.view-all-link {
+    color: var(--brand-color, #007bff);
+    text-decoration: none;
+    font-weight: 500;
+    font-size: 0.875rem;
+    padding: 0.25rem 0.5rem;
+    border-radius: 4px;
+    transition: background-color 0.2s ease;
+}
+
+.view-all-link:hover {
+    background: var(--background-color-lighter, #f8f9fa);
+    text-decoration: none;
+}
+
+.favourites-preview {
+    margin-top: 1rem;
+}
+
+/* Compact display for home page */
+.favourites-preview .favourites-list {
+    gap: 1rem;
+}
+
+.favourites-preview .favourites-group {
+    border: none;
+    background: transparent;
+}
+
+.favourites-preview .favourites-group-title {
+    background: transparent;
+    border-bottom: 1px solid var(--border-color-light, #eee);
+    padding: 0.5rem 0;
+    font-size: 0.875rem;
+}
+
+.favourites-preview .favourite-item {
+    padding: 0.5rem 0;
+    border-bottom: 1px solid var(--border-color-light, #eee);
+}
+
+.favourites-preview .favourite-item:last-child {
+    border-bottom: none;
+}
+
+/* Mobile responsive */
+@media (max-width: 600px) {
+    .favourites-section {
+        margin: 1rem 0;
+        padding: 1rem;
+    }
+
+    .section-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 0.5rem;
+    }
+
+    .section-header h2 {
+        font-size: 1.25rem;
+    }
+
+    .view-all-link {
+        align-self: flex-end;
+    }
+}
+</style>
+{% endblock %}

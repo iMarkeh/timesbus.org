@@ -12,7 +12,7 @@ from sql_util.utils import SubqueryCount
 
 from bustimes.models import Route, RouteLink
 
-from .models import FeatureToggle, ChangeNote, NotificationBanner
+from .models import FeatureToggle, ChangeNote, NotificationBanner, Favourite
 
 
 from . import models
@@ -788,6 +788,23 @@ class CustomStyleAdmin(admin.ModelAdmin):
         return bool(obj.path_patterns.strip())
     has_path_restrictions.boolean = True
     has_path_restrictions.short_description = 'Path Restricted'
+
+
+@admin.register(Favourite)
+class FavouriteAdmin(admin.ModelAdmin):
+    list_display = ('user', 'content_type', 'content_object_display', 'created_at')
+    list_filter = ('content_type', 'created_at')
+    search_fields = ('user__username', 'user__email')
+    date_hierarchy = 'created_at'
+    ordering = ('-created_at',)
+
+    def content_object_display(self, obj):
+        return str(obj.content_object)
+    content_object_display.short_description = 'Favourited Object'
+
+    def has_add_permission(self, request):
+        # Favourites should be created through the UI, not admin
+        return False
 
 admin.site.register(models.Region)
 admin.site.register(models.District)

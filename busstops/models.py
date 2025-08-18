@@ -7,6 +7,8 @@ from urllib.parse import urlencode, urlparse
 
 import yaml
 from autoslug import AutoSlugField
+from django.contrib.contenttypes.fields import GenericForeignKey
+from django.contrib.contenttypes.models import ContentType
 from django.contrib.gis.db import models
 from django.contrib.gis.db.models import Extent
 from django.contrib.gis.geos import Polygon
@@ -1507,3 +1509,80 @@ class CustomStyle(models.Model):
                 variables['--border-color-darker'] = self.light_brand_color_darker
 
         return variables
+
+
+class Favourite(models.Model):
+    """User favourites for services and operators"""
+
+    user = models.ForeignKey(
+        'accounts.User',
+        on_delete=models.CASCADE,
+        related_name='favourites'
+    )
+
+    # Generic foreign key to allow favouriting different types of objects
+    content_type = models.ForeignKey(ContentType, on_delete=models.CASCADE)
+    object_id = models.PositiveIntegerField()
+    content_object = GenericForeignKey('content_type', 'object_id')
+
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        unique_together = ('user', 'content_type', 'object_id')
+        verbose_name = "Favourite"
+        verbose_name_plural = "Favourites"
+        ordering = ['-created_at']
+
+    def __str__(self):
+        return f"{self.user.username} - {self.content_object}"
+
+    @classmethod
+    def get_user_favourites(cls, user, content_type=None):
+        """Get all favourites for a user, optionally filtered by content type"""
+        if not user.is_authenticated:
+            return cls.objects.none()
+
+        queryset = cls.objects.filter(user=user).select_related('content_type')
+
+        if content_type:
+            if isinstance(content_type, str):
+                # Allow passing model name as string
+                queryset = queryset.filter(content_type__model=content_type.lower())
+            else:
+                queryset = queryset.filter(content_type=content_type)
+
+        return queryset
+
+    @classmethod
+    def is_favourited(cls, user, obj):
+        """Check if an object is favourited by a user"""
+        if not user.is_authenticated:
+            return False
+
+        content_type = ContentType.objects.get_for_model(obj)
+        return cls.objects.filter(
+            user=user,
+            content_type=content_type,
+            object_id=obj.pk
+        ).exists()
+
+    @classmethod
+    def toggle_favourite(cls, user, obj):
+        """Toggle favourite status for an object. Returns (favourite_obj, created)"""
+        if not user.is_authenticated:
+            return None, False
+
+        content_type = ContentType.objects.get_for_model(obj)
+        favourite, created = cls.objects.get_or_create(
+            user=user,
+            content_type=content_type,
+            object_id=obj.pk,
+            defaults={'content_object': obj}
+        )
+
+        if not created:
+            # Already exists, so remove it
+            favourite.delete()
+            return None, False
+
+        return favourite, True
