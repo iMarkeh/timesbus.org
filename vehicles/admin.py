@@ -336,9 +336,8 @@ class BulkVehicleCreationAdmin(admin.ModelAdmin):
     def save_model(self, request, obj, form, change):
         # Handle the bulk creation logic here
         try:
-            # Get the VehicleAdmin instance to call the method
-            vehicle_admin = VehicleAdmin(models.Vehicle, admin.site)
-            result = vehicle_admin._perform_bulk_creation(form.cleaned_data)
+            # Call the bulk creation method directly
+            result = self._perform_bulk_creation(form.cleaned_data)
             messages.success(
                 request,
                 f"Successfully processed {result['attempted']} vehicles. "
@@ -351,6 +350,52 @@ class BulkVehicleCreationAdmin(admin.ModelAdmin):
         # Don't actually save the proxy object
         pass
 
+    def _perform_bulk_creation(self, cleaned_data):
+        """Perform the actual bulk vehicle creation"""
+        operator = cleaned_data['operator']
+        source = cleaned_data['source']
+        vehicle_codes_text = cleaned_data['vehicle_codes']
+        fleet_number_start = cleaned_data.get('fleet_number_start')
+        vehicle_type = cleaned_data.get('vehicle_type')
+        livery = cleaned_data.get('livery')
+
+        vehicle_codes = [code.strip() for code in vehicle_codes_text.strip().split('\n') if code.strip()]
+
+        created_count = 0
+        skipped_count = 0
+        current_fleet_number = fleet_number_start
+
+        with transaction.atomic():
+            for vehicle_code in vehicle_codes:
+                # Check if vehicle already exists
+                if models.Vehicle.objects.filter(code=vehicle_code).exists():
+                    skipped_count += 1
+                    continue
+
+                # Create the vehicle
+                vehicle_data = {
+                    'code': vehicle_code,
+                    'operator': operator,
+                    'source': source,
+                }
+
+                if vehicle_type:
+                    vehicle_data['vehicle_type'] = vehicle_type
+                if livery:
+                    vehicle_data['livery'] = livery
+                if current_fleet_number is not None:
+                    vehicle_data['fleet_number'] = current_fleet_number
+                    current_fleet_number += 1
+
+                models.Vehicle.objects.create(**vehicle_data)
+                created_count += 1
+
+        return {
+            'attempted': len(vehicle_codes),
+            'created': created_count,
+            'skipped': skipped_count,
+        }
+
     def response_add(self, request, obj, post_url_continue=None):
         # Redirect to the vehicle changelist after bulk creation
         from django.http import HttpResponseRedirect
@@ -361,96 +406,7 @@ class BulkVehicleCreationAdmin(admin.ModelAdmin):
 
 
 
-    def _perform_bulk_creation(self, cleaned_data):
-        """Perform the actual bulk vehicle creation"""
-        operator = cleaned_data['operator']
-        source = cleaned_data['source']
-        vehicle_codes_text = cleaned_data['vehicle_codes']
-        fleet_number_start = cleaned_data.get('fleet_number_start')
-        vehicle_type = cleaned_data.get('vehicle_type')
-        livery = cleaned_data.get('livery')
 
-        # Parse vehicle codes
-        vehicle_codes = [
-            code.strip()
-            for code in vehicle_codes_text.split('\n')
-            if code.strip()
-        ]
-
-        if not vehicle_codes:
-            raise ValueError("No vehicle codes provided")
-
-        # Get IDs for foreign keys
-        operator_noc = operator.noc if operator else None
-        source_id = source.id if source else None
-        vehicle_type_id = vehicle_type.id if vehicle_type else None
-        livery_id = livery.id if livery else None
-
-        with transaction.atomic():
-            with connection.cursor() as cursor:
-                vehicle_insert_data = []
-                current_fleet_number = fleet_number_start
-
-                for code in vehicle_codes:
-                    # Create slug using operator prefix and code
-                    slug = f"{operator_noc}-{code}"
-
-                    # Prepare fleet number
-                    fleet_number = current_fleet_number
-                    if current_fleet_number is not None:
-                        current_fleet_number += 1
-
-                    vehicle_insert_data.append((
-                        slug,                    # slug
-                        code,                    # code
-                        fleet_number,            # fleet_number
-                        "",                      # fleet_code
-                        "",                      # reg
-                        "",                      # colours
-                        "",                      # name
-                        "",                      # branding
-                        "",                      # notes
-                        None,                    # latest_journey_data
-                        False,                   # withdrawn
-                        None,                    # data
-                        False,                   # locked
-                        None,                    # garage_id
-                        None,                    # latest_journey_id
-                        livery_id,               # livery_id
-                        operator_noc,            # operator_id
-                        source_id,               # source_id
-                        vehicle_type_id,         # vehicle_type_id
-                    ))
-
-                if not vehicle_insert_data:
-                    raise ValueError("No valid vehicle data to insert")
-
-                # Construct bulk insert SQL
-                placeholders = ", ".join(["%s"] * len(vehicle_insert_data[0]))
-                values_list_placeholders = [
-                    f"({placeholders})" for _ in vehicle_insert_data
-                ]
-                flat_values = [item for sublist in vehicle_insert_data for item in sublist]
-
-                insert_sql = f"""
-                INSERT INTO vehicles_vehicle (
-                    slug, code, fleet_number, fleet_code, reg, colours, name,
-                    branding, notes, latest_journey_data, withdrawn, data,
-                    locked, garage_id, latest_journey_id, livery_id,
-                    operator_id, source_id, vehicle_type_id
-                )
-                VALUES {','.join(values_list_placeholders)}
-                ON CONFLICT (slug) DO NOTHING;
-                """
-
-                cursor.execute(insert_sql, flat_values)
-                rows_created = cursor.rowcount
-
-                return {
-                    'attempted': len(vehicle_insert_data),
-                    'created': rows_created,
-                    'skipped': len(vehicle_insert_data) - rows_created
-                }
 
 
 class UserFilter(admin.SimpleListFilter):
