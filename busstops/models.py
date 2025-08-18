@@ -1230,3 +1230,94 @@ class ChangeNote(models.Model):
     def date(self):
         """Backward compatibility property for templates that still use .date"""
         return self.datetime.date()
+
+
+class CustomStyle(models.Model):
+    """Custom styles for specific dates (e.g., holidays, special events)"""
+
+    name = models.CharField(max_length=100, help_text="Name for this custom style (e.g., 'Christmas 2024', 'Halloween')")
+    start_date = models.DateField(help_text="Start date for this custom style")
+    end_date = models.DateField(help_text="End date for this custom style")
+
+    # Light mode overrides
+    light_logo_url = models.URLField(blank=True, help_text="Custom logo URL for light mode")
+    light_banner_url = models.URLField(blank=True, help_text="Custom banner background URL for light mode")
+    light_brand_color = models.CharField(max_length=7, blank=True, help_text="Custom brand color for light mode (hex)")
+    light_brand_color_darker = models.CharField(max_length=7, blank=True, help_text="Custom darker brand color for light mode (hex)")
+
+    # Dark mode overrides
+    dark_logo_url = models.URLField(blank=True, help_text="Custom logo URL for dark mode")
+    dark_banner_url = models.URLField(blank=True, help_text="Custom banner background URL for dark mode")
+    dark_brand_color = models.CharField(max_length=7, blank=True, help_text="Custom brand color for dark mode (hex)")
+    dark_brand_color_darker = models.CharField(max_length=7, blank=True, help_text="Custom darker brand color for dark mode (hex)")
+
+    # Additional CSS overrides
+    additional_css = models.TextField(blank=True, help_text="Additional CSS to inject (advanced users only)")
+
+    # Control
+    active = models.BooleanField(default=True, help_text="Whether this custom style is active")
+    priority = models.IntegerField(default=0, help_text="Priority (higher numbers take precedence if dates overlap)")
+
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        ordering = ['-priority', '-start_date']
+        verbose_name = "Custom Style"
+        verbose_name_plural = "Custom Styles"
+
+    def __str__(self):
+        return f"{self.name} ({self.start_date} to {self.end_date})"
+
+    def is_active_for_date(self, check_date=None):
+        """Check if this style is active for a given date"""
+        if not self.active:
+            return False
+
+        if check_date is None:
+            check_date = timezone.now().date()
+
+        return self.start_date <= check_date <= self.end_date
+
+    @classmethod
+    def get_active_style_for_date(cls, check_date=None):
+        """Get the highest priority active style for a given date"""
+        if check_date is None:
+            check_date = timezone.now().date()
+
+        return cls.objects.filter(
+            active=True,
+            start_date__lte=check_date,
+            end_date__gte=check_date
+        ).first()  # Already ordered by priority, start_date
+
+    def get_css_variables(self, dark_mode=False):
+        """Generate CSS variables for this custom style"""
+        variables = {}
+
+        if dark_mode:
+            if self.dark_logo_url:
+                variables['--logo-url'] = f"url('{self.dark_logo_url}')"
+            if self.dark_banner_url:
+                variables['--brand-banner'] = f"url('{self.dark_banner_url}')"
+            if self.dark_brand_color:
+                variables['--brand-color'] = self.dark_brand_color
+            if self.dark_brand_color_darker:
+                variables['--brand-color-darker'] = self.dark_brand_color_darker
+                variables['--brand-color-darker-darker'] = self.dark_brand_color_darker
+                variables['--border-color'] = self.dark_brand_color_darker
+                variables['--border-color-darker'] = self.dark_brand_color_darker
+        else:
+            if self.light_logo_url:
+                variables['--logo-url'] = f"url('{self.light_logo_url}')"
+            if self.light_banner_url:
+                variables['--brand-banner'] = f"url('{self.light_banner_url}')"
+            if self.light_brand_color:
+                variables['--brand-color'] = self.light_brand_color
+            if self.light_brand_color_darker:
+                variables['--brand-color-darker'] = self.light_brand_color_darker
+                variables['--brand-color-darker-darker'] = self.light_brand_color_darker
+                variables['--border-color'] = self.light_brand_color_darker
+                variables['--border-color-darker'] = self.light_brand_color_darker
+
+        return variables

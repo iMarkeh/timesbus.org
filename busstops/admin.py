@@ -661,6 +661,38 @@ class ChangeNoteAdmin(admin.ModelAdmin):
     def short_note(self, obj):
         return obj.note[:60] + ('...' if len(obj.note) > 60 else '')
 
+
+@admin.register(models.CustomStyle)
+class CustomStyleAdmin(admin.ModelAdmin):
+    list_display = ('name', 'start_date', 'end_date', 'active', 'priority', 'is_currently_active')
+    list_filter = ('active', 'start_date', 'end_date')
+    search_fields = ('name',)
+    date_hierarchy = 'start_date'
+    ordering = ('-priority', '-start_date')
+
+    fieldsets = (
+        ('Basic Information', {
+            'fields': ('name', 'start_date', 'end_date', 'active', 'priority')
+        }),
+        ('Light Mode Overrides', {
+            'fields': ('light_logo_url', 'light_banner_url', 'light_brand_color', 'light_brand_color_darker'),
+            'classes': ('collapse',)
+        }),
+        ('Dark Mode Overrides', {
+            'fields': ('dark_logo_url', 'dark_banner_url', 'dark_brand_color', 'dark_brand_color_darker'),
+            'classes': ('collapse',)
+        }),
+        ('Advanced', {
+            'fields': ('additional_css',),
+            'classes': ('collapse',)
+        }),
+    )
+
+    def is_currently_active(self, obj):
+        return obj.is_active_for_date()
+    is_currently_active.boolean = True
+    is_currently_active.short_description = 'Currently Active'
+
 admin.site.register(models.Region)
 admin.site.register(models.District)
 admin.site.register(models.OperatorGroup)

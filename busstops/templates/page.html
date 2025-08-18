@@ -15,10 +15,12 @@
 {% endblock canonical %}
 <script type="application/ld+json">{"@context":"http://schema.org","@type":"WebSite","url":"https://transportthing.uk","name":"TransportThing","potentialAction":{"@type":"SearchAction","target":"https://transportthing.uk/search-query?q={q}","query-input":"required name=q"}}</script>
 {% load static %}
+{% load custom_styles %}
 <!-- <link rel="icon" sizes="48x48" type="image/png" href="/favicon.ico"> -->
 <link rel="icon" sizes="any" type="image/svg+xml" href="https://cdn.transportthing.uk/TT%20Icon.png">
 <link rel="manifest" href="/static/manifest.webmanifest">
 <link rel="stylesheet" href="/static/dist/css/style.css">
+{% custom_style_css %}
 <meta name="description" content="check out our fleet lists of buses, trains, trams, satellites and more, all in one place!">
 <meta property="og:url" content="https://transportthing.uk">
 <meta property="og:type" content="website">
