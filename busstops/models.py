@@ -1539,7 +1539,22 @@ class Favourite(models.Model):
         ordering = ['-created_at']
 
     def __str__(self):
-        return f"{self.user.username} - {self.content_object}"
+        return f"{self.user.username} - {self.get_content_object()}"
+    
+    def get_content_object(self):
+        """Get the content object, handling both integer and string primary keys"""
+        if self.object_id is not None:
+            # Integer primary key - use the standard GenericForeignKey
+            return self.content_object
+        elif self.object_id_str is not None:
+            # String primary key - manually fetch the object
+            try:
+                model_class = self.content_type.model_class()
+                pk_field = model_class._meta.pk.name
+                return model_class.objects.get(**{pk_field: self.object_id_str})
+            except (AttributeError, model_class.DoesNotExist):
+                return None
+        return None
 
     @classmethod
     def get_user_favourites(cls, user, content_type=None):
