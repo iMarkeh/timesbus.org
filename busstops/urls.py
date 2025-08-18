@@ -44,56 +44,6 @@ urlpatterns = [
         name="liverydatabase",
     ),
     path(
-        "satellites/all",
-        TemplateView.as_view(template_name="satellites/all.html"),
-        name="all_satellites",
-    ),
-    path(
-        "satellites",
-        TemplateView.as_view(template_name="satellites/home.html"),
-        name="satellites",
-    ),
-    path(
-        "satellites/starlink",
-        TemplateView.as_view(template_name="satellites/starlink.html"),
-        name="sl_satellites",
-    ),
-    path(
-        "satellites/oneweb",
-        TemplateView.as_view(template_name="satellites/oneweb.html"),
-        name="ow_satellites",
-    ),
-    path(
-        "satellites/gps",
-        TemplateView.as_view(template_name="satellites/gps.html"),
-        name="gps_satellites",
-    ),
-    path(
-        "satellites/visual",
-        TemplateView.as_view(template_name="satellites/visual.html"),
-        name="visual_satellites",
-    ),
-    path(
-        "satellites/weather",
-        TemplateView.as_view(template_name="satellites/weather.html"),
-        name="weather_satellites",
-    ),
-    path(
-        "satellites/goes",
-        TemplateView.as_view(template_name="satellites/goes.html"),
-        name="goes_satellites",
-    ),
-    path(
-        "satellites/kuiper",
-        TemplateView.as_view(template_name="satellites/kuiper.html"),
-        name="kuiper_satellites",
-    ),
-    path(
-        "satellites/soon",
-        TemplateView.as_view(template_name="satellites/soon.html"),
-        name="coming_soon_sat",
-    ),
-    path(
         "ads.txt",
         cache_control(max_age=1800)(
             RedirectView.as_view(

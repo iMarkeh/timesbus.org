@@ -40,7 +40,7 @@ class Command(ImportLiveVehiclesCommand):
     previous_locations = {}
 
     # API configuration - using the same API as import_iss.py
-    API_BASE_URL = "https://eden.apilogic.uk"
+    API_BASE_URL = "https://kolas.apilogic.uk"
     API_KEY = "timesbus-vm"
 
     # Popular satellites to track (NORAD IDs)
