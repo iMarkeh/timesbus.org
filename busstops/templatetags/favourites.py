@@ -23,6 +23,17 @@ def favourite_button(context, obj, css_class=""):
     request = context.get('request')
     user = request.user if request else None
     
+    # Handle case where obj is None
+    if obj is None:
+        return {
+            'user': user,
+            'object': None,
+            'is_favourited': False,
+            'css_class': css_class,
+            'content_type_id': None,
+            'object_id': None,
+        }
+    
     is_fav = Favourite.is_favourited(user, obj) if user and user.is_authenticated else False
     
     return {
