@@ -5,6 +5,8 @@ from ...models import VehicleLocation, VehicleJourney, Vehicle
 from busstops.models import Operator
 from ..import_live_vehicles import ImportLiveVehiclesCommand
 
+# example data returned from eden.apilogic.uk
+#{"info":{"satelliteId":25544,"satelliteName":"ISS (ZARYA)"},"positions":[{"latitude":9.238993805727212,"longitude":141.73927582227083,"altitude":415.679606809703,"azimuth":0.0,"elevation":0.0,"ra":172.12053711758603,"dec":9.323420018196797,"timestamp":1755490541}]}
 
 class Command(ImportLiveVehiclesCommand):
     source_name = "APILogic - ISS"
@@ -41,7 +43,7 @@ class Command(ImportLiveVehiclesCommand):
 
     def get_items(self):
         try:
-            response = requests.get("https://tb.apilogic.uk/tracking/iss/position.asmx?api_key=timesbus-vm")
+            response = requests.get("https://eden.apilogic.uk/satellite/25544/positions?api_key=timesbus-vm", timeout=20)
             response.raise_for_status()
             data = response.json()
         except requests.exceptions.RequestException as e:
@@ -50,9 +52,9 @@ class Command(ImportLiveVehiclesCommand):
 
         iss_item = {
             "fn": "ISS",
-            "timestamp": data["timestamp"],
-            "lat": data["latitude"],
-            "lon": data["longitude"],
+            "timestamp": data["positions"][0]["timestamp"],
+            "lat": data["positions"][0]["latitude"],
+            "lon": data["positions"][0]["longitude"],
             "line": "Orbital Path",
             "direction": "Earth",
             "bearing": 0,
