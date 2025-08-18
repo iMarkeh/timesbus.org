@@ -1,4 +1,5 @@
 {% extends 'page.html' %}
+{% load favourites %}
 
 {% block title %}{{ object }} – {% if operators %}{{ operators.0 }} – {% endif %}TransportThing{% endblock %}
 
@@ -16,27 +17,62 @@
         }
     </style>
     {% endif %}
+
+    <style>
+        .service-header-wrapper {
+            display: flex;
+            align-items: flex-start;
+            gap: 1rem;
+            margin-bottom: 1rem;
+        }
+
+        .service-header {
+            flex: 1;
+            margin: 0;
+        }
+
+        .service-favourite {
+            flex-shrink: 0;
+            margin-top: 0.25rem;
+        }
+
+        @media (max-width: 600px) {
+            .service-header-wrapper {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 0.5rem;
+            }
+
+            .service-favourite {
+                align-self: flex-end;
+                margin-top: 0;
+            }
+        }
+    </style>
 {% endblock head %}
 
 {% block bodyclass %}{% endblock %}
 
 {% block content %}
 
-<h1 class="service-header">
-    {% for line_name in object.get_line_names() %}
-        {% if line_name and line_name not in object.line_brand %}
-            {% if ' ' not in line_name or line_name not in object.description %}
-                <strong class="name{% if ' ' not in line_name %} is-short{% endif %}{% if object.colour_id %} colour colour-{{ object.colour_id }}{% endif %}">
-                    {{ line_name }}
-                </strong>
+<div class="service-header-wrapper">
+    <h1 class="service-header">
+        {% for line_name in object.get_line_names() %}
+            {% if line_name and line_name not in object.line_brand %}
+                {% if ' ' not in line_name or line_name not in object.description %}
+                    <strong class="name{% if ' ' not in line_name %} is-short{% endif %}{% if object.colour_id %} colour colour-{{ object.colour_id }}{% endif %}">
+                        {{ line_name }}
+                    </strong>
+                {% endif %}
             {% endif %}
+        {% endfor %}
+        {% if object.line_brand %}
+            <strong class="name{% if object.colour_id %} colour colour-{{ object.colour_id }}{% endif %}">{{ object.line_brand }}</strong>
         {% endif %}
-    {% endfor %}
-    {% if object.line_brand %}
-        <strong class="name{% if object.colour_id %} colour colour-{{ object.colour_id }}{% endif %}">{{ object.line_brand }}</strong>
-    {% endif %}
-    <span class="description">{{ object.description }}</span>
-</h1>
+        <span class="description">{{ object.description }}</span>
+    </h1>
+    {% favourite_button object css_class="large service-favourite" %}
+</div>
 
 <p>
     {% if operators %}
