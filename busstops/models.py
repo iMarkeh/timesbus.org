@@ -1416,20 +1416,29 @@ class CustomStyle(models.Model):
 
         patterns = [pattern.strip() for pattern in self.path_patterns.split('\n') if pattern.strip()]
 
+        # Debug logging
+        import logging
+        logger = logging.getLogger(__name__)
+        logger.debug(f"Checking path '{path}' against patterns: {patterns}, exact_match: {self.exact_match}")
+
         for pattern in patterns:
             if self.exact_match:
                 if path == pattern:
+                    logger.debug(f"Exact match found: '{path}' == '{pattern}'")
                     return True
             else:
                 # Support wildcard matching
                 if '*' in pattern:
                     import fnmatch
                     if fnmatch.fnmatch(path, pattern):
+                        logger.debug(f"Wildcard match found: '{path}' matches '{pattern}'")
                         return True
                 else:
                     if path.startswith(pattern):
+                        logger.debug(f"Prefix match found: '{path}' starts with '{pattern}'")
                         return True
 
+        logger.debug(f"No match found for path '{path}'")
         return False
 
     @classmethod
