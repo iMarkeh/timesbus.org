@@ -1,0 +1,257 @@
+{% load favourites %}
+
+{% if favourites %}
+<div class="favourites-list">
+    {% for content_type, items in grouped_favourites.items %}
+        <div class="favourites-group">
+            <h3 class="favourites-group-title">
+                {% if content_type == 'service' %}
+                    <span class="icon">🚌</span> Services
+                {% elif content_type == 'operator' %}
+                    <span class="icon">🏢</span> Operators
+                {% else %}
+                    {{ content_type|title }}s
+                {% endif %}
+            </h3>
+            
+            <div class="favourites-items">
+                {% for favourite in items %}
+                    <div class="favourite-item">
+                        {% if content_type == 'service' %}
+                            <a href="{{ favourite.content_object.get_absolute_url }}" class="favourite-link">
+                                <div class="favourite-content">
+                                    <div class="favourite-title">
+                                        {{ favourite.content_object.line_name }}
+                                    </div>
+                                    <div class="favourite-subtitle">
+                                        {{ favourite.content_object.description|default:"Service" }}
+                                    </div>
+                                    {% if favourite.content_object.operator %}
+                                        <div class="favourite-operator">
+                                            {{ favourite.content_object.operator.name }}
+                                        </div>
+                                    {% endif %}
+                                </div>
+                            </a>
+                        {% elif content_type == 'operator' %}
+                            <a href="{{ favourite.content_object.get_absolute_url }}" class="favourite-link">
+                                <div class="favourite-content">
+                                    <div class="favourite-title">
+                                        {{ favourite.content_object.name }}
+                                    </div>
+                                    <div class="favourite-subtitle">
+                                        {{ favourite.content_object.vehicle_set.count }} vehicles
+                                    </div>
+                                </div>
+                            </a>
+                        {% else %}
+                            <a href="{{ favourite.content_object.get_absolute_url }}" class="favourite-link">
+                                <div class="favourite-content">
+                                    <div class="favourite-title">
+                                        {{ favourite.content_object }}
+                                    </div>
+                                </div>
+                            </a>
+                        {% endif %}
+                        
+                        {% favourite_button favourite.content_object css_class="small favourite-remove" %}
+                    </div>
+                {% endfor %}
+            </div>
+        </div>
+    {% endfor %}
+</div>
+{% else %}
+    <div class="no-favourites">
+        <div class="no-favourites-icon">⭐</div>
+        <h3>No favourites yet</h3>
+        <p>Start exploring and add your favourite services and operators!</p>
+        <div class="no-favourites-links">
+            <a href="/services" class="btn btn-primary">Browse Services</a>
+            <a href="/operators" class="btn btn-secondary">Browse Operators</a>
+        </div>
+    </div>
+{% endif %}
+
+<style>
+.favourites-list {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+}
+
+.favourites-group {
+    background: var(--background-color, #fff);
+    border: 1px solid var(--border-color, #ddd);
+    border-radius: 8px;
+    overflow: hidden;
+}
+
+.favourites-group-title {
+    background: var(--background-color-lighter, #f8f9fa);
+    padding: 0.75rem 1rem;
+    margin: 0;
+    font-size: 1rem;
+    font-weight: 600;
+    color: var(--text-color, #333);
+    border-bottom: 1px solid var(--border-color, #ddd);
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.favourites-group-title .icon {
+    font-size: 1.2rem;
+}
+
+.favourites-items {
+    display: flex;
+    flex-direction: column;
+}
+
+.favourite-item {
+    display: flex;
+    align-items: center;
+    padding: 0.75rem 1rem;
+    border-bottom: 1px solid var(--border-color-light, #eee);
+    transition: background-color 0.2s ease;
+}
+
+.favourite-item:last-child {
+    border-bottom: none;
+}
+
+.favourite-item:hover {
+    background: var(--background-color-lighter, #f8f9fa);
+}
+
+.favourite-link {
+    flex: 1;
+    text-decoration: none;
+    color: inherit;
+    display: block;
+}
+
+.favourite-link:hover {
+    text-decoration: none;
+}
+
+.favourite-content {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+}
+
+.favourite-title {
+    font-weight: 600;
+    color: var(--brand-color, #007bff);
+    font-size: 1rem;
+}
+
+.favourite-subtitle {
+    color: var(--text-color-muted, #666);
+    font-size: 0.875rem;
+}
+
+.favourite-operator {
+    color: var(--text-color-muted, #666);
+    font-size: 0.75rem;
+    font-style: italic;
+}
+
+.favourite-remove {
+    margin-left: 0.5rem;
+    flex-shrink: 0;
+}
+
+.no-favourites {
+    text-align: center;
+    padding: 3rem 1rem;
+    color: var(--text-color-muted, #666);
+}
+
+.no-favourites-icon {
+    font-size: 3rem;
+    margin-bottom: 1rem;
+    opacity: 0.5;
+}
+
+.no-favourites h3 {
+    margin: 0 0 0.5rem 0;
+    color: var(--text-color, #333);
+}
+
+.no-favourites p {
+    margin: 0 0 1.5rem 0;
+    font-size: 0.875rem;
+}
+
+.no-favourites-links {
+    display: flex;
+    gap: 1rem;
+    justify-content: center;
+    flex-wrap: wrap;
+}
+
+.btn {
+    padding: 0.5rem 1rem;
+    border-radius: 4px;
+    text-decoration: none;
+    font-weight: 500;
+    transition: all 0.2s ease;
+    border: 1px solid;
+}
+
+.btn-primary {
+    background: var(--brand-color, #007bff);
+    color: white;
+    border-color: var(--brand-color, #007bff);
+}
+
+.btn-primary:hover {
+    background: var(--brand-color-darker, #0056b3);
+    border-color: var(--brand-color-darker, #0056b3);
+    text-decoration: none;
+}
+
+.btn-secondary {
+    background: transparent;
+    color: var(--text-color, #333);
+    border-color: var(--border-color, #ddd);
+}
+
+.btn-secondary:hover {
+    background: var(--background-color-lighter, #f8f9fa);
+    text-decoration: none;
+}
+
+/* Mobile responsive */
+@media (max-width: 600px) {
+    .favourites-list {
+        gap: 1rem;
+    }
+    
+    .favourite-item {
+        padding: 0.5rem;
+    }
+    
+    .favourites-group-title {
+        padding: 0.5rem;
+        font-size: 0.875rem;
+    }
+    
+    .no-favourites {
+        padding: 2rem 1rem;
+    }
+    
+    .no-favourites-links {
+        flex-direction: column;
+        align-items: center;
+    }
+    
+    .btn {
+        padding: 0.75rem 1.5rem;
+        min-width: 120px;
+    }
+}
+</style>

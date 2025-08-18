@@ -1,0 +1,124 @@
+{% extends 'page.html' %}
+{% load favourites %}
+
+{% block title %}{{ page_title }} – transportthing.uk{% endblock %}
+
+{% block bodyclass %}narrow{% endblock %}
+
+{% block content %}
+
+<div class="favourites-page">
+    <div class="page-header">
+        <h1>
+            <span class="icon">⭐</span>
+            My Favourites
+        </h1>
+        <p class="page-description">
+            Your favourite services and operators, all in one place.
+        </p>
+    </div>
+
+    <div class="favourites-content">
+        {% favourites_list user %}
+    </div>
+    
+    {% if favourites %}
+        <div class="favourites-actions">
+            <a href="/favourites/export" class="btn btn-secondary">
+                📥 Export Favourites
+            </a>
+        </div>
+    {% endif %}
+</div>
+
+<style>
+.favourites-page {
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 2rem 1rem;
+}
+
+.page-header {
+    text-align: center;
+    margin-bottom: 2rem;
+    padding-bottom: 1rem;
+    border-bottom: 1px solid var(--border-color, #ddd);
+}
+
+.page-header h1 {
+    margin: 0 0 0.5rem 0;
+    color: var(--text-color, #333);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    font-size: 2rem;
+}
+
+.page-header .icon {
+    font-size: 2.5rem;
+}
+
+.page-description {
+    margin: 0;
+    color: var(--text-color-muted, #666);
+    font-size: 1.1rem;
+}
+
+.favourites-content {
+    margin-bottom: 2rem;
+}
+
+.favourites-actions {
+    text-align: center;
+    padding-top: 1rem;
+    border-top: 1px solid var(--border-color, #ddd);
+}
+
+.btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.75rem 1.5rem;
+    border-radius: 6px;
+    text-decoration: none;
+    font-weight: 500;
+    transition: all 0.2s ease;
+    border: 1px solid;
+}
+
+.btn-secondary {
+    background: transparent;
+    color: var(--text-color, #333);
+    border-color: var(--border-color, #ddd);
+}
+
+.btn-secondary:hover {
+    background: var(--background-color-lighter, #f8f9fa);
+    text-decoration: none;
+    transform: translateY(-1px);
+}
+
+/* Mobile responsive */
+@media (max-width: 600px) {
+    .favourites-page {
+        padding: 1rem 0.5rem;
+    }
+    
+    .page-header h1 {
+        font-size: 1.5rem;
+        flex-direction: column;
+        gap: 0.25rem;
+    }
+    
+    .page-header .icon {
+        font-size: 2rem;
+    }
+    
+    .page-description {
+        font-size: 1rem;
+    }
+}
+</style>
+
+{% endblock content %}

@@ -16,6 +16,7 @@ from django.urls import path
 from .views import change_notes_view
 
 from . import views
+from .views import favourites
 
 sitemaps = {
     "operators": views.OperatorSitemap,
@@ -160,6 +161,13 @@ if apps.is_installed("debug_toolbar"):
     ]
 
 
-urlpatterns += [
+# Favourites URLs
+favourites_urls = [
+    path('favourites/', favourites.favourites_list, name='favourites_list'),
+    path('favourites/toggle/', favourites.toggle_favourite, name='toggle_favourite'),
+    path('favourites/api/', favourites.favourites_api, name='favourites_api'),
+]
+
+urlpatterns += favourites_urls + [
     path('updates', change_notes_view, name='changes.html'),
 ]
