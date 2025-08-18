@@ -1526,6 +1526,10 @@ class Favourite(models.Model):
     object_id_str = models.CharField(max_length=100, null=True, blank=True)  # For string PKs
     content_object = GenericForeignKey('content_type', 'object_id')
 
+    # Cached display information (populated when favourite is created)
+    display_name = models.CharField(max_length=255, blank=True, help_text="Cached display name for performance")
+    display_subtitle = models.CharField(max_length=255, blank=True, help_text="Cached subtitle (e.g., NOC for operators)")
+    
     created_at = models.DateTimeField(auto_now_add=True)
 
     class Meta:
@@ -1592,6 +1596,25 @@ class Favourite(models.Model):
         try:
             content_type = ContentType.objects.get_for_model(obj)
             
+            # Prepare cached display information
+            display_name = str(obj)
+            display_subtitle = ""
+            
+            # Customize display based on object type
+            if content_type.model == 'operator':
+                display_name = obj.name
+                display_subtitle = f"({obj.noc})"
+            elif content_type.model == 'service':
+                display_name = obj.get_line_name()
+                if obj.description and obj.description != display_name:
+                    display_subtitle = obj.description
+                if obj.operator.exists():
+                    operator_names = ", ".join(op.name for op in obj.operator.all()[:2])  # Limit to first 2
+                    if not display_subtitle:
+                        display_subtitle = operator_names
+                    elif len(obj.operator.all()) == 1:
+                        display_subtitle = f"{display_subtitle} - {operator_names}"
+            
             if isinstance(obj.pk, int):
                 # Integer primary key
                 favourite, created = cls.objects.get_or_create(
@@ -1599,7 +1622,10 @@ class Favourite(models.Model):
                     content_type=content_type,
                     object_id=obj.pk,
                     object_id_str=None,
-                    defaults={'content_object': obj}
+                    defaults={
+                        'display_name': display_name,
+                        'display_subtitle': display_subtitle
+                    }
                 )
             else:
                 # String primary key
@@ -1607,7 +1633,11 @@ class Favourite(models.Model):
                     user=user,
                     content_type=content_type,
                     object_id=None,
-                    object_id_str=str(obj.pk)
+                    object_id_str=str(obj.pk),
+                    defaults={
+                        'display_name': display_name,
+                        'display_subtitle': display_subtitle
+                    }
                 )
 
             if not created:
