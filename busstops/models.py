@@ -1559,12 +1559,21 @@ class Favourite(models.Model):
         if not user.is_authenticated:
             return False
 
-        content_type = ContentType.objects.get_for_model(obj)
-        return cls.objects.filter(
-            user=user,
-            content_type=content_type,
-            object_id=obj.pk
-        ).exists()
+        # Check if the object has an integer primary key
+        # The current Favourite model design only supports integer object_ids
+        if not isinstance(obj.pk, int):
+            return False
+
+        try:
+            content_type = ContentType.objects.get_for_model(obj)
+            return cls.objects.filter(
+                user=user,
+                content_type=content_type,
+                object_id=obj.pk
+            ).exists()
+        except (ValueError, TypeError):
+            # Handle any other database compatibility issues
+            return False
 
     @classmethod
     def toggle_favourite(cls, user, obj):
@@ -1572,17 +1581,26 @@ class Favourite(models.Model):
         if not user.is_authenticated:
             return None, False
 
-        content_type = ContentType.objects.get_for_model(obj)
-        favourite, created = cls.objects.get_or_create(
-            user=user,
-            content_type=content_type,
-            object_id=obj.pk,
-            defaults={'content_object': obj}
-        )
-
-        if not created:
-            # Already exists, so remove it
-            favourite.delete()
+        # Check if the object has an integer primary key
+        # The current Favourite model design only supports integer object_ids
+        if not isinstance(obj.pk, int):
             return None, False
 
-        return favourite, True
+        try:
+            content_type = ContentType.objects.get_for_model(obj)
+            favourite, created = cls.objects.get_or_create(
+                user=user,
+                content_type=content_type,
+                object_id=obj.pk,
+                defaults={'content_object': obj}
+            )
+
+            if not created:
+                # Already exists, so remove it
+                favourite.delete()
+                return None, False
+
+            return favourite, True
+        except (ValueError, TypeError):
+            # Handle any database compatibility issues
+            return None, False
