@@ -44,9 +44,41 @@ class Command(BaseCommand):
         
         # Test the main method
         self.stdout.write(f"\n" + "="*50)
+
+        # Test with current date
+        from django.utils import timezone
+        current_date = timezone.now().date()
+        self.stdout.write(f"Current date: {current_date}")
+
         active_style = CustomStyle.get_active_style_for_date(path=path)
-        
+
         if active_style:
             self.stdout.write(self.style.SUCCESS(f"Active style for path '{path}': {active_style.name}"))
+            self.stdout.write(f"  Priority: {active_style.priority}")
+            self.stdout.write(f"  Date range: {active_style.start_date} to {active_style.end_date}")
         else:
             self.stdout.write(self.style.WARNING(f"No active style found for path '{path}'"))
+
+        # Also test what the context processor would return
+        self.stdout.write(f"\n" + "-"*30)
+        self.stdout.write("Context processor test:")
+
+        # Simulate what happens in the context processor
+        try:
+            from busstops.context_processors import custom_styles
+
+            class MockRequest:
+                def __init__(self, path):
+                    self.path = path
+
+            mock_request = MockRequest(path)
+            context = custom_styles(mock_request)
+
+            if context.get('has_custom_style'):
+                style = context.get('custom_style')
+                self.stdout.write(self.style.SUCCESS(f"Context processor returns: {style.name if style else 'None'}"))
+            else:
+                self.stdout.write(self.style.WARNING("Context processor returns: No custom style"))
+
+        except Exception as e:
+            self.stdout.write(self.style.ERROR(f"Context processor error: {e}"))
