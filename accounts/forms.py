@@ -14,6 +14,11 @@ from django.forms import (
 )
 from turnstile.fields import TurnstileField
 
+
+class IPBannedException(Exception):
+    """Custom exception for IP-banned registration attempts"""
+    pass
+
 User = get_user_model()
 
 
@@ -33,7 +38,7 @@ class RegistrationForm(PasswordResetForm):
 
         if ip_address:
             if User.objects.filter(trusted=False, ip_address=ip_address).exists():
-                raise SuspiciousOperation
+                raise IPBannedException("Registration blocked due to IP address restriction")
 
         try:
             self.user = User.objects.get(email__iexact=email_address)
