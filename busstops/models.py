@@ -1421,29 +1421,19 @@ class CustomStyle(models.Model):
             if pattern:
                 patterns.append(pattern)
 
-        # Debug logging
-        import logging
-        logger = logging.getLogger(__name__)
-        logger.debug(f"Checking path '{path}' against patterns: {patterns}, exact_match: {self.exact_match}")
-
         for pattern in patterns:
             if self.exact_match:
                 if path == pattern:
-                    logger.debug(f"Exact match found: '{path}' == '{pattern}'")
                     return True
             else:
                 # Support wildcard matching
                 if '*' in pattern:
                     import fnmatch
                     if fnmatch.fnmatch(path, pattern):
-                        logger.debug(f"Wildcard match found: '{path}' matches '{pattern}'")
                         return True
                 else:
                     if path.startswith(pattern):
-                        logger.debug(f"Prefix match found: '{path}' starts with '{pattern}'")
                         return True
-
-        logger.debug(f"No match found for path '{path}'")
         return False
 
     @classmethod
@@ -1459,26 +1449,14 @@ class CustomStyle(models.Model):
             end_date__gte=check_date
         )
 
-        # Debug logging
-        import logging
-        logger = logging.getLogger(__name__)
-        logger.debug(f"get_active_style_for_date: path='{path}', date={check_date}")
-        logger.debug(f"Found {active_styles.count()} active styles for date")
-
         # If no path specified, return the first (highest priority) style
         if path is None:
-            result = active_styles.first()
-            logger.debug(f"No path specified, returning: {result}")
-            return result
+            return active_styles.first()
 
         # Filter by path matching
         for style in active_styles:
-            logger.debug(f"Testing style: {style.name} (priority: {style.priority})")
             if style.matches_path(path):
-                logger.debug(f"Path match found, returning: {style.name}")
                 return style
-
-        logger.debug("No matching style found")
         return None
 
     def get_css_variables(self, dark_mode=False):
