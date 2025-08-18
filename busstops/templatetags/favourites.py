@@ -20,8 +20,9 @@ def get_user_favourites(user, content_type=None):
 @register.inclusion_tag('favourites/favourite_button.html', takes_context=True)
 def favourite_button(context, obj, css_class=""):
     """Render a favourite/unfavourite button for an object"""
-    user = context['request'].user
-    is_fav = Favourite.is_favourited(user, obj) if user.is_authenticated else False
+    request = context.get('request')
+    user = request.user if request else None
+    is_fav = Favourite.is_favourited(user, obj) if user and user.is_authenticated else False
     
     return {
         'user': user,
