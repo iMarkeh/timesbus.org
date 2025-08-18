@@ -17,45 +17,47 @@
             <div class="favourites-items">
                 {% for favourite in items %}
                     <div class="favourite-item">
-                        {% if favourite.content_object %}
-                            <a href="{{ favourite.content_object.get_absolute_url }}" class="favourite-link">
+                        {% with content_obj=favourite.get_content_object %}
+                            {% if content_obj %}
+                                <a href="{{ content_obj.get_absolute_url }}" class="favourite-link">
+                                    <div class="favourite-content">
+                                        <div class="favourite-title">
+                                            {{ favourite.display_name|default:content_obj }}
+                                        </div>
+                                        {% if favourite.display_subtitle %}
+                                            <div class="favourite-subtitle">
+                                                {{ favourite.display_subtitle }}
+                                            </div>
+                                        {% endif %}
+                                    </div>
+                                </a>
+                                
+                                {% favourite_button content_obj css_class="small favourite-remove" %}
+                            {% else %}
+                                {# Fallback for orphaned favourites where the object no longer exists #}
                                 <div class="favourite-content">
                                     <div class="favourite-title">
-                                        {{ favourite.display_name|default:favourite.content_object }}
+                                        {{ favourite.display_name|default:"Deleted item" }}
                                     </div>
                                     {% if favourite.display_subtitle %}
                                         <div class="favourite-subtitle">
                                             {{ favourite.display_subtitle }}
                                         </div>
                                     {% endif %}
-                                </div>
-                            </a>
-                            
-                            {% favourite_button favourite.content_object css_class="small favourite-remove" %}
-                        {% else %}
-                            {# Fallback for orphaned favourites where the object no longer exists #}
-                            <div class="favourite-content">
-                                <div class="favourite-title">
-                                    {{ favourite.display_name|default:"Deleted item" }}
-                                </div>
-                                {% if favourite.display_subtitle %}
-                                    <div class="favourite-subtitle">
-                                        {{ favourite.display_subtitle }}
+                                    <div class="favourite-subtitle" style="color: #999; font-style: italic;">
+                                        (No longer available)
                                     </div>
-                                {% endif %}
-                                <div class="favourite-subtitle" style="color: #999; font-style: italic;">
-                                    (No longer available)
                                 </div>
-                            </div>
-                            
-                            {# Show a remove button for orphaned favourites #}
-                            <form method="post" action="/favourites/remove/{{ favourite.id }}/" style="display: inline;">
-                                {% csrf_token %}
-                                <button type="submit" class="favourite-btn small favourite-remove" title="Remove from favourites">
-                                    <span class="favourite-icon">✕</span>
-                                </button>
-                            </form>
-                        {% endif %}
+                                
+                                {# Show a remove button for orphaned favourites #}
+                                <form method="post" action="/favourites/remove/{{ favourite.id }}/" style="display: inline;">
+                                    {% csrf_token %}
+                                    <button type="submit" class="favourite-btn small favourite-remove" title="Remove from favourites">
+                                        <span class="favourite-icon">✕</span>
+                                    </button>
+                                </form>
+                            {% endif %}
+                        {% endwith %}
                     </div>
                 {% endfor %}
             </div>
