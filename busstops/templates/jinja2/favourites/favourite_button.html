@@ -1,0 +1,164 @@
+{% if user.is_authenticated %}
+<button 
+    class="favourite-btn {{ css_class }} {% if is_favourited %}favourited{% endif %}"
+    data-content-type="{{ content_type_id }}"
+    data-object-id="{{ object_id }}"
+    title="{% if is_favourited %}Remove from favourites{% else %}Add to favourites{% endif %}"
+    aria-label="{% if is_favourited %}Remove from favourites{% else %}Add to favourites{% endif %}"
+>
+    <span class="favourite-icon">
+        {% if is_favourited %}★{% else %}☆{% endif %}
+    </span>
+</button>
+{% endif %}
+
+<style>
+.favourite-btn {
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 0.25rem;
+    font-size: 1.2rem;
+    color: #ccc;
+    transition: all 0.2s ease;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.favourite-btn:hover {
+    color: #ffd700;
+    transform: scale(1.1);
+}
+
+.favourite-btn.favourited {
+    color: #ffd700;
+}
+
+.favourite-btn.favourited:hover {
+    color: #ccc;
+}
+
+.favourite-btn:focus {
+    outline: 2px solid var(--brand-color, #007bff);
+    outline-offset: 2px;
+    border-radius: 2px;
+}
+
+.favourite-icon {
+    display: block;
+    line-height: 1;
+}
+
+/* Small variant */
+.favourite-btn.small {
+    font-size: 1rem;
+    padding: 0.125rem;
+}
+
+/* Large variant */
+.favourite-btn.large {
+    font-size: 1.5rem;
+    padding: 0.5rem;
+}
+
+/* Loading state */
+.favourite-btn.loading {
+    opacity: 0.6;
+    pointer-events: none;
+}
+
+.favourite-btn.loading .favourite-icon {
+    animation: pulse 1s infinite;
+}
+
+@keyframes pulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.5; }
+}
+</style>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Handle favourite button clicks
+    document.addEventListener('click', function(e) {
+        if (e.target.closest('.favourite-btn')) {
+            e.preventDefault();
+            e.stopPropagation();
+            
+            const btn = e.target.closest('.favourite-btn');
+            const contentTypeId = btn.dataset.contentType;
+            const objectId = btn.dataset.objectId;
+            
+            toggleFavourite(btn, contentTypeId, objectId);
+        }
+    });
+});
+
+async function toggleFavourite(btn, contentTypeId, objectId) {
+    // Prevent double-clicks
+    if (btn.classList.contains('loading')) return;
+    
+    btn.classList.add('loading');
+    
+    try {
+        const response = await fetch('/favourites/toggle/', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': getCsrfToken(),
+            },
+            body: JSON.stringify({
+                content_type_id: contentTypeId,
+                object_id: objectId
+            })
+        });
+        
+        if (!response.ok) {
+            throw new Error(`HTTP ${response.status}`);
+        }
+        
+        const data = await response.json();
+        
+        // Update button state
+        const icon = btn.querySelector('.favourite-icon');
+        if (data.is_favourited) {
+            btn.classList.add('favourited');
+            icon.textContent = '★';
+            btn.title = 'Remove from favourites';
+            btn.setAttribute('aria-label', 'Remove from favourites');
+        } else {
+            btn.classList.remove('favourited');
+            icon.textContent = '☆';
+            btn.title = 'Add to favourites';
+            btn.setAttribute('aria-label', 'Add to favourites');
+        }
+        
+        // Dispatch custom event for other components to listen to
+        document.dispatchEvent(new CustomEvent('favouriteToggled', {
+            detail: {
+                contentTypeId,
+                objectId,
+                isFavourited: data.is_favourited
+            }
+        }));
+        
+    } catch (error) {
+        console.error('Error toggling favourite:', error);
+        // Could show a toast notification here
+    } finally {
+        btn.classList.remove('loading');
+    }
+}
+
+function getCsrfToken() {
+    const cookies = document.cookie.split(';');
+    for (let cookie of cookies) {
+        const [name, value] = cookie.trim().split('=');
+        if (name === 'csrftoken') {
+            return value;
+        }
+    }
+    return '';
+}
+</script>
