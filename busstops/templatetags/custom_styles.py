@@ -51,11 +51,13 @@ def has_custom_style():
     return CustomStyle.get_active_style_for_date() is not None
 
 
-@register.simple_tag
-def get_custom_style():
-    """Get the active custom style for today"""
+@register.simple_tag(takes_context=True)
+def get_custom_style(context):
+    """Get the active custom style for today and current path"""
     from busstops.models import CustomStyle
-    return CustomStyle.get_active_style_for_date()
+    request = context.get('request')
+    path = request.path if request else None
+    return CustomStyle.get_active_style_for_date(path=path)
 
 
 @register.inclusion_tag('banners/notification_banners.html')

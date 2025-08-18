@@ -751,15 +751,19 @@ class NotificationBannerAdmin(admin.ModelAdmin):
 
 @admin.register(models.CustomStyle)
 class CustomStyleAdmin(admin.ModelAdmin):
-    list_display = ('name', 'start_date', 'end_date', 'active', 'priority', 'is_currently_active')
-    list_filter = ('active', 'start_date', 'end_date')
-    search_fields = ('name',)
+    list_display = ('name', 'start_date', 'end_date', 'has_path_restrictions', 'active', 'priority', 'is_currently_active')
+    list_filter = ('active', 'exact_match', 'start_date', 'end_date')
+    search_fields = ('name', 'path_patterns')
     date_hierarchy = 'start_date'
     ordering = ('-priority', '-start_date')
 
     fieldsets = (
         ('Basic Information', {
             'fields': ('name', 'start_date', 'end_date', 'active', 'priority')
+        }),
+        ('Path Targeting', {
+            'fields': ('path_patterns', 'exact_match'),
+            'description': 'Control where this style applies. Examples: "/operators/nasa", "/vehicles/nasa-*"'
         }),
         ('Light Mode Overrides', {
             'fields': ('light_logo_url', 'light_banner_url', 'light_brand_color', 'light_brand_color_darker'),
@@ -779,6 +783,11 @@ class CustomStyleAdmin(admin.ModelAdmin):
         return obj.is_active_for_date()
     is_currently_active.boolean = True
     is_currently_active.short_description = 'Currently Active'
+
+    def has_path_restrictions(self, obj):
+        return bool(obj.path_patterns.strip())
+    has_path_restrictions.boolean = True
+    has_path_restrictions.short_description = 'Path Restricted'
 
 admin.site.register(models.Region)
 admin.site.register(models.District)
