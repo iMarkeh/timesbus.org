@@ -41,7 +41,7 @@ class Command(ImportLiveVehiclesCommand):
 
     # API configuration - using the same API as import_iss.py
     API_BASE_URL = "https://kolas.apilogic.uk"
-    API_KEY = "timesbus-vm"
+    API_KEY = "v1.public.03b5bq5obzueg2xfd5zw3ac"
 
     # Popular satellites to track (NORAD IDs)
     # This is a curated list of interesting satellites - you can expand this
