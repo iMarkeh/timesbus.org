@@ -251,7 +251,6 @@ class Command(ImportLiveVehiclesCommand):
                 source=self.source,
                 reg="SAT-" + satellite_id,
                 code=satellite_id,
-                fleet_code=satellite_id,
                 name=satellite_name,
             )
 
