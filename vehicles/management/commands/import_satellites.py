@@ -249,10 +249,10 @@ class Command(ImportLiveVehiclesCommand):
             vehicle = Vehicle.objects.create(
                 operator=self.operator,
                 source=self.source,
+                reg="SAT-" + satellite_id,
                 code=satellite_id,
                 fleet_code=satellite_id,
                 name=satellite_name,
-                notes=f"Satellite: {satellite_name}"
             )
 
             self.vehicle_cache[satellite_id] = vehicle
