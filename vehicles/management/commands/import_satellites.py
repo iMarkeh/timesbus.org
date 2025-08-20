@@ -119,9 +119,12 @@ class Command(ImportLiveVehiclesCommand):
         try:
             # Try to get active satellites from Celestrak
             catalog_urls = [
-                "https://celestrak.com/NORAD/elements/gp.php?GROUP=active&FORMAT=json",
                 "https://celestrak.com/NORAD/elements/gp.php?GROUP=stations&FORMAT=json",
                 "https://celestrak.com/NORAD/elements/gp.php?GROUP=starlink&FORMAT=json",
+                "https://celestrak.com/NORAD/elements/gp.php?GROUP=oneweb&FORMAT=json",
+                "https://celestrak.com/NORAD/elements/gp.php?GROUP=kuiper&FORMAT=json",
+                "https://celestrak.com/NORAD/elements/gp.php?GROUP=eutelsat&FORMAT=json",
+                "https://celestrak.com/NORAD/elements/gp.php?GROUP=intelsat&FORMAT=json",
             ]
 
             all_satellite_ids = []
