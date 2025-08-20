@@ -41,7 +41,7 @@ class Command(ImportLiveVehiclesCommand):
 
     # API configuration - using the same API as import_iss.py
     API_BASE_URL = "https://kolas.apilogic.uk"
-    API_KEY = "v1.public.03b5bq5obzueg2xfd5zw3ac"
+    API_KEY = "v1.public.w9vgnyzl8ua42q8v6osq3w.5jzmys8ibjl"
     
     @staticmethod
     def add_arguments(parser):
