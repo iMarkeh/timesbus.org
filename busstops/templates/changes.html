@@ -144,9 +144,14 @@
                     <li>
                         <span class="note-time">{{ note.datetime|time:"H:i" }}</span> - {{ note.note|linebreaksbr }}
                          {% if note.link_url and note.link_text %}
+                            <br/>
+                            <hr />
                              <div class="note-action-row">
                                  <button type="button" onclick="window.location.href='{{ note.link_url }}'" class="note-link-button button">{{ note.link_text }}</button>
                              </div>
+                             <br/>
+                             <hr/>
+                             <br/>
                          {% endif %}
                         {% if note.tags.exists %}
                             <div class="note-tags">
