@@ -47,7 +47,7 @@ urlpatterns = [
     path("rules", TemplateView.as_view(template_name="rules.html")),
     path("map", TemplateView.as_view(template_name="map.html"), name="map"),
     path("maps", TemplateView.as_view(template_name="map.html")),
-    path("map/old", TemplateView.as_view(template_name="map_classic.html")),
+    path("map/old", views.map_classic, name="map_classic"),
     path("siri/<uuid:uuid>", views.siri_post),
     path("overland/<uuid:uuid>", views.overland),
 ]

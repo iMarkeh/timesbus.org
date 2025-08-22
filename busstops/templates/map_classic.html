@@ -272,7 +272,7 @@
       <a href="/map" class="button primary-button">Track buses and find bus stops!</a>
     </li>
     <li>
-      <a href="/vehicles/nasa-25544" class="button secondary-button">Track the ISS while it orbits Earth</a>
+      <a href="/vehicles/nasa-iss" class="button secondary-button">Track the ISS while it orbits Earth</a>
     </li>
   </ul>
 </div>
@@ -280,12 +280,12 @@
 <div class="regions-section card">
   <h2>Explore Regions</h2>
   <div class="region-list-container">
-    {% for region_group in regions %}
+    {% for region_group in regions_list %}
     <div class="region-group">
       <h3>{{ region_group.name }}</h3>
       <ul>
         {% for region in region_group.regions %}
-        <li><a href="/region/{{ region.code }}">{{ region.name }}</a></li>
+        <li><a href="{{ region.get_absolute_url }}">{{ region.name }}</a></li>
         {% endfor %}
       </ul>
     </div>

@@ -33,7 +33,7 @@ from sql_util.utils import Exists, SubqueryMax, SubqueryMin
 
 from accounts.models import User
 from buses.utils import cdn_cache_control
-from busstops.models import SERVICE_ORDER_REGEX, Operator, Service
+from busstops.models import SERVICE_ORDER_REGEX, Operator, Service, Region
 from busstops.utils import get_bounding_box
 from bustimes.models import Garage, Route, StopTime
 from bustimes.utils import contiguous_stoptimes_only, get_other_trips_in_block
