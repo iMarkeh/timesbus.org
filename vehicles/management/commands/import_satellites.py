@@ -283,8 +283,7 @@ class Command(ImportLiveVehiclesCommand):
                 operator=self.operator,
                 source=self.source,
                 code=satellite_id,
-                reg=f"SAT-{satellite_id}",
-                notes=
+                reg=f"SAT-{satellite_id}"
             )
 
             self.vehicle_cache[satellite_id] = vehicle
