@@ -12,7 +12,7 @@
    <header class="site-header">
         <a href="/" class="site-name"></a>
         <ul>
-            <li><a href="/map{% if object.latlong %}#16/{{ object.latlong.y|floatformat:4 }}/{{ object.latlong.x|floatformat:4 }}{% endif %}" style="color: #ffffff">Map</a></li>
+            <li><a href="/map{% if object.latlong %}#16/{{ object.latlong.y|floatformat:4 }}/{{ object.latlong.x|floatformat:4 }}{% endif %}">Map</a></li>
         </ul>
         <form method="GET" action="/search-query" class="search">
             <label>

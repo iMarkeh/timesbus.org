@@ -126,11 +126,6 @@
   color: var(--heading-color); /* Apply heading color variable */
   margin-bottom: 20px;
   font-size: 1.8em;
-  transition: color 0.3s ease; /* Smooth transition */
-}
-
-.region-group h3 {
-  border-bottom-color: var(--card-border); /* Apply card border for separator */
 }
 
 /* Search Form - using variables */
@@ -200,37 +195,11 @@
   background-color: var(--secondary-button-hover-bg);
 }
 
-/* Regions Section - using variables */
-.main-content-grid {
-  display: flex;
-  gap: 30px;
-  margin-bottom: 30px;
-}
-
-.search-section,
-.features-section {
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-}
-
-.feature-list {
-  list-style: none;
-  padding: 0;
-  margin: auto 0 0 0;
-  display: flex;
-  flex-direction: column;
-  gap: 15px;
-}
-
-.feature-list li {
-  width: 100%;
-}
-
+/* Simplified Regions Section - using variables */
 .region-list-container {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-  gap: 25px;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
 }
 
 .region-group {
@@ -264,10 +233,6 @@
 
 /* Responsive Adjustments */
 @media (max-width: 768px) {
-  .main-content-grid {
-    flex-direction: column;
-  }
-
   .hero-section h1 {
     font-size: 1.8em;
   }
@@ -284,10 +249,6 @@
   .search-form button[type="submit"] {
     width: 100%;
   }
-
-  .region-list-container {
-    grid-template-columns: 1fr;
-  }
 }
 </style>
 <div class="hero-section">
@@ -295,100 +256,40 @@
   <p class="subtitle">Your ultimate guide to public transport in the UK and Ireland.</p>
 </div>
 
-<div class="main-content-grid">
-  <div class="search-section card">
-    <h2><label for="q">Find Your Journey</label></h2>
-    <p>Search for places, operators, or routes across the network.</p>
-    <form method="get" action="/search-query" class="search-form">
-      <input id="q" name="q" type="search" placeholder="e.g., London, Stagecoach, 236" required />
-      <button type="submit">Search</button>
-    </form>
-  </div>
+<div class="search-section card">
+  <h2><label for="q">Find Your Journey</label></h2>
+  <p>Search for places, operators, or routes across the network.</p>
+  <form method="get" action="/search-query" class="search-form">
+    <input id="q" name="q" type="search" placeholder="e.g., London, Stagecoach, 236" required />
+    <button type="submit">Search</button>
+  </form>
+</div>
 
-  <div class="features-section card">
-    <h2>Popular Features</h2>
-    <ul class="feature-list">
-      <li>
-        <a href="/map" class="button primary-button">Track buses and find bus stops!</a>
-      </li>
-      <li>
-        <a href="/vehicles/nasa-iss" class="button secondary-button">Track the ISS while it orbits Earth</a>
-      </li>
-    </ul>
-  </div>
+<div class="features-section card">
+  <h2>Popular Features</h2>
+  <ul class="feature-list">
+    <li>
+      <a href="/map" class="button primary-button">Track buses and find bus stops!</a>
+    </li>
+    <li>
+      <a href="/vehicles/nasa-iss" class="button secondary-button">Track the ISS while it orbits Earth</a>
+    </li>
+  </ul>
 </div>
 
 <div class="regions-section card">
   <h2>Explore Regions</h2>
   <div class="region-list-container">
-    {% if request.headers.cf_ipcountry == "IE" %}
+    {% for region_group in regions_list %}
     <div class="region-group">
-      <h3>Ireland</h3>
+      <h3>{{ region_group.name }}</h3>
       <ul>
-        <li><a href="/region/CO">Connacht</a></li>
-        <li><a href="/region/LE">Leinster</a></li>
-        <li><a href="/region/MU">Munster</a></li>
-        <li><a href="/region/UL">Ulster</a></li>
+        {% for region in region_group.regions %}
+        <li><a href="/region/{{ region.code }}">{{ region.name }}</a></li>
+        {% endfor %}
       </ul>
     </div>
-    <div class="region-group">
-      <h3>Northern Ireland</h3>
-      <ul>
-        <li><a href="/regions/NI">Northern Ireland</a></li>
-      </ul>
-    </div>
-    {% endif %}
-
-    <div class="region-group">
-      <h3>England</h3>
-      <ul>
-        <li><a href="/region/EA">East Anglia</a></li>
-        <li><a href="/region/EM">East Midlands</a></li>
-        <li><a href="/region/L">London</a></li>
-        <li><a href="/region/NE">North East</a></li>
-        <li><a href="/region/NW">North West</a></li>
-        <li><a href="/region/SE">South East</a></li>
-        <li><a href="/region/SW">South West</a></li>
-        <li><a href="/region/WM">West Midlands</a></li>
-        <li><a href="/region/Y">Yorkshire</a></li>
-      </ul>
-    </div>
-
-    <div class="region-group">
-      <h3>Other UK Regions</h3>
-      <ul>
-        <li><a href="/region/W">Wales</a></li>
-        <li><a href="/region/S">Scotland</a></li>
-        <li><a href="/region/GB">Great Britain</a></li>
-      </ul>
-    </div>
-
-    {% if request.headers.cf_ipcountry != "IE" %}
-    <div class="region-group">
-      <h3>Northern Ireland</h3>
-      <ul>
-        <li><a href="/region/NI">Northern Ireland</a></li>
-      </ul>
-    </div>
-    <div class="region-group">
-      <h3>Ireland</h3>
-      <ul>
-        <li><a href="/region/CO">Connacht</a></li>
-        <li><a href="/region/LE">Leinster</a></li>
-        <li><a href="/region/MU">Munster</a></li>
-        <li><a href="/region/UL">Ulster</a></li>
-      </ul>
-    </div>
-    {% endif %}
-
-    <div class="region-group">
-      <h3>Outer Islands</h3>
-      <ul>
-        <li><a href="/region/IM">Isle of Man</a></li>
-        <li><a href="/region/GG">Guernsey</a></li>
-        <li><a href="/region/JE">Jersey</a></li>
-      </ul>
-    </div>
+    {% endfor %}
   </div>
 </div>
 {% endblock content %}
