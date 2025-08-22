@@ -1715,55 +1715,6 @@ def favourites_list(request):
 
     return render(request, 'favourites/favourites_page.html', context)
 
-
-@cdn_cache_control(max_age=3600)
-@require_safe
-def map_classic(request):
-    """View for the classic map page with dynamic regions"""
-    
-    # Get all regions
-    all_regions = Region.objects.all()
-    
-    # Define region groupings
-    region_groups = {
-        "Ireland": ["CO", "LE", "MU", "UL"],
-        "Northern Ireland": ["NI"],
-        "England": ["EA", "EM", "L", "NE", "NW", "SE", "SW", "WM", "Y"],
-        "Other UK Regions": ["W", "S", "GB"],
-        "Outer Islands": ["IM", "GG", "JE"]
-    }
-    
-    # Build regions_list with proper grouping
-    regions_list = []
-    for group_name, region_codes in region_groups.items():
-        group_regions = [r for r in all_regions if r.id in region_codes]
-        if group_regions:  # Only add groups that have regions
-            regions_list.append({
-                "name": group_name,
-                "regions": group_regions
-            })
-    
-    # Handle IP-based ordering for Ireland users
-    if request.headers.get("cf_ipcountry") == "IE":
-        # Move Ireland and Northern Ireland to the front
-        reordered_list = []
-        ireland_groups = []
-        other_groups = []
-        
-        for group in regions_list:
-            if group["name"] in ["Ireland", "Northern Ireland"]:
-                ireland_groups.append(group)
-            else:
-                other_groups.append(group)
-        
-        regions_list = ireland_groups + other_groups
-    
-    context = {
-        "regions_list": regions_list
-    }
-    
-    return render(request, "map_classic.html", context)
-
 @login_required
 def favourites_api(request):
     """API endpoint to get user's favourites as JSON"""
