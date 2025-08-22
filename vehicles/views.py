@@ -749,7 +749,7 @@ def check_user(request):
     if (
         not request.user.trusted
         and timezone.now() - request.user.date_joined < datetime.timedelta(hours=1)
-        and request.user.vehiclerevision_set.count() > 4
+        and request.user.vehiclerevision_set.count() > 10
     ):
         raise PermissionDenied(
             "As your account is so new, please wait a bit before editing any more vehicles"

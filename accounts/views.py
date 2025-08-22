@@ -20,8 +20,8 @@ def register(request):
             "403.html",
             {
                 "exception": mark_safe("""Registration is currently closed, sorry.
-You can still enjoy all the main features of transportthing.uk without an account.
-You can also suggest edits <a href="/contact">by email</a> or <a href="https://transportthing.uk/discord">on Discord</a>."""),
+                You can still enjoy all the main features of transportthing.uk without an account.
+                You can also suggest edits <a href="/contact">by email</a> or <a href="https://transportthing.uk/discord">on Discord</a>."""),
             },
             status=503,
         )
