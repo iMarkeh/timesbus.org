@@ -20,6 +20,5 @@ bustimes_api_importer.py
 /.parcel-cache/
 *.zip
 core
-vehicles/management/commands/import_vehicles.py
-busstops/templates/siridebug.html
-update.sh
+docker-compose.yml
+
