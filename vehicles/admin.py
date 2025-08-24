@@ -1,4 +1,5 @@
 from django.forms import ModelForm, Textarea, TextInput, CharField, IntegerField
+from django import forms
 from django.contrib import admin, messages
 from django.contrib.auth import get_user_model
 from django.db import IntegrityError, connection, transaction
@@ -19,12 +20,19 @@ class BulkVehicleCreationForm(ModelForm):
 
     vehicle_codes = CharField(
         widget=Textarea(attrs={'rows': 10, 'cols': 50}),
-        help_text="Enter vehicle codes, one per line (e.g., YY67_HBG, YJ18_DHC)"
+        help_text="Enter vehicle codes, one per line (e.g., YY67_HBG, YJ18_DHC)",
+        required=True
+    )
+
+    fleet_numbers = CharField(
+        widget=Textarea(attrs={'rows': 10, 'cols': 50}),
+        required=False,
+        help_text="Optional: Enter fleet numbers, one per line (must match number of vehicle codes). Leave blank to use sequential numbering."
     )
 
     fleet_number_start = IntegerField(
         required=False,
-        help_text="Optional: Starting fleet number (will auto-increment for each vehicle)"
+        help_text="Optional: Starting fleet number (will auto-increment for each vehicle). Ignored if fleet numbers are specified above."
     )
 
     class Meta:
@@ -37,6 +45,22 @@ class BulkVehicleCreationForm(ModelForm):
         # Make vehicle_type and livery optional
         self.fields['vehicle_type'].required = False
         self.fields['livery'].required = False
+
+    def clean(self):
+        cleaned_data = super().clean()
+        vehicle_codes_text = cleaned_data.get('vehicle_codes', '').strip()
+        fleet_numbers_text = cleaned_data.get('fleet_numbers', '').strip()
+
+        if vehicle_codes_text and fleet_numbers_text:
+            vehicle_codes = [code.strip() for code in vehicle_codes_text.split('\n') if code.strip()]
+            fleet_numbers = [num.strip() for num in fleet_numbers_text.split('\n') if num.strip()]
+
+            if len(vehicle_codes) != len(fleet_numbers):
+                raise forms.ValidationError(
+                    f"Number of vehicle codes ({len(vehicle_codes)}) must match number of fleet numbers ({len(fleet_numbers)})"
+                )
+
+        return cleaned_data
 
 
 class BulkVehicleCreation(models.Vehicle):
@@ -358,18 +382,26 @@ class BulkVehicleCreationAdmin(admin.ModelAdmin):
         operator = cleaned_data['operator']
         source = cleaned_data['source']
         vehicle_codes_text = cleaned_data['vehicle_codes']
+        fleet_numbers_text = cleaned_data.get('fleet_numbers', '').strip()
         fleet_number_start = cleaned_data.get('fleet_number_start')
         vehicle_type = cleaned_data.get('vehicle_type')
         livery = cleaned_data.get('livery')
 
         vehicle_codes = [code.strip() for code in vehicle_codes_text.strip().split('\n') if code.strip()]
 
+        # Parse fleet numbers if provided
+        fleet_numbers = []
+        if fleet_numbers_text:
+            fleet_numbers = [num.strip() for num in fleet_numbers_text.split('\n') if num.strip()]
+            # Convert to integers, skip invalid entries
+            fleet_numbers = [int(num) for num in fleet_numbers if num.isdigit()]
+
         created_count = 0
         skipped_count = 0
         current_fleet_number = fleet_number_start
 
         with transaction.atomic():
-            for vehicle_code in vehicle_codes:
+            for i, vehicle_code in enumerate(vehicle_codes):
                 # Check if vehicle already exists for this operator
                 if models.Vehicle.objects.filter(code=vehicle_code, operator=operator).exists():
                     skipped_count += 1
@@ -386,7 +418,13 @@ class BulkVehicleCreationAdmin(admin.ModelAdmin):
                     vehicle_data['vehicle_type'] = vehicle_type
                 if livery:
                     vehicle_data['livery'] = livery
-                if current_fleet_number is not None:
+
+                # Handle fleet number assignment
+                if fleet_numbers and i < len(fleet_numbers):
+                    # Use individual fleet number
+                    vehicle_data['fleet_number'] = fleet_numbers[i]
+                elif current_fleet_number is not None:
+                    # Use sequential numbering
                     vehicle_data['fleet_number'] = current_fleet_number
                     current_fleet_number += 1
 
