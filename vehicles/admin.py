@@ -45,6 +45,9 @@ class BulkVehicleCreation(models.Vehicle):
         proxy = True
         verbose_name = "Bulk Vehicle Creation"
         verbose_name_plural = "Bulk Vehicle Creation"
+        permissions = [
+            ("add_vehicle", "Can add vehicle"),
+        ]
 
 
 @admin.register(models.VehicleType)
