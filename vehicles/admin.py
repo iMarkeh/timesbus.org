@@ -46,7 +46,7 @@ class BulkVehicleCreation(models.Vehicle):
         verbose_name = "Bulk Vehicle Creation"
         verbose_name_plural = "Bulk Vehicle Creation"
         permissions = [
-            ("add_vehicle", "Can add vehicle"),
+            ("bulk_add_vehicle", "Can bulk add vehicles"),
         ]
 
 
@@ -319,13 +319,13 @@ class VehicleAdmin(admin.ModelAdmin):
 
 
 class BulkVehicleCreationAdmin(admin.ModelAdmin):
-    """Admin for bulk vehicle creation - inherits autocomplete from VehicleAdmin"""
+    """Admin for bulk vehicle creation"""
     form = BulkVehicleCreationForm
     autocomplete_fields = ("vehicle_type", "livery")
     raw_id_fields = ("operator", "source")
 
     def has_module_permission(self, request):
-        return request.user.has_perm('vehicles.add_vehicle')
+        return request.user.has_perm('vehicles.bulk_add_vehicle')
 
     def has_view_permission(self, request, obj=None):
         return False
