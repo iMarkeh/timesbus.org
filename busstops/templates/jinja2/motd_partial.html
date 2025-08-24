@@ -8,20 +8,23 @@
             }
             $(".quote-source").text(quotes.author)
             $(".quote-text").html(quotes.text)
-        }).fail(function () {
-            $(".quote-text").text("API : There would be a quote here but I'm not responding, apparently :3")
+        }).fail(function (data) {
+            $(".quote-text").text(data.responseText)
+            $(".quote-source").text("API")
         })
     }
     function fetchAprilQuote() {
-        $.getJSON("https://eden.apilogic.uk/quotes/random?tags=tb-april&published=true", function (quotes) {
+        $.getJSON("https://eden.apilogic.uk/quotes/random?tags=april-one&published=true", function (quotes) {
             if (quotes.length === 0) {
-                $(".quote-text").text(" ")
+                $(".quote-text").text("No quotes available, suggest some in discord")
+                $(".quote-source").text("System")
                 return;
             }
             $(".quote-source").text(quotes.author)
             $(".quote-text").html(quotes.text)
         }).fail(function () {
-            $(".quote-text").text("API : There would be a quote here but I'm not responding, apparently :3")
+            $(".quote-text").text("Failed to get quotes.")
+            $(".quote-source").text("System")
         })
     }
 

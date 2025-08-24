@@ -56,6 +56,7 @@ from vosa.models import Registration
 
 from django.shortcuts import render
 from .models import ChangeNote
+from .models import Region
 
 from . import forms
 from .models import (
@@ -1713,7 +1714,6 @@ def favourites_list(request):
     }
 
     return render(request, 'favourites/favourites_page.html', context)
-
 
 @login_required
 def favourites_api(request):

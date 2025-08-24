@@ -3,10 +3,10 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Livery Creator</title>
+  <title>TT Livery Creator</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <script src="https://cdn.jsdelivr.net/npm/js-yaml@4.1.0/dist/js-yaml.min.js"></script>
-    <style>
+  <style>
     #gradient {
       resize: both;
       overflow: auto;
@@ -49,14 +49,14 @@
     .liverymedium { width: 4.5rem; height: 3rem; }
     .liverysmall { width: 3rem; height: 2rem; }
     
-    .bus-times-size-map{
-    width: 1.5rem;  /* 24px */
-    height: 1rem;   /* 16px */
-    margin: 0.3em 0.5em 0 0;
-    font-size: 1rem; 
-    line-height: 1;
-    font-weight: bold;
-  }
+    .bus-times-size-map {
+      width: 1.5rem;  /* 24px */
+      height: 1rem;   /* 16px */
+      margin: 0.3em 0.5em 0 0;
+      font-size: 1rem; 
+      line-height: 1;
+      font-weight: bold;
+    }
     
     .bus-times-size {
       height: 1.5em;
@@ -73,7 +73,6 @@
 </head>
 <body class="bg-light-mode text-light-mode dark:bg-dark-mode dark:text-dark-mode min-h-screen flex flex-col items-center justify-start p-6 transition-colors duration-300" id="body">
   <div class="w-full max-w-6xl flex flex-col md:flex-row gap-8">
-
     <div class="md:w-1/3 w-full">
       <h1 class="text-3xl font-bold mb-4 text-center md:text-left text-light-mode dark:text-dark-mode">Livery Creator</h1>
       <label for="gradient" class="block mb-2 text-sm font-medium">Enter CSS Gradient</label>
@@ -119,14 +118,12 @@
         <button id="resetColors" class="mt-2 px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 transition">Reset Colors</button>
       </div>
     </div>
-
     <div class="md:w-2/3 w-full flex flex-col gap-4">
       <div class="flex items-center space-x-2 border-b border-gray-300 pb-2">
         <span class="font-medium">Preview Sizes:</span>
         <button id="showBusTimesSizesBtn" class="px-3 py-1 text-sm rounded-md bg-gray-200 text-black">BusTimes Preview</button>
         <button id="showSiteSizesBtn" class="px-3 py-1 text-sm rounded-md bg-blue-600 text-white">Designer Preview</button>
       </div>
-      
       <div id="siteSizePreviews" class="flex flex-col md:flex-row gap-8">
         <div class="flex flex-col items-center space-y-4">
           <div class="text-sm font-medium mb-2">View in light mode</div>
@@ -156,7 +153,6 @@
           </div>
         </div>
       </div>
-
       <div id="busTimesSizePreviews" class="hidden flex flex-col md:flex-row gap-8">
         <div class="flex flex-col items-center space-y-4">
           <div class="text-sm font-medium mb-2">View in light mode</div>
@@ -182,10 +178,8 @@
           </div>
         </div>
       </div>
-
     </div>
   </div>
-
   <div class="mt-12 w-full max-w-6xl">
     <h2 class="text-2xl font-bold mb-4 text-[#00657b]">Vehicle List View</h2>
     <table class="w-full text-sm text-left border border-grey-300 bg-[#ffffff]">
@@ -197,11 +191,9 @@
       <tbody id="fleetTableBody"></tbody>
     </table>
   </div>
-
   <button id="changesTrigger" class="fixed bottom-4 left-4 px-4 py-2 bg-gray-700 text-white text-sm rounded-lg shadow-lg hover:bg-gray-800 transition-colors">
     Site Changes
   </button>
-
   <div id="changesModal" class="hidden fixed inset-0 bg-black bg-opacity-60 flex items-center justify-center z-50 p-4">
     <div class="bg-white dark:bg-gray-800 rounded-lg shadow-2xl w-full max-w-2xl max-h-[80vh] flex flex-col">
       <div class="flex justify-between items-center p-4 border-b border-gray-200 dark:border-gray-700">
@@ -213,7 +205,6 @@
       </div>
     </div>
   </div>
-
   <script>
     // --- Existing App Logic ---
     const gradientInput = document.getElementById('gradient');
