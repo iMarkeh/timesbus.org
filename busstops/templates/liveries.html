@@ -74,7 +74,7 @@
 <body class="bg-light-mode text-light-mode dark:bg-dark-mode dark:text-dark-mode min-h-screen flex flex-col items-center justify-start p-6 transition-colors duration-300" id="body">
   <div class="w-full max-w-6xl flex flex-col md:flex-row gap-8">
     <div class="md:w-1/3 w-full">
-      <h1 class="text-3xl font-bold mb-4 text-center md:text-left text-light-mode dark:text-dark-mode">Livery Creator</h1>
+      <h1 class="text-1xl font-bold mb-4 text-center md:text-left text-[#16306b]">TransportThing Official Livery Viewer</h1>
       <label for="gradient" class="block mb-2 text-sm font-medium">Enter CSS Gradient</label>
       <textarea id="gradient" placeholder="e.g. linear-gradient(180deg, #000000 50%, #afb6c0 50%)" class="w-full p-3 border border-gray-300 shadow-sm rounded"></textarea>
       <div id="gradientError" class="mt-2 text-sm text-red-600 hidden">Invalid CSS gradient format.</div>
@@ -121,35 +121,35 @@
     <div class="md:w-2/3 w-full flex flex-col gap-4">
       <div class="flex items-center space-x-2 border-b border-gray-300 pb-2">
         <span class="font-medium">Preview Sizes:</span>
-        <button id="showBusTimesSizesBtn" class="px-3 py-1 text-sm rounded-md bg-gray-200 text-black">BusTimes Preview</button>
+        <button id="showBusTimesSizesBtn" class="px-3 py-1 text-sm rounded-md bg-gray-200 text-black">TransportThing Preview</button>
         <button id="showSiteSizesBtn" class="px-3 py-1 text-sm rounded-md bg-blue-600 text-white">Designer Preview</button>
       </div>
       <div id="siteSizePreviews" class="flex flex-col md:flex-row gap-8">
         <div class="flex flex-col items-center space-y-4">
           <div class="text-sm font-medium mb-2">View in light mode</div>
           <div class="preview-box-light flex items-center justify-center text-[9rem] leading-none font-bold liverylarge text-black bg-white text-center">
-            <div class="text-overlay light-text">66</div>
+            <div class="text-overlay light-text">57</div>
           </div>
           <div class="preview-box-light flex items-center justify-center text-[1.75rem] leading-none font-bold liverymedium text-black bg-white text-center">
-            <div class="text-overlay light-text">66</div>
+            <div class="text-overlay light-text">57</div>
           </div>
           <div class="preview-box-light flex items-center justify-center text-[24px] leading-none font-medium liverysmall text-black bg-white text-center">
-            <div class="text-overlay light-text">66</div>
+            <div class="text-overlay light-text">57</div>
           </div>
         </div>
         <div class="flex flex-col items-center space-y-4">
           <div class="text-sm font-medium mb-2">View in dark mode</div>
           <div class="preview-box-dark overlay-box liverylarge bg-black flex items-center justify-center text-[9rem] leading-none font-bold text-white text-center">
             <div class="gradient-overlay" id="bigGradient"></div>
-            <div class="text-overlay dark-text">66</div>
+            <div class="text-overlay dark-text">57</div>
           </div>
           <div class="preview-box-dark overlay-box liverymedium bg-black flex items-center justify-center text-[1.75rem] leading-none font-bold text-white text-center">
             <div class="gradient-overlay" id="xxsmall2Gradient"></div>
-            <div class="text-overlay dark-text">66</div>
+            <div class="text-overlay dark-text">57</div>
           </div>
           <div class="preview-box-dark overlay-box liverysmall bg-black flex items-center justify-center text-[24px] leading-none font-medium text-white text-center">
             <div class="gradient-overlay" id="xxsmall3Gradient"></div>
-            <div class="text-overlay dark-text">66</div>
+            <div class="text-overlay dark-text">57</div>
           </div>
         </div>
       </div>
@@ -157,31 +157,31 @@
         <div class="flex flex-col items-center space-y-4">
           <div class="text-sm font-medium mb-2">View in light mode</div>
           <div class="preview-box-light flex items-center justify-center text-black bg-white text-center bus-times-size-large">
-            <div class="text-overlay light-text">66</div>
+            <div class="text-overlay light-text">32</div>
           </div>
           <div class="preview-box-light flex items-center justify-center text-black bg-white text-center bus-times-size">
-            <div class="text-overlay light-text">66</div>
+            <div class="text-overlay light-text">32</div>
           </div>
           <div class="preview-box-light flex items-center justify-center text-black bg-white text-center bus-times-size-map">
-            <div class="text-overlay light-text">66</div>
+            <div class="text-overlay light-text">32</div>
           </div>
         </div>
         <div class="flex flex-col items-center space-y-4">
           <div class="text-sm font-medium mb-2">View in dark mode</div>
           <div class="preview-box-dark overlay-box bg-black flex items-center justify-center text-white text-center bus-times-size">
             <div class="gradient-overlay" id="busTimesGradientMedium"></div>
-            <div class="text-overlay dark-text">66</div>
+            <div class="text-overlay dark-text">21</div>
           </div>
           <div class="preview-box-dark overlay-box bg-black flex items-center justify-center text-white text-center bus-times-size-map">
             <div class="gradient-overlay" id="busTimesGradientMap"></div>
-            <div class="text-overlay dark-text">66</div>
+            <div class="text-overlay dark-text">21</div>
           </div>
         </div>
       </div>
     </div>
   </div>
   <div class="mt-12 w-full max-w-6xl">
-    <h2 class="text-2xl font-bold mb-4 text-[#00657b]">Vehicle List View</h2>
+    <h2 class="text-1xl font-bold mb-4 text-[#09a7b5]">TransportThing Fleet List Viewer</h2>
     <table class="w-full text-sm text-left border border-grey-300 bg-[#ffffff]">
       <thead>
         <tr>
@@ -191,6 +191,7 @@
       <tbody id="fleetTableBody"></tbody>
     </table>
   </div>
+  <a href="/liverydatabase" class="absolute top-6 right-6 z-20 px-4 py-2 bg-blue-600 text-white font-semibold rounded-lg shadow-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition">Livery Database</a>
   <button id="changesTrigger" class="fixed bottom-4 left-4 px-4 py-2 bg-gray-700 text-white text-sm rounded-lg shadow-lg hover:bg-gray-800 transition-colors">
     Site Changes
   </button>
@@ -390,10 +391,6 @@
         { fleet: '73013', reg: 'YH24 MDF', route: '22X', time: '17:10', type: 'Yutong E12' },
         { fleet: '11703', reg: 'YX73 PCZ', route: '59', time: '21:09', type: 'ADL Enviro400 MMC' },
         { fleet: '11705', reg: 'YX73 PDO', route: '2', time: '21:52', type: 'ADL Enviro200 MMC' },
-        { fleet: '150268', reg: '', route: 'Sheffield > Leeds', time: '08:00', type: 'Class 150C' },
-        { fleet: '11707', reg: 'YX73 PDV', route: '57', time: '22:00', type: 'ADL Enviro400 EV' },
-        { fleet: '28932', reg: '', route: '64', time: '18:50', type: 'MAN 18.240LF Alexander Dennis Enviro200 MMC' },
-        { fleet: '11709', reg: 'YX73 PDZ', route: 'X17', time: '18:37', type: 'ADL Enviro200 EV' }
     ];
     const tableBody = document.getElementById('fleetTableBody');
 
@@ -414,7 +411,7 @@
     const closeChangesModal = document.getElementById('closeChangesModal');
     const changelogContent = document.getElementById('changelogContent');
     
-const changelogURL = 'https://raw.githubusercontent.com/barryio/liveryviewer/main/changes.yaml';
+const changelogURL = 'https://raw.githubusercontent.com/barryio/transportthingliveryviewer/main/changes.yaml';
 
     let changelogData = null; // cache
 
