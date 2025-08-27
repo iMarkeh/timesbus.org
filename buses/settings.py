@@ -20,7 +20,7 @@ ALLOWED_HOSTS = os.environ.get(
 
 CSRF_TRUSTED_ORIGINS = os.environ.get(
     "CSRF_TRUSTED_ORIGINS",
-    "https://transportthing.uk https://csm.transportthing.uk",
+    "https://transportthing.uk https://dev.transportthing.uk",
 ).split()
 
 TEST = "test" in sys.argv or "pytest" in sys.argv[0]
