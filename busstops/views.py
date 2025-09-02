@@ -77,7 +77,7 @@ from .utils import get_bounding_box
 
 operator_has_current_services = Exists("service", filter=Q(service__current=True))
 operator_has_current_services_or_vehicles = operator_has_current_services | Exists(
-    "vehicle", filter=Q(withdrawn=False, latest_journey__isnull=False)
+    "vehicle", filter=Q(withdrawn=False)
 )
 
 
@@ -90,7 +90,7 @@ def get_colours(services):
 def version(request):
     if commit_hash := os.environ.get("COMMIT_HASH"):
         return HttpResponse(
-            f"""<a href="https://github.com/TimesBus/timesbus.org/commit/{commit_hash}">{commit_hash}</a>""",
+            f"""<a href="https://github.com/TransportThing/transportthing.uk/commit/{commit_hash}">{commit_hash}</a>""",
         )
     return HttpResponse(
         os.environ.get("KAMAL_CONTAINER_NAME"), content_type="text/plain"
