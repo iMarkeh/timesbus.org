@@ -926,7 +926,7 @@ class OperatorDetailView(DetailView):
         # vehicles tab:
 
         context["vehicles"] = self.object.vehicle_set.filter(
-            withdrawn=False, latest_journey__isnull=False
+            withdrawn=False
         ).exists()
         if redis_client and (
             context["vehicles"] or any(s.tracking for s in context["services"])
