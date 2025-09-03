@@ -5,13 +5,13 @@
             <input type="date" name="date" value="{{ when.date.isoformat }}" required>
             <input type="time" name="time" value="{{ when.time|time:'H:i' }}">
             {% if has_live or when == now %}
-                <input type="submit" value="↻" aria-label="reload" title="reload">
+                <input type="submit" value="↻" aria-label="Reload" title="Reload">
             {% else %}
-                <input type="submit" value="go">
+                <input type="submit" value="Go">
             {% endif %}
         </form>
     {% else %}
-        <h2>next departures</h2>
+        <h2>Next departures</h2>
     {% endif %}
     {% for item in departures %}
         {% ifchanged item.time.date %}
@@ -28,9 +28,9 @@
                     {% if has_live or has_scheduled %}
                         <tr>
                             <td></td>
-                            <th scope="col">to</th>
-                            {% if has_scheduled %}<th scope="col">sched{% if has_live %}&shy;{% endif %}uled</th>{% endif %}
-                            {% if has_live %}<th scope="col">ex{% if has_scheduled %}&shy;{% endif %}pected</th>{% endif %}
+                            <th scope="col">To</th>
+                            {% if has_scheduled %}<th scope="col">Sched{% if has_live %}&shy;{% endif %}uled</th>{% endif %}
+                            {% if has_live %}<th scope="col">Ex{% if has_scheduled %}&shy;{% endif %}pected</th>{% endif %}
                             {% if indicator_prefix %}
                                 <th scope="col">{{ indicator_prefix }}</th>
                             {% endif %}
@@ -75,10 +75,10 @@
 
     {% if when %}
         {% if next_page %}
-            <p class="next"><a href="{% querystring date=next_page.date time=next_page.time %}">{% if when.date < next_page.date %}{{ next_page.date|date:"l j F" }}{% else %}later{% endif %} &darr;</a></p>
+            <p class="next"><a href="{% querystring date=next_page.date time=next_page.time %}">{% if when.date < next_page.date %}{{ next_page.date|date:"l j F" }}{% else %}Later{% endif %} &darr;</a></p>
         {% endif %}
         {% if when != now %}
-            <p><a href="{{ object.get_absolute_url }}">&uarr; now</a></p>
+            <p><a href="{{ object.get_absolute_url }}">&uarr; Now</a></p>
         {% endif %}
     {% endif %}
 </div>
