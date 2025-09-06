@@ -5,7 +5,7 @@ on:
   pull_request:
 
 jobs:
-  test-frontend:
+  tests:
     runs-on: ubuntu-24.04
     timeout-minutes: 5
 
@@ -25,6 +25,21 @@ jobs:
     - run: npm test
     - run: npm run build
 
+    - uses: actions/upload-artifact@v4.4.3
+      with:
+        name: dist
+        path: busstops/static
+        if-no-files-found: error
+
+  build:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+
+    permissions:
+      contents: read
+      packages: write
+
+    steps:
     - name: Tailscale
       uses: jaxxstorm/action-setup-tailscale@v0.0.1
       with:
@@ -33,12 +48,6 @@ jobs:
 
         version: latest
         statedir: /tmp/tailscale-state/
-
-    - uses: actions/upload-artifact@v4.4.3
-      with:
-        name: dist
-        path: busstops/static
-        if-no-files-found: error
 
     - uses: docker/setup-qemu-action@v3
     - uses: docker/setup-buildx-action@v3
@@ -51,7 +60,7 @@ jobs:
         password: ${{ secrets.GITHUB_TOKEN }}
         cache: true
 
-    - name: Build and push container to GHCR
+    - name: Build and push container to GitHub CR
       uses: docker/build-push-action@v5
       with:
           context: .
