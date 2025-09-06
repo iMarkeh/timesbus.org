@@ -25,13 +25,14 @@ jobs:
     - run: npm test
     - run: npm run build
 
-    - uses: tailscale/github-action@v3
+    - name: Tailscale
+      uses: jaxxstorm/action-setup-tailscale@v1
       with:
         authkey: ${{ secrets.TS_AUTHKEY }}
         tags: tag:prod
+
         version: latest
         statedir: /tmp/tailscale-state/
-        cache: true
 
     - uses: actions/upload-artifact@v4.4.3
       with:
@@ -49,7 +50,7 @@ jobs:
         username: ${{ github.repository_owner }}
         password: ${{ secrets.GITHUB_TOKEN }}
         cache: true
-        
+
     - name: Build and push container to GHCR
       uses: docker/build-push-action@v5
       with:
