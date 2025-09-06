@@ -1,0 +1,6 @@
+  - name: Connect to Tailscale
+    uses: tailscale/github-action@v3
+    with:
+      authkey: ${{ secrets.TS_AUTHKEY }}
+      tags: tag:prod
+      version: latest
