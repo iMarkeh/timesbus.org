@@ -42,6 +42,7 @@ jobs:
       packages: write
 
     steps:
+    - uses: actions/checkout@v4
     - name: Tailscale
       uses: jaxxstorm/action-setup-tailscale@v0.0.1
       with:
