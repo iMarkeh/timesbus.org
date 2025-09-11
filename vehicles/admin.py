@@ -434,7 +434,7 @@ class BulkVehicleCreationAdmin(admin.ModelAdmin):
                 if livery:
                     vehicle_data['livery'] = livery
 
-                if vehicle_reg:
+                if vehicle_regs:
                     vehicle_data['reg'] = vehicle_regs[i]
                 # Handle fleet number assignment
                 if fleet_numbers and i < len(fleet_numbers):
