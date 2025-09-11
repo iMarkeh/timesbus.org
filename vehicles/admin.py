@@ -393,11 +393,13 @@ class BulkVehicleCreationAdmin(admin.ModelAdmin):
         source = cleaned_data['source']
         vehicle_codes_text = cleaned_data['vehicle_codes']
         fleet_numbers_text = cleaned_data.get('fleet_numbers', '').strip()
+        vehicle_regs_text = cleaned_data.get('vehicle_regs', '').strip()
         fleet_number_start = cleaned_data.get('fleet_number_start')
         vehicle_type = cleaned_data.get('vehicle_type')
         livery = cleaned_data.get('livery')
 
         vehicle_codes = [code.strip() for code in vehicle_codes_text.strip().split('\n') if code.strip()]
+    
 
         # Parse fleet numbers if provided
         fleet_numbers = []
@@ -405,6 +407,9 @@ class BulkVehicleCreationAdmin(admin.ModelAdmin):
             fleet_numbers = [num.strip() for num in fleet_numbers_text.split('\n') if num.strip()]
             # Convert to integers, skip invalid entries
             fleet_numbers = [int(num) for num in fleet_numbers if num.isdigit()]
+
+        if vehicle_regs_text:
+            vehicle_regs = [reg.strip() for reg in vehicle_regs_text.strip().split('\n') if reg.strip()]
 
         created_count = 0
         skipped_count = 0
@@ -416,7 +421,7 @@ class BulkVehicleCreationAdmin(admin.ModelAdmin):
                 if models.Vehicle.objects.filter(code=vehicle_code, operator=operator).exists():
                     skipped_count += 1
                     continue
-
+                
                 # Create the vehicle
                 vehicle_data = {
                     'code': vehicle_code,
@@ -429,6 +434,8 @@ class BulkVehicleCreationAdmin(admin.ModelAdmin):
                 if livery:
                     vehicle_data['livery'] = livery
 
+                if vehicle_reg:
+                    vehicle_data['reg'] = vehicle_regs[i]
                 # Handle fleet number assignment
                 if fleet_numbers and i < len(fleet_numbers):
                     # Use individual fleet number
