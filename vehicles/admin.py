@@ -403,6 +403,7 @@ class BulkVehicleCreationAdmin(admin.ModelAdmin):
 
         # Parse fleet numbers if provided
         fleet_numbers = []
+        vehicle_regs = []
         if fleet_numbers_text:
             fleet_numbers = [num.strip() for num in fleet_numbers_text.split('\n') if num.strip()]
             # Convert to integers, skip invalid entries
@@ -436,6 +437,7 @@ class BulkVehicleCreationAdmin(admin.ModelAdmin):
 
                 if vehicle_regs:
                     vehicle_data['reg'] = vehicle_regs[i]
+
                 # Handle fleet number assignment
                 if fleet_numbers and i < len(fleet_numbers):
                     # Use individual fleet number
