@@ -25,7 +25,7 @@ class BulkVehicleCreationForm(ModelForm):
     )
     vehicle_regs = CharField(
         widget=Textarea(attrs={'rows': 10, 'cols': 50}),
-        help_text="Optional: Enter vehicle registrations, one per line (e.g., YY67 HBG, YJ18 DHC)",
+        help_text="Optional: Enter vehicle registrations, one per line (must match number of vehicle codes). Leave blank if not available.",
         required=False
     )
     fleet_numbers = CharField(
@@ -56,17 +56,27 @@ class BulkVehicleCreationForm(ModelForm):
         fleet_numbers_text = cleaned_data.get('fleet_numbers', '').strip()
         vehicle_regs_text = cleaned_data.get('vehicle_regs', '').strip()
 
+        vehicle_codes = []
+        if vehicle_codes_text:
+            vehicle_codes = [code.strip() for code in vehicle_codes_text.split('\n') if code.strip()]
 
+        vehicle_regs = []
         if vehicle_regs_text:
             vehicle_regs = [reg.strip() for reg in vehicle_regs_text.split('\n') if reg.strip()]
 
-        if vehicle_codes_text and fleet_numbers_text:
-            vehicle_codes = [code.strip() for code in vehicle_codes_text.split('\n') if code.strip()]
+        fleet_numbers = []
+        if fleet_numbers_text:
             fleet_numbers = [num.strip() for num in fleet_numbers_text.split('\n') if num.strip()]
-            
-            if len(vehicle_codes) != len(fleet_numbers):
+
+        # Validate counts match if provided
+        if vehicle_codes:
+            if fleet_numbers and len(vehicle_codes) != len(fleet_numbers):
                 raise forms.ValidationError(
                     f"Number of vehicle codes ({len(vehicle_codes)}) must match number of fleet numbers ({len(fleet_numbers)})"
+                )
+            if vehicle_regs and len(vehicle_codes) != len(vehicle_regs):
+                raise forms.ValidationError(
+                    f"Number of vehicle codes ({len(vehicle_codes)}) must match number of vehicle registrations ({len(vehicle_regs)})"
                 )
 
         return cleaned_data
@@ -407,6 +417,7 @@ class BulkVehicleCreationAdmin(admin.ModelAdmin):
             # Convert to integers, skip invalid entries
             fleet_numbers = [int(num) for num in fleet_numbers if num.isdigit()]
 
+        vehicle_regs = []
         if vehicle_regs_text:
             vehicle_regs = [reg.strip() for reg in vehicle_regs_text.strip().split('\n') if reg.strip()]
 
@@ -441,6 +452,10 @@ class BulkVehicleCreationAdmin(admin.ModelAdmin):
                     # Use sequential numbering
                     vehicle_data['fleet_number'] = current_fleet_number
                     current_fleet_number += 1
+
+                # Handle vehicle registration assignment
+                if vehicle_regs and i < len(vehicle_regs):
+                    vehicle_data['reg'] = vehicle_regs[i]
 
                 models.Vehicle.objects.create(**vehicle_data)
                 created_count += 1
