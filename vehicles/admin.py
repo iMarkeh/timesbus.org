@@ -57,15 +57,8 @@ class BulkVehicleCreationForm(ModelForm):
         vehicle_regs_text = cleaned_data.get('vehicle_regs', '').strip()
 
 
-        if vehicle_regs and vehicle_codes:
-            vehicle_codes = [code.strip() for code in vehicle_codes_text.split('\n') if code.strip()]
+        if vehicle_regs_text:
             vehicle_regs = [reg.strip() for reg in vehicle_regs_text.split('\n') if reg.strip()]
-            if len(vehicle_regs) != len(vehicle_codes):
-                raise forms.ValidationError(
-                    f"Number of vehicle regs ({len(vehicle_regs)}) must match number of vehicle codes ({len(vehicle_codes)})"
-                )
-        
-        
 
         if vehicle_codes_text and fleet_numbers_text:
             vehicle_codes = [code.strip() for code in vehicle_codes_text.split('\n') if code.strip()]
@@ -409,9 +402,6 @@ class BulkVehicleCreationAdmin(admin.ModelAdmin):
 
         # Parse fleet numbers if provided
         fleet_numbers = []
-        vehicle_regs = []
-        if vehicle_regs:
-            vehicle_data['reg'] = vehicle_regs[i]
         if fleet_numbers_text:
             fleet_numbers = [num.strip() for num in fleet_numbers_text.split('\n') if num.strip()]
             # Convert to integers, skip invalid entries
