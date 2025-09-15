@@ -1,7 +1,7 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.1/jquery.min.js" integrity="sha512-v2CJ7UaYy4JwqLDIrZUI/4hqeoQieOmAZNXBeQyjo21dadnwR+8ZaIJVT8EE2iyI61OV8e6M8PP2/4hpQINQ/g==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
 <script>
     function fetchRandomQuote() {
-        $.getJSON("https://eden.apilogic.uk/quotes?api_key=v1.public.5kqcqoqufql333aft60ttg?limit=10000&published=1&random_quote=true&tags=tt", function (quotes) {
+        $.getJSON("https://eden.apilogic.uk/quotes?limit=10000&published=1&random_quote=true&tags=tt&api_key=v1.public.5kqcqoqufql333aft60ttg", function (quotes) {
             if (quotes.length === 0) {
                 $(".quote-text").text(" ")
                 return;
@@ -13,7 +13,7 @@
         })
     }
     function fetchAprilQuote() {
-        $.getJSON("https://eden.apilogic.uk/quotes?api_key=v1.public.5kqcqoqufql333aft60ttg?limit=10000&published=1&random_quote=true&tags=april-one", function (quotes) {
+        $.getJSON("https://eden.apilogic.uk/quotes?limit=10000&published=1&random_quote=true&tags=april-one&api_key=v1.public.5kqcqoqufql333aft60ttg", function (quotes) {
             if (quotes.length === 0) {
                 $(".quote-text").text(" ")
                 return;
