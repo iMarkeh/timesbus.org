@@ -466,7 +466,12 @@ def vehicles_json(request) -> JsonResponse:
                             or item.get("service")
                             and item["service"]["line_name"],
                         }
-                    journeys_to_cache_later[journey_cache_key] = journey
+                    if vehicle.latest_journey_id == item["journey_id"]:
+                        journeys_to_cache_later[journey_cache_key] = journey
+                    else:
+                        logging.warning(
+                            f"{vehicle=} {vehicle.latest_journey_id=} {item['journey_id']=}"
+                        )
                     item.update(journey)
 
             if (
@@ -495,6 +500,7 @@ def vehicles_json(request) -> JsonResponse:
         response.status_code = HTTPStatus.NOT_FOUND
 
     return respond_conditionally(request, response)
+
 
 
 def get_dates(vehicle=None, service=None):
